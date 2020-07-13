@@ -23,6 +23,8 @@
     "typescript": "^3.3.3"
   },
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "graphql-constraint-directive": "^2.0.3",
+    "neo4j-graphql-js": "^2.14.4"
   }
 }
