@@ -51,17 +51,9 @@ func (r *repo) VerifyToken(profileId string, token string) (verified bool, err e
 
 	log.Infof("Searching for user: %s", profileId)
 
-	// result, err := session.Run("MATCH (this: User { id: $id }) RETURN this", map[string]interface{}{
-	// 	"id": profileId,
-	// })
 	result, err := session.Run("MATCH (this: User {id: $id} ) RETURN this.accessToken", map[string]interface{}{
 		"id": profileId,
 	})
-
-	if result == nil {
-		err = server_error.New("result is nill what the fuck", http.StatusInternalServerError)
-		return
-	}
 
 	if err != nil {
 		return
@@ -76,7 +68,6 @@ func (r *repo) VerifyToken(profileId string, token string) (verified bool, err e
 	}
 
 	accessToken := result.Record().GetByIndex(0)
-	log.Debugf("AccessToken: $s", accessToken)
 	verified = accessToken == token
 	return
 }
