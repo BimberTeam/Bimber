@@ -16,7 +16,12 @@ const init = async (driver) => {
 init(driver);
 
 const server = new ApolloServer({
-  context: { driver, neo4jDatabase: process.env.NEO4J_DATABASE },
+  context: ({ req }) => {
+    return {
+      driver,
+      req,
+    };
+  },
   introspection: true,
   playground: true,
   schema,

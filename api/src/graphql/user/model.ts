@@ -1,0 +1,36 @@
+
+export const User = `
+    type User @isAuthenticated {
+        id: ID!
+        name: String!
+        email: String!
+        password: String!
+        imageUrl: String
+        age: Int!
+        friends: [User!]! @relation(name: "FRIENDS", direction: "OUT")
+        location: Point
+        favoriteDrinkName: String!
+        favoriteDrinkCategory: DrinkCategory!
+        description: String!
+        gender: Gender!
+        genderPreference: Gender!
+        drinkPreference: DrinkCategory!
+        agePreference: Int!
+    }
+
+    enum DrinkCategory {
+        Vodka
+        Beer
+        Wine
+    }
+
+    enum Gender {
+        Male
+        Female
+    }
+
+    type Cords{
+        longitude: Float,
+        latitude: Float
+    }
+`;
