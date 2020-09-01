@@ -1,25 +1,25 @@
 import { ApolloServer } from "apollo-server-express";
 import dotenv from "dotenv";
 import express from "express";
+import { checkToken, verifyToken } from "./auth/auth";
 import { driver } from "./database/config";
-import { initializeDatabase } from "./database/initialize";
+import { initDatabase } from "./database/initialize";
 import { schema } from "./graphql/schema";
 
 dotenv.config();
 
 const app = express();
 
-const init = async (driver) => {
-  await initializeDatabase(driver);
-};
-
-init(driver);
+initDatabase(driver);
 
 const server = new ApolloServer({
-  context: ({ req }) => {
+  context: ({ req, connection}) => {
+    const token = checkToken(req, connection);
+    const user = verifyToken(token);
     return {
       driver,
       req,
+      user,
     };
   },
   introspection: true,

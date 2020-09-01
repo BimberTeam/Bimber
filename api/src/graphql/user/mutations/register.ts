@@ -1,7 +1,7 @@
 import { ApolloError } from "apollo-server";
-import crypto from "crypto";
 import neo4j from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
+import { hashPassword } from "../../../auth/auth";
 
 export default async (obj, params, ctx, resolveInfo) => {
     const session = ctx.driver.session();
@@ -12,10 +12,7 @@ export default async (obj, params, ctx, resolveInfo) => {
         params.userInput.location.latitude,
     );
 
-    params.userInput.password = crypto.createHmac(
-        "sha256",
-        process.env.HASH_SECRET,
-    ).update(params.userInput.password).digest("hex");
+    params.userInput.password = hashPassword(params.userInput.password);
 
     const findUserRes = await session.run(
         `

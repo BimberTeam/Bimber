@@ -6,9 +6,6 @@ const driver = neo4j.driver(
     process.env.NEO4J_USER || "neo4j",
     process.env.NEO4J_PASSWORD || "letmein",
   ),
-  {
-    encrypted: process.env.NEO4J_ENCRYPTED ? "ENCRYPTION_ON" : "ENCRYPTION_OFF",
-  },
 );
 
 export { driver};
