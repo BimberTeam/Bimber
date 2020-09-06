@@ -1,37 +1,31 @@
 export const UserInputs = `
-enum drinkCategory {
-    Vodka
-    Beer
-    Wine
-}
-
-input registerUserInput {
+input RegisterUserInput {
     name: String!
     email: String!
     password: String!
     imageUrl: String
     age: Int!
-    location: Point
-    favoriteDrinkName: String!
-    favoriteDrinkCategory: drinkCategory!
+    latestLocation: Point
+    favoriteAlcoholName: String!
+    favoriteAlcoholType: AlcoholType!
     description: String!
     gender: Gender!
     genderPreference: Gender!
-    drinkPreference: drinkCategory!
+    alcoholPreference: AlcoholType!
     agePreference: Int!
 }
 
-type limitedInfoAboutUser {
+type publicUser {
     name: String!
     email: String!
     imageUrl: String
     age: Int!
-    favoriteDrinkName: String!
-    favoriteDrinkCategory: DrinkCategory!
+    favoriteAlcoholName: String!
+    favoriteAlcoholType: AlcoholType!
     description: String!
     gender: Gender!
     genderPreference: Gender!
-    drinkPreference: DrinkCategory!
+    alcoholPreference: AlcoholType!
     agePreference: Int!
 }
 `;

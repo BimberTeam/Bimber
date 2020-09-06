@@ -9,5 +9,7 @@
     "outDir": "dist",
     "skipLibCheck": true
   },
-  "lib": ["es2015"]
+  "lib": [
+    "es2015"
+  ]
 }

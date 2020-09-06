@@ -1,9 +1,10 @@
 import { ApolloError } from "apollo-server"
+import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { getValueFromSessionResult } from "../../utils/helper";
 
 export default async (obj, params, ctx, resolveInfo) => {
-    const session = ctx.driver.session();
+    const session: Session = ctx.driver.session();
     if (ctx.user === null) {
         throw new ApolloError("Not authorized", "405", ["You are not allowed to do that"]);
     }
@@ -19,14 +20,14 @@ export default async (obj, params, ctx, resolveInfo) => {
         throw new ApolloError("You already belongs to this group !", "200", ["You already belongs to this group!"]);
     }
 
-    const memberQuantity = await session.run(
+    const membersCount = await session.run(
         `
         MATCH (g: Group {id: ${params.id}})<-[:BELONGS_TO]-(u:User)
-        RETURN count(*) AS memberQuantity
+        RETURN count(*) AS membersCount
         `,
     );
 
-    if (getValueFromSessionResult(memberQuantity, "memberQuantity").low === 0) {
+    if (getValueFromSessionResult(membersCount, "membersCount").low === 0) {
         const alreadyMatched = await session.run(
             `
             MATCH (g: Group {id: ${params.id}})-[:OWNER]-(u:User)
@@ -49,8 +50,6 @@ export default async (obj, params, ctx, resolveInfo) => {
             `,
         );
 
-        console.log(getValueFromSessionResult(isPending, "result"));
-
         if (getValueFromSessionResult(isPending, "result") === false) {
             const checkPending = await session.run(
                 `
@@ -70,16 +69,16 @@ export default async (obj, params, ctx, resolveInfo) => {
             `,
         );
 
-        if (alreadyRequested.records[0].get("result")  === true) {
+        if (alreadyRequested.records[0].get("result") === true) {
             throw new ApolloError("You already requested to this group !",
-             "200", ["You already requested to this group!"]);
+                "200", ["You already requested to this group!"]);
         }
     }
 
     params.email = ctx.user.email;
-    params.meID = ctx.user.id.low;
+    params.meId = ctx.user.id.low;
     params.ttl = process.env.NEO4J_TTL;
-    params.memberQuantity = memberQuantity.records[0].get("memberQuantity").low;
+    params.membersCount = membersCount.records[0].get("membersCount").low;
 
     return neo4jgraphql(obj, params, ctx, resolveInfo, true);
 };

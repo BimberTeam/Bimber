@@ -1,21 +1,25 @@
-export const initializeDatabase = (driver: any) => {
-    const initCypher = `
-        CALL apoc.schema.assert(
-          {}, {User: ["id"], Group: ["id"]}
-        )`;
-    const executeQuery = (driver: { session: () => any; }) => {
-      const session = driver.session();
-      return session
-        .writeTransaction((tx) => tx.run(initCypher))
-        .then()
-        .finally(() => session.close());
-    };
+import { Driver, Session } from "neo4j-driver";
 
-    executeQuery(driver).catch((error) => {
-      console.error("Database initialization failed to complete\n", error.message);
-    });
+/*
+  The createIndexes function is responsible for create indexes
+  for table User and Group, and ensure that neo4j database was launched correctly
+*/
+export const createIndexes = async (driver: Driver): Promise<void> => {
+  const initCypher: string = `
+    CALL apoc.schema.assert(
+      {}, {User: ["id"], Group: ["id"]}
+    )
+  `;
+
+  const session: Session = driver.session();
+  try {
+    await session.run(initCypher);
+    await session.close();
+  } catch (error) {
+    console.error("Database initialization failed to complete\n", error.message);
+  }
 };
 
-export const initDatabase = async (driver) => {
-  await initializeDatabase(driver);
+export const initializeDatabase = async (driver: Driver): Promise<void> => {
+  await createIndexes(driver);
 };

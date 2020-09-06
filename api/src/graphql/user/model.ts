@@ -11,17 +11,17 @@ export const User = `
         friends: [User!]! @relation(name: "FRIENDS", direction: "OUT")
         requestedFriends: [User!]! @relation(name: "REQUESTED_FRIENDS", direction: "OUT")
         groupInvitations: [User!]! @relation(name: "GROUP_INVITATION", direction: "OUT")
-        location: Point
-        favoriteDrinkName: String!
-        favoriteDrinkCategory: DrinkCategory!
+        latestLocation: Point
+        favoriteAlcoholName: String!
+        favoriteAlcoholType: AlcoholType!
         description: String!
         gender: Gender!
         genderPreference: Gender!
-        drinkPreference: DrinkCategory!
+        alcoholPreference: AlcoholType!
         agePreference: Int!
     }
 
-    enum DrinkCategory {
+    enum AlcoholType {
         Vodka
         Beer
         Wine
@@ -32,7 +32,7 @@ export const User = `
         Female
     }
 
-    type Cords{
+    type Coords{
         longitude: Float,
         latitude: Float
     }

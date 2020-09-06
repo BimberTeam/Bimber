@@ -4,7 +4,7 @@ import { Group } from "./group/model";
 import { GroupMutations } from "./group/mutations/mutations";
 import swipe from "./group/mutations/swipe";
 import { GroupQueries } from "./group/queries";
-import {UserInputs} from "./user/inputs";
+import { UserInputs } from "./user/inputs";
 import { User } from "./user/model";
 import login from "./user/mutations/login";
 import { UserMutations } from "./user/mutations/mutations";
@@ -35,26 +35,26 @@ const resolvers = {
     me(object, params, ctx, resolveInfo) {
       return getUserInfoFromContex(object, params, ctx, resolveInfo);
     },
-    addFriend(object, params, ctx, resolveInfo) {
+    friendRequest(object, params, ctx, resolveInfo) {
       return getUserInfoFromContex(object, params, ctx, resolveInfo);
     },
-    deleteFriend(object, params, ctx, resolveInfo) {
+    removeFriend(object, params, ctx, resolveInfo) {
       return getUserInfoFromContex(object, params, ctx, resolveInfo);
     },
-    sendFriendInvitation(object, params, ctx, resolveInfo) {
+    sendFriendRequest(object, params, ctx, resolveInfo) {
       return getUserInfoFromContex(object, params, ctx, resolveInfo);
     },
-    rejectFriendInvitation(object, params, ctx, resolveInfo) {
+    cancelFriendRequest(object, params, ctx, resolveInfo) {
       return getUserInfoFromContex(object, params, ctx, resolveInfo);
     },
     register,
     swipe,
   },
   Query: {
-    getInfoAboutUser(object, params, ctx, resolveInfo) {
+    user(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
-    getInfoAboutGroup(object, params, ctx, resolveInfo) {
+    group(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
   },

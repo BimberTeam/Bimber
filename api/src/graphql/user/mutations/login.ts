@@ -1,20 +1,26 @@
 import { ApolloError } from "apollo-server";
-import { hashPassword } from "../../../auth/auth";
+import { Session } from "neo4j-driver";
+import { verifyPassword } from "../../../auth/auth";
 import { createToken } from "../../../auth/auth";
 import { getValueFromSessionResult } from "./../../utils/helper";
 
 export default async (obj, params, ctx, resolveInfo) => {
-    const session = ctx.driver.session();
-    params.password = hashPassword(params.password);
+    const session: Session = ctx.driver.session();
 
     const findUser = await session.run(
         `
-        MATCH (user:User {email: "${params.email}", password:"${params.password}"}) return user
+        MATCH (user:User {email: "${params.email}"}) return user
         `,
     );
 
     if (findUser.records.length === 0) {
-        throw new ApolloError("Incorrect password or email !", "200", ["Incorrect password or email !"]);
+        throw new ApolloError("Incorrect Email !", "200", ["Incorrect Email !"]);
+    }
+
+    const hashedPassword = findUser.records[0].get("user").properties.password;
+
+    if (!verifyPassword(params.password, hashedPassword)) {
+        throw new ApolloError("Incorrect Password !", "200", ["Incorrect Password !"]);
     }
 
     const user = {

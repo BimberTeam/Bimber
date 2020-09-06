@@ -1,9 +1,9 @@
 export const UserMutations = `
-    addFriend(friendID: Int!): String
+    friendRequest(friendId: Int!): String
     @cypher(
     statement: """
-        MATCH(a: User { id: $meID })
-        MATCH(b: User { id: $friendID })
+        MATCH(a: User { id: $meId })
+        MATCH(b: User { id: $friendId })
         OPTIONAL MATCH(a)-[fa:REQUESTED_FRIENDS]->(b)
         OPTIONAL MATCH(b)-[fb:REQUESTED_FRIENDS]->(a)
         DELETE fa, fb
@@ -22,11 +22,11 @@ export const UserMutations = `
     """
     )
 
-    deleteFriend(friendID: Int!): String
+    removeFriend(friendId: Int!): String
     @cypher(
     statement: """
-        MATCH(a: User { id: $meID })
-        MATCH(b: User { id: $friendID })
+        MATCH(a: User { id: $meId })
+        MATCH(b: User { id: $friendId })
         OPTIONAL MATCH (a)-[fa:FRIENDS]->(b)
         OPTIONAL MATCH (b)-[fb:FRIENDS]->(a)
         DELETE fa, fb
@@ -34,10 +34,10 @@ export const UserMutations = `
     """
     )
 
-    sendFriendInvitation(userInvitedID: Int!): String
+    sendFriendRequest(userInvitedID: Int!): String
     @cypher(
     statement: """
-        MATCH(a: User { id: $meID })
+        MATCH(a: User { id: $meId })
         MATCH(b: User { id: $userInvitedID })
         CALL apoc.do.case([
             EXISTS((a)-[:FRIENDS]->(b))=true OR EXISTS((b)-[:FRIENDS]->(a))=true,
@@ -71,18 +71,18 @@ export const UserMutations = `
     """
     )
 
-    rejectFriendInvitation(inviterID: Int!): String
+    cancelFriendRequest(userId: Int!): String
     @cypher(
     statement: """
-        MATCH(a: User { id: $meID })
-        MATCH(b: User { id: $inviterID })
+        MATCH(a: User { id: $meId })
+        MATCH(b: User { id: $userId })
         MATCH (a)-[f:REQUESTED_FRIENDS]->(b)
         DELETE f
         RETURN 'Invitation rejected'
     """
     )
 
-    register(userInput: registerUserInput): String
+    register(userInput: RegisterUserInput): String
     @cypher(
     statement: """
         CREATE (u:User {
@@ -91,9 +91,9 @@ export const UserMutations = `
             password: $userInput.password,
             imageUrl: $userInput.imageUrl,
             age: $userInput.age,
-            location: $userInput.location,
-            favoriteDrinkName: $userInput.favoriteDrinkName,
-            favoriteDrinkCategory: $userInput.favoriteDrinkCategory,
+            latestLocation: $userInput.latestLocation,
+            favoriteAlcoholName: $userInput.favoriteAlcoholName,
+            favoriteAlcoholType: $userInput.favoriteAlcoholType,
             description: $userInput.description,
             gender: $userInput.gender,
             genderPreference: $userInput.genderPreference,

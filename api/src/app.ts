@@ -1,19 +1,30 @@
 import { ApolloServer } from "apollo-server-express";
 import dotenv from "dotenv";
 import express from "express";
+import neo4j from "neo4j-driver";
 import { checkToken, verifyToken } from "./auth/auth";
-import { driver } from "./database/config";
-import { initDatabase } from "./database/initialize";
+import { initializeDatabase } from "./database/initialize";
 import { schema } from "./graphql/schema";
+
+const driver = neo4j.driver(
+  process.env.NEO4J_URI || "bolt://localhost:7687",
+  neo4j.auth.basic(
+    process.env.NEO4J_USER || "neo4j",
+    process.env.NEO4J_PASSWORD || "letmein",
+  ),
+  {
+    encrypted: process.env.NEO4J_ENCRYPTED ? "ENCRYPTION_ON" : "ENCRYPTION_OFF",
+  },
+);
 
 dotenv.config();
 
 const app = express();
 
-initDatabase(driver);
+initializeDatabase(driver);
 
 const server = new ApolloServer({
-  context: ({ req, connection}) => {
+  context: ({ req, connection }) => {
     const token = checkToken(req, connection);
     const user = verifyToken(token);
     return {
