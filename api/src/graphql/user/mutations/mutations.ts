@@ -92,23 +92,32 @@ export const AccountMutations = `
     """
     )
 
-    register(userInput: RegisterAccountInput): String
+    updateAccount(account:UpdateAccountInput!): User
+    @cypher(
+        statement: """
+            MATCH(a: Account { id: $meId })
+            SET a += apoc.map.fromLists($keys,$values)
+            RETURN a
+        """
+    )
+
+    register(user: RegisterAccountInput): String
     @cypher(
     statement: """
         CREATE (u:Account {
-            name: $userInput.name,
-            email: $userInput.email,
-            password: $userInput.password,
-            imageUrl: $userInput.imageUrl,
-            age: $userInput.age,
-            latestLocation: $userInput.latestLocation,
-            favoriteAlcoholName: $userInput.favoriteAlcoholName,
-            favoriteAlcoholType: $userInput.favoriteAlcoholType,
-            description: $userInput.description,
-            gender: $userInput.gender,
-            genderPreference: $userInput.genderPreference,
-            agePreference: $userInput.agePreference,
-            alcoholPreference: $userInput.alcoholPreference
+            name: $user.name,
+            email: $user.email,
+            password: $user.password,
+            imageUrl: $user.imageUrl,
+            age: $user.age,
+            latestLocation: $user.latestLocation,
+            favoriteAlcoholName: $user.favoriteAlcoholName,
+            favoriteAlcoholType: $user.favoriteAlcoholType,
+            description: $user.description,
+            gender: $user.gender,
+            genderPreference: $user.genderPreference,
+            agePreference: $user.agePreference,
+            alcoholPreference: $user.alcoholPreference
         })
         CREATE (g: Group)
         SET u.id = id(u)
