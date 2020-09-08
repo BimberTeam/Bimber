@@ -1,6 +1,6 @@
 
-export const User = `
-    type User {
+export const Account = `
+    type Account {
         id: ID!
         name: String!
         email: String!
@@ -8,9 +8,9 @@ export const User = `
         imageUrl: String
         token: String
         age: Int!
-        friends: [User!]! @relation(name: "FRIENDS", direction: "OUT")
-        requestedFriends: [User!]! @relation(name: "REQUESTED_FRIENDS", direction: "OUT")
-        groupInvitations: [User!]! @relation(name: "GROUP_INVITATION", direction: "OUT")
+        friends: [Account!]! @relation(name: "FRIENDS", direction: "OUT")
+        requestedFriends: [Account!]! @relation(name: "REQUESTED_FRIENDS", direction: "OUT")
+        groupInvitations: [Account!]! @relation(name: "GROUP_INVITATION", direction: "OUT")
         latestLocation: Point
         favoriteAlcoholName: String!
         favoriteAlcoholType: AlcoholType!

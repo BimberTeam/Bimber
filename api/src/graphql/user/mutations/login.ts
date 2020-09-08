@@ -7,33 +7,33 @@ import { getValueFromSessionResult } from "./../../utils/helper";
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
-    const findUser = await session.run(
+    const findAccount = await session.run(
         `
-        MATCH (user:User {email: "${params.email}"}) return user
+        MATCH (account:Account {email: "${params.email}"}) return account
         `,
     );
 
-    if (findUser.records.length === 0) {
+    if (findAccount.records.length === 0) {
         throw new ApolloError("Incorrect Email !", "200", ["Incorrect Email !"]);
     }
 
-    const hashedPassword = findUser.records[0].get("user").properties.password;
+    const hashedPassword = findAccount.records[0].get("account").properties.password;
 
     if (!verifyPassword(params.password, hashedPassword)) {
         throw new ApolloError("Incorrect Password !", "200", ["Incorrect Password !"]);
     }
 
-    const user = {
-        email: findUser.records[0].get("user").properties.email,
-        id: findUser.records[0].get("user").properties.id,
+    const account = {
+        email: findAccount.records[0].get("account").properties.email,
+        id: findAccount.records[0].get("account").properties.id,
     };
 
-    const token = createToken(user.email, user.id);
+    const token = createToken(account.id);
 
     const setToken = await session.run(
         `
-        MATCH (user:User {email: "${params.email}"})
-        SET user.token = '${token}'
+        MATCH (account:Account {email: "${params.email}"})
+        SET account.token = '${token}'
         return 'ok' AS result
         `,
     );
@@ -41,6 +41,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     if (getValueFromSessionResult(setToken, "result") !== "ok") {
         throw new ApolloError("Unexpected Error !", "200", ["Unexpected Error!"]);
     }
+    await session.close();
 
     return token;
 };

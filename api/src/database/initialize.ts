@@ -1,13 +1,14 @@
 import { Driver, Session } from "neo4j-driver";
 
 /*
-  The createIndexes function is responsible for create indexes
-  for table User and Group, and ensure that neo4j database was launched correctly
+  `createIndexes` creates indexes for both types: `Account` and `Group`.
+  It is supposed to magically ensure that neo4j database is launched correctly every time.
+  I have not idea why it is like that but I have seen it somewhere so I decided to keep it that way.
 */
 export const createIndexes = async (driver: Driver): Promise<void> => {
   const initCypher: string = `
     CALL apoc.schema.assert(
-      {}, {User: ["id"], Group: ["id"]}
+      {}, {Account: ["id"], Group: ["id"]}
     )
   `;
 

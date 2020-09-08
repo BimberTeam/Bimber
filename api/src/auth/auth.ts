@@ -1,28 +1,27 @@
 import { ApolloError } from "apollo-server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Integer } from "neo4j-driver";
 
-interface ITokenInfo {
+interface TokenInfo {
     email: string;
-    id: { low: Integer, high: Integer };
-    iat: Integer;
-    exp: Integer;
+    id: { low: number, high: number };
+    iat: number;
+    exp: number;
 }
 
-export const createToken = (email: string, id: string): string => {
-    return jwt.sign({ email, id }, process.env.JWT_SECRET, { expiresIn: process.env.TOKEN_EXPIRE_TIME });
+export const createToken = (id: string): string => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.TOKEN_EXPIRE_TIME });
 };
 
-export const verifyToken = (token: string): ITokenInfo => {
-    let decodedUser;
+export const verifyToken = (token: string): TokenInfo => {
+    let decodedAccount;
     if (!token) { return null; }
     try {
-        decodedUser = jwt.verify(token, process.env.JWT_SECRET);
+        decodedAccount = jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {
         throw new ApolloError("Invalid token", "401", ["Token is invalid!"]);
     }
-    return decodedUser;
+    return decodedAccount;
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
@@ -33,7 +32,7 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
     return await bcrypt.compare(password, hash);
 };
 
-export const checkToken = (req, connection): string => {
+export const retrieveToken = (req, connection): string => {
     if (connection) {
         return connection.context.token;
     }

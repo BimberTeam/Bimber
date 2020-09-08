@@ -3,11 +3,12 @@ export const GroupMutations = `
         Parameters:\n
         id: Int - id of group which you want to join\n
         Description: \n
-        If this group is one-person, this mutation will create new group
-        and a relationship BELONGS_TO between you, the owner of swiped group and
-        a group just created.\n
-        But if this group have more than one member, will be send a request to join
-        to this group (relationship REQUESTED). And you have to wait for group vote result.\n
+        If requested group consists of a single person new group will be created containing both:
+        - current user
+        - requested group's owner
+
+        Otherwise new relationship ('REQUESTED') will be created between the caller and requested group.
+        Caller will be pending until accepted by majority of the group members.
     """
     swipe(id: Int): String
     @cypher(
@@ -17,22 +18,22 @@ export const GroupMutations = `
             $membersCount = 0,
             \\"
                 WITH $g AS g, $ttl AS ttl
-                MATCH (g)<-[:OWNER]-(swipedUser:User)
-                MATCH (meGroup: Group)-[b:OWNER]-(me:User {id: $meId})
-                MATCH (swipedUser)-[pen:PENDING]->(meGroup)
+                MATCH (g)<-[:OWNER]-(swipedAccount:Account)
+                MATCH (meGroup: Group)-[b:OWNER]-(me:Account {id: $meId})
+                MATCH (swipedAccount)-[pen:PENDING]->(meGroup)
                 DELETE pen
                 CREATE(group: Group)
                 SET group.id = id(group)
                 SET group:TTL
                 SET group.ttl = timestamp() + toInteger(ttl)
                 MERGE(me)-[:BELONGS_TO]->(group)
-                MERGE(swipedUser)-[:BELONGS_TO]->(group)
-                RETURN 'ok' AS res
+                MERGE(swipedAccount)-[:BELONGS_TO]->(group)
+                RETURN 'Sent swipe request!' AS res
             \\",
             \\"
-                MATCH(me: User{id: $meId})
+                MATCH(me: Account{id: $meId})
                 MERGE(me)-[:REQUESTED]->(g)
-                RETURN 'ok' AS res
+                RETURN 'ok!' AS res
             \\",
             {g:g, meId:$meId, ttl:ttl}
         ) YIELD value
@@ -40,7 +41,4 @@ export const GroupMutations = `
         """
     )
 
-`;
-
-export const UserInputs = `
 `;

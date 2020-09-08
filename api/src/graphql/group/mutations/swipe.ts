@@ -11,8 +11,8 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const alreadyBelongsTo = await session.run(
         `
-        MATCH (g: Group {id: ${params.id}}), (u:User {id: ${ctx.user.id.low}})
-        RETURN EXISTS((g)<-[:BELONGS_TO]-(u)) AS result
+        MATCH (g: Group {id: ${params.id}}), (a:Account {id: ${ctx.user.id.low}})
+        RETURN EXISTS((g)<-[:BELONGS_TO]-(a)) AS result
         `,
     );
 
@@ -22,7 +22,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const membersCount = await session.run(
         `
-        MATCH (g: Group {id: ${params.id}})<-[:BELONGS_TO]-(u:User)
+        MATCH (g: Group {id: ${params.id}})<-[:BELONGS_TO]-(a:Account)
         RETURN count(*) AS membersCount
         `,
     );
@@ -30,9 +30,9 @@ export default async (obj, params, ctx, resolveInfo) => {
     if (getValueFromSessionResult(membersCount, "membersCount").low === 0) {
         const alreadyMatched = await session.run(
             `
-            MATCH (g: Group {id: ${params.id}})-[:OWNER]-(u:User)
-            MATCH (me:User {id: ${ctx.user.id.low}})
-            MATCH (group)<-[:BELONGS_TO]-(u)
+            MATCH (g: Group {id: ${params.id}})-[:OWNER]-(a:Account)
+            MATCH (me:Account {id: ${ctx.user.id.low}})
+            MATCH (group)<-[:BELONGS_TO]-(a)
             MATCH (group)<-[:BELONGS_TO]-(me)
             RETURN group
             `,
@@ -44,17 +44,17 @@ export default async (obj, params, ctx, resolveInfo) => {
 
         const isPending = await session.run(
             `
-            MATCH (group: Group {id: ${params.id}})-[:OWNER]-(u:User)
-            MATCH (meGroup: Group)-[b:OWNER]-(me:User {id: ${ctx.user.id.low}})
-            RETURN EXISTS( (u)-[:PENDING]->(meGroup) ) AS result
+            MATCH (group: Group {id: ${params.id}})-[:OWNER]-(a:Account)
+            MATCH (meGroup: Group)-[b:OWNER]-(me:Account {id: ${ctx.user.id.low}})
+            RETURN EXISTS( (a)-[:PENDING]->(meGroup) ) AS result
             `,
         );
 
         if (getValueFromSessionResult(isPending, "result") === false) {
             const checkPending = await session.run(
                 `
-                MATCH (g: Group {id: ${params.id}})-[:OWNER]-(u:User)
-                MATCH (me:User {id: ${ctx.user.id.low}})
+                MATCH (g: Group {id: ${params.id}})-[:OWNER]-(Account)
+                MATCH (me:Account {id: ${ctx.user.id.low}})
                 MERGE (me)-[:PENDING]-(g)
                 RETURN 'ok' AS result
                 `,
@@ -64,8 +64,8 @@ export default async (obj, params, ctx, resolveInfo) => {
     } else {
         const alreadyRequested = await session.run(
             `
-            MATCH (g: Group {id: ${params.id}}), (u:User {id: ${ctx.user.id.low}})
-            RETURN EXISTS((g)<-[:REQUESTED]-(u)) AS result
+            MATCH (g: Group {id: ${params.id}}), (a:Account {id: ${ctx.user.id.low}})
+            RETURN EXISTS((g)<-[:REQUESTED]-(a)) AS result
             `,
         );
 
@@ -74,8 +74,7 @@ export default async (obj, params, ctx, resolveInfo) => {
                 "200", ["You already requested to this group!"]);
         }
     }
-
-    params.email = ctx.user.email;
+    await session.close();
     params.meId = ctx.user.id.low;
     params.ttl = process.env.NEO4J_TTL;
     params.membersCount = membersCount.records[0].get("membersCount").low;

@@ -14,15 +14,17 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     params.userInput.password = await hashPassword(params.userInput.password);
 
-    const findUserRes = await session.run(
+    const findAccountRes = await session.run(
         `
-        MATCH (u:User {email: "${params.userInput.email}"}) return u
+        MATCH (a:Account {email: "${params.userInput.email}"}) return a
         `,
     );
 
-    if (findUserRes.records.length > 0) {
+    if (findAccountRes.records.length > 0) {
         throw new ApolloError("This user already exists!", "200", ["This user already exists!"]);
     }
+
+    await session.close();
 
     return neo4jgraphql(obj, params, ctx, resolveInfo, true);
 };

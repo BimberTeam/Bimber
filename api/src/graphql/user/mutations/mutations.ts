@@ -1,32 +1,42 @@
-export const UserMutations = `
-    friendRequest(friendId: Int!): String
+export const AccountMutations = `
+    acceptFriendRequest(friendId: Int!): String
     @cypher(
     statement: """
-        MATCH(a: User { id: $meId })
-        MATCH(b: User { id: $friendId })
+        MATCH(a: Account { id: $meId })
+        MATCH(b: Account { id: $friendId })
         OPTIONAL MATCH(a)-[fa:REQUESTED_FRIENDS]->(b)
         OPTIONAL MATCH(b)-[fb:REQUESTED_FRIENDS]->(a)
-        DELETE fa, fb
-        MERGE(a)-[:FRIENDS]->(b)
-        MERGE(b)-[:FRIENDS]->(a)
-        ON CREATE SET a.is_exist = true
-        ON MATCH SET a.is_exist = false
-        WITH a, (
-            CASE a.is_exist
-            WHEN true THEN 'Ok'
-            ELSE 'This relation already exist'
-            END
-        ) AS result
-        REMOVE a.is_exist
-        RETURN result
+        CALL apoc.do.when(
+            EXISTS( (b)-[:REQUESTED_FRIENDS]->(a)  ) = true,
+            \\"
+            DELETE fa, fb
+            MERGE(a)-[:FRIENDS]->(b)
+            MERGE(b)-[:FRIENDS]->(a)
+            ON CREATE SET a.is_exist = true
+            ON MATCH SET a.is_exist = false
+            WITH a, (
+                CASE a.is_exist
+                WHEN true THEN 'Friend added successfully!'
+                ELSE 'This relation already exist!'
+                END
+            ) AS res
+            REMOVE a.is_exist
+            RETURN res
+            \\",
+            \\"
+            RETURN 'You cannot add this user to friends !' AS res
+            \\",
+            {a:a, b:b, fa:fa, fb:fb}
+        ) YIELD value
+        RETURN value.res
     """
     )
 
     removeFriend(friendId: Int!): String
     @cypher(
     statement: """
-        MATCH(a: User { id: $meId })
-        MATCH(b: User { id: $friendId })
+        MATCH(a: Account { id: $meId })
+        MATCH(b: Account { id: $friendId })
         OPTIONAL MATCH (a)-[fa:FRIENDS]->(b)
         OPTIONAL MATCH (b)-[fb:FRIENDS]->(a)
         DELETE fa, fb
@@ -34,15 +44,15 @@ export const UserMutations = `
     """
     )
 
-    sendFriendRequest(userInvitedID: Int!): String
+    sendFriendRequest(friendId: Int!): String
     @cypher(
     statement: """
-        MATCH(a: User { id: $meId })
-        MATCH(b: User { id: $userInvitedID })
+        MATCH(a: Account { id: $meId })
+        MATCH(b: Account { id: $friendId })
         CALL apoc.do.case([
             EXISTS((a)-[:FRIENDS]->(b))=true OR EXISTS((b)-[:FRIENDS]->(a))=true,
-                \\"RETURN 'This users are already friends' AS result\\",
-            EXISTS((a)-[:REQUESTED_FRIENDS]->(b))=true,
+                \\"RETURN 'You are already friend with this user!' AS result\\",
+            EXISTS((b)-[:REQUESTED_FRIENDS]->(a))=true,
                 \\" WITH $a AS a, $b AS b
                 OPTIONAL MATCH(a)-[fa:REQUESTED_FRIENDS]->(b)
                 OPTIONAL MATCH(b)-[fb:REQUESTED_FRIENDS]->(a)
@@ -50,9 +60,9 @@ export const UserMutations = `
                 MERGE(a)-[:FRIENDS]->(b)
                 MERGE(b)-[:FRIENDS]->(a)
                 RETURN 'Added friend' AS result \\",
-            EXISTS((a)-[:REQUESTED_FRIENDS]->(b))=false,
+            EXISTS((b)-[:REQUESTED_FRIENDS]->(a))=false,
                 \\"  WITH $a AS a, $b AS b
-                MERGE(b)-[:REQUESTED_FRIENDS]->(a)
+                MERGE(a)-[:REQUESTED_FRIENDS]->(b)
                 ON CREATE SET a.is_exist = true
                 ON MATCH SET a.is_exist = false
                 WITH a, (
@@ -71,21 +81,21 @@ export const UserMutations = `
     """
     )
 
-    cancelFriendRequest(userId: Int!): String
+    denyFriendRequest(userId: Int!): String
     @cypher(
     statement: """
-        MATCH(a: User { id: $meId })
-        MATCH(b: User { id: $userId })
+        MATCH(a: Account { id: $meId })
+        MATCH(b: Account { id: $userId })
         MATCH (a)-[f:REQUESTED_FRIENDS]->(b)
         DELETE f
         RETURN 'Invitation rejected'
     """
     )
 
-    register(userInput: RegisterUserInput): String
+    register(userInput: RegisterAccountInput): String
     @cypher(
     statement: """
-        CREATE (u:User {
+        CREATE (u:Account {
             name: $userInput.name,
             email: $userInput.email,
             password: $userInput.password,
@@ -97,7 +107,8 @@ export const UserMutations = `
             description: $userInput.description,
             gender: $userInput.gender,
             genderPreference: $userInput.genderPreference,
-            agePreference: $userInput.agePreference
+            agePreference: $userInput.agePreference,
+            alcoholPreference: $userInput.alcoholPreference
         })
         CREATE (g: Group)
         SET u.id = id(u)
@@ -109,11 +120,11 @@ export const UserMutations = `
 
     login(email: String!, password: String!): String
 
-    me: User
+    me: Account
     @cypher(
     statement: """
-        MATCH (u:User {email: $email})
-        RETURN u
+        MATCH (a:Account {id: $meId})
+        RETURN a
     """
     )
 `;

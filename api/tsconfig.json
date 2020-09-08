@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "es2017",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
@@ -10,6 +10,6 @@
     "skipLibCheck": true
   },
   "lib": [
-    "es2015"
+    "es2017"
   ]
 }

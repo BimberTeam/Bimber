@@ -6,7 +6,6 @@ export default async (obj, params, ctx, resolveInfo) => {
         throw new ApolloError("Not authorized", "405", ["Not authorized"]);
     }
 
-    params.email = ctx.user.email;
     params.meId = ctx.user.id.low;
     return neo4jgraphql(obj, params, ctx, resolveInfo, true);
 };

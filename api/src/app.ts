@@ -2,7 +2,7 @@ import { ApolloServer } from "apollo-server-express";
 import dotenv from "dotenv";
 import express from "express";
 import neo4j from "neo4j-driver";
-import { checkToken, verifyToken } from "./auth/auth";
+import { retrieveToken, verifyToken } from "./auth/auth";
 import { initializeDatabase } from "./database/initialize";
 import { schema } from "./graphql/schema";
 
@@ -17,6 +17,7 @@ const driver = neo4j.driver(
   },
 );
 
+
 dotenv.config();
 
 const app = express();
@@ -25,7 +26,7 @@ initializeDatabase(driver);
 
 const server = new ApolloServer({
   context: ({ req, connection }) => {
-    const token = checkToken(req, connection);
+    const token = retrieveToken(req, connection);
     const user = verifyToken(token);
     return {
       driver,

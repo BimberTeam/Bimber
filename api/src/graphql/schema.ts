@@ -4,48 +4,48 @@ import { Group } from "./group/model";
 import { GroupMutations } from "./group/mutations/mutations";
 import swipe from "./group/mutations/swipe";
 import { GroupQueries } from "./group/queries";
-import { UserInputs } from "./user/inputs";
-import { User } from "./user/model";
+import { AccountInputs } from "./user/inputs";
+import { Account } from "./user/model";
 import login from "./user/mutations/login";
-import { UserMutations } from "./user/mutations/mutations";
+import { AccountMutations } from "./user/mutations/mutations";
 import register from "./user/mutations/register";
-import { UserQueries } from "./user/queries";
-import getUserInfoFromContex from "./utils/getUserInfoFromContex";
+import { AccountQueries } from "./user/queries";
+import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
 
 export const typeDefs = `
-  ${User}
+  ${Account}
   ${Group}
 
   type Query {
-    ${UserQueries}
+    ${AccountQueries}
     ${GroupQueries}
   }
 
   type Mutation {
-    ${UserMutations}
+    ${AccountMutations}
     ${GroupMutations}
   }
 
-  ${UserInputs}
+  ${AccountInputs}
 `;
 
 const resolvers = {
   Mutation: {
     login,
     me(object, params, ctx, resolveInfo) {
-      return getUserInfoFromContex(object, params, ctx, resolveInfo);
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
-    friendRequest(object, params, ctx, resolveInfo) {
-      return getUserInfoFromContex(object, params, ctx, resolveInfo);
+    acceptFriendRequest(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
     removeFriend(object, params, ctx, resolveInfo) {
-      return getUserInfoFromContex(object, params, ctx, resolveInfo);
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
     sendFriendRequest(object, params, ctx, resolveInfo) {
-      return getUserInfoFromContex(object, params, ctx, resolveInfo);
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
-    cancelFriendRequest(object, params, ctx, resolveInfo) {
-      return getUserInfoFromContex(object, params, ctx, resolveInfo);
+    denyFriendRequest(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
     register,
     swipe,
@@ -68,7 +68,7 @@ const schema = makeAugmentedSchema({
       isAuthenticated: true,
     },
     query: {
-      exclude: ["User"],
+      exclude: ["Account"],
     },
   },
   resolvers,

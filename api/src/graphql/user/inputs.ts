@@ -1,5 +1,5 @@
-export const UserInputs = `
-input RegisterUserInput {
+export const AccountInputs = `
+input RegisterAccountInput {
     name: String!
     email: String!
     password: String!
@@ -15,7 +15,7 @@ input RegisterUserInput {
     agePreference: Int!
 }
 
-type publicUser {
+type User {
     name: String!
     email: String!
     imageUrl: String
