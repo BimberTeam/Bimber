@@ -67,9 +67,8 @@ const schema = makeAugmentedSchema({
       hasScope: false,
       isAuthenticated: true,
     },
-    query: {
-      exclude: ["Account"],
-    },
+    mutation: false,
+    query: false,
   },
   resolvers,
   typeDefs,
