@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  neo4j:
+    build: ./neo4j
+    ports:
+      - 7474:7474
+      - 7687:7687
+    env_file:
+     - neo4j.env
+
+  api:
+    build: ./api
+    ports:
+      - 4001:4001
+    env_file:
+      - api.env
+    links:
+      - neo4j
+    depends_on:
+      - neo4j
