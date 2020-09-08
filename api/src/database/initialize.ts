@@ -15,9 +15,10 @@ export const createIndexes = async (driver: Driver): Promise<void> => {
   const session: Session = driver.session();
   try {
     await session.run(initCypher);
-    await session.close();
   } catch (error) {
     console.error("Database initialization failed to complete\n", error.message);
+  } finally {
+    await session.close();
   }
 };
 

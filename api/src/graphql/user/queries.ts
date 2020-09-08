@@ -1,5 +1,5 @@
 export const AccountQueries = `
-user(id: Int): User
+    user(id: Int): User
     @cypher(
         statement: """
         MATCH(account: Account { id: $id })

@@ -14,7 +14,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     );
 
     if (findAccount.records.length === 0) {
-        throw new ApolloError("Incorrect Email !", "200", ["Incorrect Email !"]);
+        throw new ApolloError("Email not found!", "200", ["Email not found!"]);
     }
 
     const hashedPassword = findAccount.records[0].get("account").properties.password;

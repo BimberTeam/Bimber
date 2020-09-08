@@ -21,6 +21,20 @@ export const Account = `
         agePreference: Int!
     }
 
+    type User {
+        name: String!
+        email: String!
+        imageUrl: String
+        age: Int!
+        favoriteAlcoholName: String!
+        favoriteAlcoholType: AlcoholType!
+        description: String!
+        gender: Gender!
+        genderPreference: Gender!
+        alcoholPreference: AlcoholType!
+        agePreference: Int!
+    }
+
     enum AlcoholType {
         Vodka
         Beer

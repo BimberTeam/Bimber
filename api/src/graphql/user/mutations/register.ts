@@ -7,6 +7,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
     params.userInput.latestLocation = new neo4j.types.Point(
+    // magic number info : https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point-wgs84-2d
         4326,
         params.userInput.latestLocation.longitude,
         params.userInput.latestLocation.latitude,
