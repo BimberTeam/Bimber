@@ -9,6 +9,7 @@ import { Account } from "./user/model";
 import login from "./user/mutations/login";
 import { AccountMutations } from "./user/mutations/mutations";
 import register from "./user/mutations/register";
+import updateAccount from "./user/mutations/updateAccount"
 import { AccountQueries } from "./user/queries";
 import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
 
@@ -49,6 +50,7 @@ const resolvers = {
     },
     register,
     swipe,
+    updateAccount,
   },
   Query: {
     user(object, params, ctx, resolveInfo) {
@@ -67,9 +69,8 @@ const schema = makeAugmentedSchema({
       hasScope: false,
       isAuthenticated: true,
     },
-    query: {
-      exclude: ["Account"],
-    },
+    mutation: false,
+    query: false,
   },
   resolvers,
   typeDefs,

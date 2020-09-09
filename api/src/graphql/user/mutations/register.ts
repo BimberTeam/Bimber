@@ -6,22 +6,22 @@ import { hashPassword } from "../../../auth/auth";
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
-    params.userInput.latestLocation = new neo4j.types.Point(
+    params.user.latestLocation = new neo4j.types.Point(
     // magic number info : https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point-wgs84-2d
         4326,
-        params.userInput.latestLocation.longitude,
-        params.userInput.latestLocation.latitude,
+        params.user.latestLocation.longitude,
+        params.user.latestLocation.latitude,
     );
 
-    params.userInput.password = await hashPassword(params.userInput.password);
+    params.user.password = await hashPassword(params.user.password);
 
-    const findAccountRes = await session.run(
+    const findAccount = await session.run(
         `
-        MATCH (a:Account {email: "${params.userInput.email}"}) return a
+        MATCH (a:Account {email: "${params.user.email}"}) return a
         `,
     );
 
-    if (findAccountRes.records.length > 0) {
+    if (findAccount.records.length > 0) {
         throw new ApolloError("This user already exists!", "200", ["This user already exists!"]);
     }
 
