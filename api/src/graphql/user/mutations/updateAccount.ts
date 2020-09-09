@@ -5,14 +5,14 @@ import { neo4jgraphql } from "neo4j-graphql-js";
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
-    if (params.account.email) {
-        const findAccountRes = await session.run(
+    if (params.account.email !== undefined) {
+        const findAccount = await session.run(
             `
             MATCH (a:Account {email: "${params.account.email}"}) return a
             `,
         );
 
-        if (findAccountRes.records.length > 0) {
+        if (findAccount.records.length > 0) {
             throw new ApolloError("This email is not unique!", "200", ["This email is not unique!"]);
         }
 

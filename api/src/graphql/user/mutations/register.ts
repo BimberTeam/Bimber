@@ -15,13 +15,13 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     params.user.password = await hashPassword(params.user.password);
 
-    const findAccountRes = await session.run(
+    const findAccount = await session.run(
         `
         MATCH (a:Account {email: "${params.user.email}"}) return a
         `,
     );
 
-    if (findAccountRes.records.length > 0) {
+    if (findAccount.records.length > 0) {
         throw new ApolloError("This user already exists!", "200", ["This user already exists!"]);
     }
 
