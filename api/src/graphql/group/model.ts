@@ -1,9 +1,27 @@
 export const Group = `
     type Group {
         id: ID!
-        members: [Account] @relation(name: "BELONGS_TO", direction: "IN")
-        pendingMembers: [Account] @relation(name: "PENDING", direction: "IN")
-        requestedMembers: [Account] @relation(name: "REQUESTED", direction: "IN")
+        members: [User]
+        @cypher(
+            statement: """
+                MATCH (this)<-[:BELONGS_TO]-(a:Account)
+                RETURN a
+            """
+        )
+        pendingMembers: [User]
+        @cypher(
+            statement: """
+                MATCH (this)<-[:PENDING]-(a:Account)
+                RETURN a
+            """
+        )
+        requestedMembers: [User]
+        @cypher(
+            statement: """
+                MATCH (this)<-[:REQUESTED]-(a:Account)
+                RETURN a
+            """
+        )
         membersCount: Int
         @cypher(
         statement: """

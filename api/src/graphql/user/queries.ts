@@ -18,4 +18,31 @@ export const AccountQueries = `
         }
         """
     )
+
+    friendsList: [User]
+    @cypher(
+        statement: """
+            MATCH (a:Account {id: $meId})
+            MATCH (a)<-[:FRIENDS]-(friends:Account)
+            RETURN friends
+        """
+    )
+
+    requestedFriendsList: [User]
+    @cypher(
+        statement: """
+            MATCH (a:Account {id: $meId})
+            MATCH (a)<-[:REQUESTED_FRIENDS]-(friends:Account)
+            RETURN friends
+        """
+    )
+
+    requestedGroupList: [Group]
+    @cypher(
+        statement: """
+            MATCH (a:Account {id: $meId})
+            MATCH (a)-[:REQUESTED]->(groups:Group)
+            RETURN groups
+        """
+    )
 `;
