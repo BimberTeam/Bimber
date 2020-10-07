@@ -59,6 +59,18 @@ const resolvers = {
     group(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
+    friendsList(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
+    requestedFriendsList(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
+    requestedGroupList(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
+    groupList(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
   },
 };
 
