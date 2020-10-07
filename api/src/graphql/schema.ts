@@ -12,6 +12,7 @@ import register from "./user/mutations/register";
 import updateAccount from "./user/mutations/updateAccount"
 import { AccountQueries } from "./user/queries";
 import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
+import addFriendToGroup from "./group/mutations/addFriendToGroup";
 
 export const typeDefs = `
   ${Account}
@@ -54,6 +55,7 @@ const resolvers = {
     register,
     swipe,
     updateAccount,
+    addFriendToGroup,
   },
   Query: {
     user(object, params, ctx, resolveInfo) {

@@ -51,4 +51,12 @@ export const GroupMutations = `
         """
     )
 
+    addFriendToGroup(groupId: Int, friendId: Int):String
+    @cypher(
+        statement: """
+            MATCH(me: Account{id: $meId})
+            RETURN 'Request was sent!'
+        """
+    )
+
 `;
