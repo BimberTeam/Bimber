@@ -48,6 +48,9 @@ const resolvers = {
     denyFriendRequest(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
+    createGroup(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
     register,
     swipe,
     updateAccount,

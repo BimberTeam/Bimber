@@ -41,4 +41,14 @@ export const GroupMutations = `
         """
     )
 
+    createGroup:String
+    @cypher(
+        statement: """
+            MATCH(me: Account{id: $meId})
+            CREATE(g: Group)
+            MERGE(me)-[:BELONGS_TO]->(g)
+            RETURN 'Group created successfully!'
+        """
+    )
+
 `;
