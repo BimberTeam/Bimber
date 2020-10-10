@@ -13,6 +13,10 @@ import updateAccount from "./user/mutations/updateAccount"
 import { AccountQueries } from "./user/queries";
 import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
 import pendingMembersList from "./group/queries/pendingMembersList";
+import { GroupInputs } from "./group/inputs";
+import acceptPendingRequest from "./group/mutations/acceptPendingRequest";
+import rejectPendingRequest from "./group/mutations/rejectPendingRequest";
+
 
 export const typeDefs = `
   ${Account}
@@ -29,6 +33,7 @@ export const typeDefs = `
   }
 
   ${AccountInputs}
+  ${GroupInputs}
 `;
 
 const resolvers = {
@@ -52,6 +57,8 @@ const resolvers = {
     register,
     swipe,
     updateAccount,
+    acceptPendingRequest,
+    rejectPendingRequest,
   },
   Query: {
     user(object, params, ctx, resolveInfo) {

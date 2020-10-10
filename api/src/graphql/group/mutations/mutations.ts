@@ -41,4 +41,24 @@ export const GroupMutations = `
         """
     )
 
+    acceptPendingRequest(acceptPendingRequestInput: AcceptPendingRequestInput!): String
+    @cypher(
+        statement: """
+            MATCH (a:Account{id: $acceptPendingRequestInput.pendingUserId})
+            MATCH (g:Group{id: $acceptPendingRequestInput.groupId})
+            MERGE (g)-[:VOTE_FAVOUR{id: $meId}]->(a)
+            RETURN ''
+        """
+    )
+
+    rejectPendingRequest(rejectPendingRequestInput: RejectPendingRequestInput!): String
+    @cypher(
+        statement: """
+            MATCH (a:Account{id: $acceptPendingRequestInput.pendingUserId})
+            MATCH (g:Group{id: $acceptPendingRequestInput.groupId})
+            MERGE (g)-[:VOTE_AGAINST{id: $meId}]->(a)
+            RETURN ''
+        """
+    )
+
 `;
