@@ -1,15 +1,15 @@
 import { makeAugmentedSchema } from "neo4j-graphql-js";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { Group } from "./group/model";
-import { GroupMutations } from "./group/mutations/mutations";
-import swipe from "./group/mutations/swipe";
+import { GroupMutations } from "./group/mutations";
+import swipe from "./group/resolvers/swipe";
 import { GroupQueries } from "./group/queries";
 import { AccountInputs } from "./user/inputs";
 import { Account } from "./user/model";
-import login from "./user/mutations/login";
+import login from "./user/resovlers/login";
 import { AccountMutations } from "./user/mutations";
-import register from "./user/mutations/register";
-import updateAccount from "./user/mutations/updateAccount"
+import register from "./user/resovlers/register";
+import updateAccount from "./user/resovlers/updateAccount"
 import { AccountQueries } from "./user/queries";
 import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
 
@@ -33,9 +33,6 @@ export const typeDefs = `
 const resolvers = {
   Mutation: {
     login,
-    me(object, params, ctx, resolveInfo) {
-      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
-    },
     acceptFriendRequest(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
@@ -53,6 +50,9 @@ const resolvers = {
     updateAccount,
   },
   Query: {
+    me(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
     user(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
