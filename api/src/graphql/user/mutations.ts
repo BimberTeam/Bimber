@@ -1,5 +1,5 @@
 export const AccountMutations = `
-    acceptFriendRequest(friendId: Int!): String
+    acceptFriendRequest(friendId: ID!): String
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
@@ -32,7 +32,7 @@ export const AccountMutations = `
     """
     )
 
-    removeFriend(friendId: Int!): String
+    removeFriend(friendId: ID!): String
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
@@ -44,7 +44,7 @@ export const AccountMutations = `
     """
     )
 
-    sendFriendRequest(friendId: Int!): String
+    sendFriendRequest(friendId: ID!): String
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
@@ -81,7 +81,7 @@ export const AccountMutations = `
     """
     )
 
-    denyFriendRequest(userId: Int!): String
+    denyFriendRequest(userId: ID!): String
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
@@ -120,8 +120,8 @@ export const AccountMutations = `
             alcoholPreference: $user.alcoholPreference
         })
         CREATE (g: Group)
-        SET u.id = id(u)
-        SET g.id = id(g)
+        SET u.id = apoc.create.uuid()
+        SET g.id = apoc.create.uuid()
         MERGE(u)-[:OWNER]->(g)
         RETURN 'Registration Complete!'
     """

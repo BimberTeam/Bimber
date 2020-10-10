@@ -1,4 +1,12 @@
 export const AccountQueries = `
+    me: Account
+    @cypher(
+    statement: """
+        MATCH (a:Account {id: $meId})
+        RETURN a
+    """
+    )
+
     user(id: Int): User
     @cypher(
         statement: """

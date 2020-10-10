@@ -10,7 +10,7 @@ export const GroupMutations = `
         Otherwise new relationship ('REQUESTED') will be created between the caller and requested group.
         Caller will be pending until accepted by majority of the group members.
     """
-    swipe(id: Int): String
+    swipe(id: ID!): String
     @cypher(
         statement: """
         MATCH(g: Group {id: $id})
@@ -23,7 +23,7 @@ export const GroupMutations = `
                 MATCH (swipedAccount)-[pen:PENDING]->(meGroup)
                 DELETE pen
                 CREATE(group: Group)
-                SET group.id = id(group)
+                SET group.id = apoc.create.uuid()
                 SET group:TTL
                 SET group.ttl = timestamp() + toInteger(ttl)
                 MERGE(me)-[:BELONGS_TO]->(group)
@@ -40,5 +40,4 @@ export const GroupMutations = `
         RETURN value.res
         """
     )
-
 `;
