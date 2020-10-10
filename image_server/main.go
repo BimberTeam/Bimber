@@ -12,7 +12,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	_ "github.com/pierrre/imageserver/image/jpeg"
 	_ "github.com/pierrre/imageserver/image/png"
 )
@@ -22,12 +21,6 @@ const UUID = `[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0
 func main() {
 
 	log := logger.GetLogger()
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	log.Info("Loaded .env file")
 
 	cfg, err := config.LoadServerConfig()
 	if err != nil {

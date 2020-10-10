@@ -51,7 +51,7 @@ func (r *repo) VerifyToken(profileId string, token string) (verified bool, err e
 
 	log.Infof("Searching for user: %s", profileId)
 
-	result, err := session.Run("MATCH (this: User {id: $id} ) RETURN this.accessToken", map[string]interface{}{
+	result, err := session.Run("MATCH (this: Account {id: $id} ) RETURN this.token", map[string]interface{}{
 		"id": profileId,
 	})
 
