@@ -1,23 +1,28 @@
 import { makeAugmentedSchema } from "neo4j-graphql-js";
 import { neo4jgraphql } from "neo4j-graphql-js";
-import { Group } from "./group/model";
+import { GroupTypes } from "./group/types";
 import { GroupMutations } from "./group/mutations";
 import swipe from "./group/resolvers/swipe";
 import { GroupQueries } from "./group/queries";
 import { AccountInputs } from "./user/inputs";
-import { Account } from "./user/model";
-import login from "./user/resovlers/login";
+import { AccountTypes } from "./user/types";
+import login from "./user/resolvers/login";
 import { AccountMutations } from "./user/mutations";
-import register from "./user/resovlers/register";
-import updateAccount from "./user/resovlers/updateAccount"
+import register from "./user/resolvers/register";
+import updateAccount from "./user/resolvers/updateAccount"
 import { AccountQueries } from "./user/queries";
 import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
+import { UtilTypes } from "./utils/types";
+import { UtilInputs } from "./utils/inputs";
 
 export const typeDefs = `
-  ${Account}
-  ${Group}
+  ${AccountTypes}
+  ${GroupTypes}
+  
+  ${UtilTypes}
 
   ${AccountInputs}
+  ${UtilInputs}
 
   type Query {
     ${AccountQueries}

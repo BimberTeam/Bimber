@@ -7,14 +7,14 @@ export const AccountQueries = `
     """
     )
 
-    user(id: Int): User
+    user(id: ID!): User
     @cypher(
         statement: """
         MATCH(account: Account { id: $id })
         RETURN {
+            id: account.id,
             name: account.name,
             email: account.email,
-            imageUrl: account.imageUrl,
             age: account.age,
             favoriteAlcoholName: account.favoriteAlcoholName,
             favoriteAlcoholType: account.favoriteAlcoholType,
@@ -22,7 +22,8 @@ export const AccountQueries = `
             gender: account.gender,
             genderPreference: account.genderPreference,
             alcoholPreference: account.alcoholPreference,
-            agePreference: account.agePreference
+            agePreferenceFrom: account.agePreferenceFrom
+            agePreferenceTO: account.agePreferenceTo
         }
         """
     )

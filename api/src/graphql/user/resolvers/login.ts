@@ -43,5 +43,5 @@ export default async (obj, params, ctx, resolveInfo) => {
     }
     await session.close();
 
-    return token;
+    return {token};
 };
