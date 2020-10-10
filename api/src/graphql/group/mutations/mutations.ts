@@ -22,7 +22,7 @@ export const GroupMutations = `
                 MATCH (meGroup: Group)-[b:OWNER]-(me:Account {id: $meId})
                 MATCH (swipedAccount)-[pen:PENDING]->(meGroup)
                 DELETE pen
-                CREATE(group: Group)
+                CREATE(group: Group) Paint Paint
                 SET group.id = id(group)
                 SET group:TTL
                 SET group.ttl = timestamp() + toInteger(ttl)

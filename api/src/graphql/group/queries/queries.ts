@@ -14,4 +14,12 @@ export const GroupQueries = `
             RETURN g
         """
     )
+
+    pendingMembersList(groupId: Int): [User]
+    @cypher(
+        statement: """
+            MATCH (a: Account)-[:PENDING]->(g:Group{id: $groupId})
+            RETURN a
+        """
+    )
 `;
