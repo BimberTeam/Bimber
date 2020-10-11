@@ -70,15 +70,15 @@ export default async (obj, params, ctx, resolveInfo) => {
         MATCH ( (a)-[vf:VOTE_FAVOUR]-(g) )
         RETURN count(vf) as result
         UNION ALL
-        MATCH (a: Account{id: ${params.acceptPendingRequestInput.pendingUserId}})
-        MATCH (g: Group{id: ${params.acceptPendingRequestInput.groupId}})
-        MATCH ( (a)-[va:VOTE_AGAINST]-(g) )
-        RETURN count(va) as result
+        MATCH (g: Group{id: ${params.acceptPendingRequestInput.groupId}})-[b:BELONGS_TO]-(a:Account)
+        RETURN count(b) as result
         `
     );
 
-    console.log(distributionOfVotes.records[0].get("result"));
-    console.log(distributionOfVotes.records[1].get("result"));
+    const countOfVoteFavour = distributionOfVotes.records[0].get("result").low;
+    const countOfGroup= distributionOfVotes.records[1].get("result").low;
+    console.log(countOfVoteFavour);
+    console.log(countOfGroup);
 
     const isAlreadyVoted = await session.run(
         `
@@ -93,6 +93,8 @@ export default async (obj, params, ctx, resolveInfo) => {
         throw new ApolloError("You have already voted!", "400", ["You have already voted!"]);
     }
 
+    params.distributionOfVotes = countOfVoteFavour+1/countOfGroup;
+    console.log(params.distributionOfVotes)
     params.meId = ctx.user.id.low;
     return neo4jgraphql(obj, params, ctx, resolveInfo, true);
 };

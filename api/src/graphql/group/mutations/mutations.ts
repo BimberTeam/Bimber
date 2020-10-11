@@ -44,20 +44,63 @@ export const GroupMutations = `
     acceptPendingRequest(acceptPendingRequestInput: AcceptPendingRequestInput!): String
     @cypher(
         statement: """
-            MATCH (a:Account{id: $acceptPendingRequestInput.pendingUserId})
-            MATCH (g:Group{id: $acceptPendingRequestInput.groupId})
+        MATCH (a:Account{id: $acceptPendingRequestInput.pendingUserId})
+        MATCH (g:Group{id: $acceptPendingRequestInput.groupId})
+        CALL apoc.do.when(
+            $distributionOfVotes >= 0.5,
+            \\"
+            CALL {
+                MATCH ( (a)-[vf:VOTE_FAVOUR]-(g) )
+                RETURN vf as result
+                UNION ALL
+                MATCH ( (a)-[va:VOTE_AGAINST]-(g) )
+                RETURN va as result
+                UNION ALL
+                MATCH (a)-[p:PENDING]->(g)
+                RETURN p as result
+            }
+            MERGE (a)-[:BELONGS_TO]->(g)
+            DELETE result
+            RETURN 'Added user to group!' as result
+            \\",
+            \\"
             MERGE (g)-[:VOTE_FAVOUR{id: $meId}]->(a)
-            RETURN ''
+            RETURN 'Voted successfully!' as result
+            \\",
+            {a:a, g:g, meId:$meId}
+        ) YIELD value
+        RETURN value.result
         """
     )
 
     rejectPendingRequest(rejectPendingRequestInput: RejectPendingRequestInput!): String
     @cypher(
         statement: """
-            MATCH (a:Account{id: $acceptPendingRequestInput.pendingUserId})
-            MATCH (g:Group{id: $acceptPendingRequestInput.groupId})
+        MATCH (a:Account{id: $rejectPendingRequestInput.pendingUserId})
+        MATCH (g:Group{id: $rejectPendingRequestInput.groupId})
+        CALL apoc.do.when(
+            $distributionOfVotes > 0.5,
+            \\"
+            CALL {
+                MATCH ( (a)-[vf:VOTE_FAVOUR]-(g) )
+                RETURN vf as result
+                UNION ALL
+                MATCH ( (a)-[va:VOTE_AGAINST]-(g) )
+                RETURN va as result
+                UNION ALL
+                MATCH (a)-[p:PENDING]->(g)
+                RETURN p as result
+            }
+            DELETE result
+            RETURN 'User deleted from pending' as result
+            \\",
+            \\"
             MERGE (g)-[:VOTE_AGAINST{id: $meId}]->(a)
-            RETURN ''
+            RETURN 'Voted successfully!' as result
+            \\",
+            {a:a, g:g, meId:$meId}
+        ) YIELD value
+        RETURN value.result
         """
     )
 

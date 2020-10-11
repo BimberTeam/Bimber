@@ -50,4 +50,20 @@ export const Account = `
         longitude: Float,
         latitude: Float
     }
+
+    type PendingMemberListPayload{
+        name: String!
+        email: String!
+        imageUrl: String
+        age: Int!
+        favoriteAlcoholName: String!
+        favoriteAlcoholType: AlcoholType!
+        description: String!
+        gender: Gender!
+        genderPreference: Gender!
+        alcoholPreference: AlcoholType!
+        agePreference: Int!
+        voteAgainst: Int!
+        voteFavour: Int!
+    }
 `;
