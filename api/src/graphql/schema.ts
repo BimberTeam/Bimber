@@ -1,26 +1,32 @@
 import { makeAugmentedSchema } from "neo4j-graphql-js";
 import { neo4jgraphql } from "neo4j-graphql-js";
-import { Group } from "./group/model";
-import { GroupMutations } from "./group/mutations/mutations";
-import swipe from "./group/mutations/swipe";
-import { GroupQueries } from "./group/queries/queries";
+import { GroupTypes } from "./group/types";
+import { GroupMutations } from "./group/mutations";
+import swipe from "./group/resolvers/swipe";
+import { GroupQueries } from "./group/queries";
 import { AccountInputs } from "./user/inputs";
-import { Account } from "./user/model";
-import login from "./user/mutations/login";
-import { AccountMutations } from "./user/mutations/mutations";
-import register from "./user/mutations/register";
-import updateAccount from "./user/mutations/updateAccount"
+import { AccountTypes } from "./user/types";
+import login from "./user/resolvers/login";
+import { AccountMutations } from "./user/mutations";
+import register from "./user/resolvers/register";
+import updateAccount from "./user/resolvers/updateAccount"
 import { AccountQueries } from "./user/queries";
 import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
 import pendingMembersList from "./group/queries/pendingMembersList";
 import { GroupInputs } from "./group/inputs";
 import acceptPendingRequest from "./group/mutations/acceptPendingRequest";
 import rejectPendingRequest from "./group/mutations/rejectPendingRequest";
-
+import { UtilTypes } from "./utils/types";
+import { UtilInputs } from "./utils/inputs";
 
 export const typeDefs = `
-  ${Account}
-  ${Group}
+  ${AccountTypes}
+  ${GroupTypes}
+  
+  ${UtilTypes}
+
+  ${AccountInputs}
+  ${UtilInputs}
 
   type Query {
     ${AccountQueries}
@@ -39,9 +45,6 @@ export const typeDefs = `
 const resolvers = {
   Mutation: {
     login,
-    me(object, params, ctx, resolveInfo) {
-      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
-    },
     acceptFriendRequest(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
@@ -61,6 +64,12 @@ const resolvers = {
     rejectPendingRequest,
   },
   Query: {
+    me(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
+    accountExists(object, params, ctx, resolveInfo) {
+      return neo4jgraphql(object, params, ctx, resolveInfo);
+    },
     user(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },

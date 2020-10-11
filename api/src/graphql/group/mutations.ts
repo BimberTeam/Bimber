@@ -10,7 +10,7 @@ export const GroupMutations = `
         Otherwise new relationship ('REQUESTED') will be created between the caller and requested group.
         Caller will be pending until accepted by majority of the group members.
     """
-    swipe(id: Int): String
+    swipe(id: ID!): String
     @cypher(
         statement: """
         MATCH(g: Group {id: $id})
@@ -22,8 +22,8 @@ export const GroupMutations = `
                 MATCH (meGroup: Group)-[b:OWNER]-(me:Account {id: $meId})
                 MATCH (swipedAccount)-[pen:PENDING]->(meGroup)
                 DELETE pen
-                CREATE(group: Group) Paint Paint
-                SET group.id = id(group)
+                CREATE(group: Group)
+                SET group.id = apoc.create.uuid()
                 SET group:TTL
                 SET group.ttl = timestamp() + toInteger(ttl)
                 MERGE(me)-[:BELONGS_TO]->(group)
@@ -41,11 +41,11 @@ export const GroupMutations = `
         """
     )
 
-    acceptPendingRequest(acceptPendingRequestInput: AcceptPendingRequestInput!): String
+    acceptPendingRequest(input: AcceptPendingRequestInput!): String
     @cypher(
         statement: """
-        MATCH (a:Account{id: $acceptPendingRequestInput.pendingUserId})
-        MATCH (g:Group{id: $acceptPendingRequestInput.groupId})
+        MATCH (a:Account{id: $input.pendingUserId})
+        MATCH (g:Group{id: $input.groupId})
         CALL apoc.do.when(
             $distributionOfVotes >= 0.5,
             \\"
@@ -73,11 +73,11 @@ export const GroupMutations = `
         """
     )
 
-    rejectPendingRequest(rejectPendingRequestInput: RejectPendingRequestInput!): String
+    rejectPendingRequest(input: RejectPendingRequestInput!): String
     @cypher(
         statement: """
-        MATCH (a:Account{id: $rejectPendingRequestInput.pendingUserId})
-        MATCH (g:Group{id: $rejectPendingRequestInput.groupId})
+        MATCH (a:Account{id: $input.pendingUserId})
+        MATCH (g:Group{id: $input.groupId})
         CALL apoc.do.when(
             $distributionOfVotes > 0.5,
             \\"
@@ -103,5 +103,4 @@ export const GroupMutations = `
         RETURN value.result
         """
     )
-
 `;

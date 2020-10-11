@@ -29,6 +29,6 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     params.keys = keys;
     params.values = values;
-    params.meId = ctx.user.id.low;
+    params.meId = ctx.user.id;
     return neo4jgraphql(obj, params, ctx, resolveInfo, true);
 };
