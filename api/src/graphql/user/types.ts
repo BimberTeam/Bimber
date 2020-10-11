@@ -1,11 +1,10 @@
 
-export const Account = `
+export const AccountTypes = `
     type Account {
         id: ID!
         name: String!
         email: String!
         password: String!
-        imageUrl: String
         token: String
         age: Int!
         friends: [Account!]! @relation(name: "FRIENDS", direction: "OUT")
@@ -18,13 +17,14 @@ export const Account = `
         gender: Gender!
         genderPreference: Gender!
         alcoholPreference: AlcoholType!
-        agePreference: Int!
+        agePreferenceFrom: Int! 
+        agePreferenceTo: Int! 
     }
 
     type User {
+        id: ID!
         name: String!
         email: String!
-        imageUrl: String
         age: Int!
         favoriteAlcoholName: String!
         favoriteAlcoholType: AlcoholType!
@@ -32,22 +32,27 @@ export const Account = `
         gender: Gender!
         genderPreference: Gender!
         alcoholPreference: AlcoholType!
-        agePreference: Int!
+        agePreferenceFrom: Int! 
+        agePreferenceTo: Int! 
     }
 
     enum AlcoholType {
-        Vodka
-        Beer
-        Wine
+        VODKA
+        BEER
+        WINE
     }
 
     enum Gender {
-        Male
-        Female
+        MALE
+        FEMALE
     }
 
     type Coords{
         longitude: Float,
         latitude: Float
+    }
+    
+    type LoginPayload {
+        token: String!
     }
 `;

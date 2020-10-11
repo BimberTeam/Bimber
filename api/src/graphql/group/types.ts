@@ -1,4 +1,4 @@
-export const Group = `
+export const GroupTypes = `
     type Group {
         id: ID!
         members: [User]
