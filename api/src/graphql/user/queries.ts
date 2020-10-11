@@ -6,6 +6,14 @@ export const AccountQueries = `
         RETURN a
     """
     )
+    
+    accountExists(email: String!): Boolean
+    @cypher(
+    statement: """
+    MATCH(account: Account{email: $email})
+    return count(account)=1 as result
+    """
+    )
 
     user(id: ID!): User
     @cypher(
