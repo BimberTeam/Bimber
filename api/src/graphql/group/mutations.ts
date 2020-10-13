@@ -1,3 +1,10 @@
+const addedUserToGroup = "'Użytkownik został dodany do grupy!";
+const voted = "'Głos został oddany!'";
+const deletedUserFromPending = "'Użytkownik został usunięty z listy oczekujących na dołcząenie do podanej grupy!'";
+
+const createdNewGroup = "'Utworzono nową grupę !'";
+const requestedToJoinToGroup = "'Wysłano prośbę o dołączenię do grupy !'"
+
 export const GroupMutations = `
     """
         Parameters:\n
@@ -10,7 +17,7 @@ export const GroupMutations = `
         Otherwise new relationship ('REQUESTED') will be created between the caller and requested group.
         Caller will be pending until accepted by majority of the group members.
     """
-    swipe(id: ID!): String
+    swipe(id: ID!): Message
     @cypher(
         statement: """
         MATCH(g: Group {id: $id})
@@ -28,44 +35,44 @@ export const GroupMutations = `
                 SET group.ttl = timestamp() + toInteger(ttl)
                 MERGE(me)-[:BELONGS_TO]->(group)
                 MERGE(swipedAccount)-[:BELONGS_TO]->(group)
-                RETURN 'Sent swipe request!' AS res
+                RETURN {status: 'OK', message: ${createdNewGroup}} as result
             \\",
             \\"
                 MATCH(me: Account{id: $meId})
-                MERGE(me)-[:REQUESTED]->(g)
-                RETURN 'ok!' AS res
+                MERGE(me)-[:PENDING]->(g)
+                RETURN {status: 'OK', message: ${requestedToJoinToGroup}} as result
             \\",
             {g:g, meId:$meId, ttl:ttl}
         ) YIELD value
-        RETURN value.res
+        RETURN value.result
         """
     )
 
-    acceptPendingRequest(input: AcceptPendingRequestInput!): String
+    acceptPendingRequest(input: AcceptPendingRequestInput!): Message
     @cypher(
         statement: """
-        MATCH (a:Account{id: $input.pendingUserId})
+        MATCH (a:Account{id: $input.userId})
         MATCH (g:Group{id: $input.groupId})
         CALL apoc.do.when(
             $distributionOfVotes >= 0.5,
             \\"
             CALL {
-                MATCH ( (a)-[vf:VOTE_FAVOUR]-(g) )
+                MATCH ( (a)-[vf:VOTE_IN_FAVOUR]-(g) )
                 RETURN vf as result
                 UNION ALL
                 MATCH ( (a)-[va:VOTE_AGAINST]-(g) )
                 RETURN va as result
                 UNION ALL
-                MATCH (a)-[p:PENDING]->(g)
+                MATCH ( (a)-[p:PENDING]->(g) )
                 RETURN p as result
             }
             MERGE (a)-[:BELONGS_TO]->(g)
             DELETE result
-            RETURN 'Added user to group!' as result
+            RETURN {status: 'OK', message: ${addedUserToGroup}} as result
             \\",
             \\"
-            MERGE (g)-[:VOTE_FAVOUR{id: $meId}]->(a)
-            RETURN 'Voted successfully!' as result
+            MERGE (g)-[:VOTE_IN_FAVOUR{id: $meId}]->(a)
+            RETURN {status: 'OK', message: ${voted}} as result
             \\",
             {a:a, g:g, meId:$meId}
         ) YIELD value
@@ -73,30 +80,30 @@ export const GroupMutations = `
         """
     )
 
-    rejectPendingRequest(input: RejectPendingRequestInput!): String
+    rejectPendingRequest(input: RejectPendingRequestInput!): Message
     @cypher(
         statement: """
-        MATCH (a:Account{id: $input.pendingUserId})
+        MATCH (a:Account{id: $input.userId})
         MATCH (g:Group{id: $input.groupId})
         CALL apoc.do.when(
             $distributionOfVotes > 0.5,
             \\"
             CALL {
-                MATCH ( (a)-[vf:VOTE_FAVOUR]-(g) )
+                MATCH ( (a)-[vf:VOTE_IN_FAVOUR]-(g) )
                 RETURN vf as result
                 UNION ALL
                 MATCH ( (a)-[va:VOTE_AGAINST]-(g) )
                 RETURN va as result
                 UNION ALL
-                MATCH (a)-[p:PENDING]->(g)
+                MATCH ( (a)-[p:PENDING]->(g) )
                 RETURN p as result
             }
             DELETE result
-            RETURN 'User deleted from pending' as result
+            RETURN {status: 'OK', message: ${deletedUserFromPending}} as result
             \\",
             \\"
             MERGE (g)-[:VOTE_AGAINST{id: $meId}]->(a)
-            RETURN 'Voted successfully!' as result
+            RETURN {status: 'OK', message: ${voted}} as result
             \\",
             {a:a, g:g, meId:$meId}
         ) YIELD value

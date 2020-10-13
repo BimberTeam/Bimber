@@ -1,5 +1,5 @@
-import { makeAugmentedSchema } from "neo4j-graphql-js";
-import { neo4jgraphql } from "neo4j-graphql-js";
+import { makeAugmentedSchema } from "./../../node_modules/neo4j-graphql-js";
+import { neo4jgraphql } from "./../..//node_modules/neo4j-graphql-js";
 import { GroupTypes } from "./group/types";
 import { GroupMutations } from "./group/mutations";
 import swipe from "./group/resolvers/swipe";
@@ -11,18 +11,18 @@ import { AccountMutations } from "./user/mutations";
 import register from "./user/resolvers/register";
 import updateAccount from "./user/resolvers/updateAccount"
 import { AccountQueries } from "./user/queries";
-import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
+import getAccountInfoFromContex from "./common/getAccountInfoFromContext";
 import pendingMembersList from "./group/queries/pendingMembersList";
 import { GroupInputs } from "./group/inputs";
 import acceptPendingRequest from "./group/mutations/acceptPendingRequest";
 import rejectPendingRequest from "./group/mutations/rejectPendingRequest";
-import { UtilTypes } from "./utils/types";
-import { UtilInputs } from "./utils/inputs";
+import { UtilTypes } from "./common/types";
+import { UtilInputs } from "./common/inputs";
 
 export const typeDefs = `
   ${AccountTypes}
   ${GroupTypes}
-  
+
   ${UtilTypes}
 
   ${AccountInputs}

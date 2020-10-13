@@ -5,7 +5,7 @@ import { hashPassword } from "../../../auth/auth";
 
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
-    
+
     if (params.user.latestLocation) {
         params.user.latestLocation = new neo4j.types.Point(
         // magic number info : https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point-wgs84-2d

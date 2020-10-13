@@ -4,12 +4,12 @@
         from: Int
         to: Int
     }
-    
+
     enum Status {
         OK
         ERROR
     }
-    
+
     type Message {
         message: String!
         status: Status!

@@ -64,10 +64,10 @@ export const AccountTypes = `
         genderPreference: Gender!
         alcoholPreference: AlcoholType!
         agePreference: Int!
-        voteAgainst: Int!
-        voteFavour: Int!
+        votesAgainst: Int!
+        votesInFavour: Int!
     }
-    
+
     type LoginPayload {
         token: String!
     }

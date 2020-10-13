@@ -27,8 +27,8 @@ export const AccountMutations = `
             ON MATCH SET a.is_exist = false
             WITH a, (
                 CASE a.is_exist
-                WHEN true THEN {status: 'OK', message: ${friendAdded}} 
-                ELSE {status: 'ERROR', message: ${friendAlreadyExists}} 
+                WHEN true THEN {status: 'OK', message: ${friendAdded}}
+                ELSE {status: 'ERROR', message: ${friendAlreadyExists}}
                 END
             ) AS res
             REMOVE a.is_exist
@@ -99,7 +99,7 @@ export const AccountMutations = `
         MATCH(b: Account { id: $userId })
         MATCH (a)-[f:REQUESTED_FRIENDS]->(b)
         DELETE f
-        RETURN {status: 'OK', message: ${friendRequestDenied}} 
+        RETURN {status: 'OK', message: ${friendRequestDenied}}
     """
     )
 
@@ -134,11 +134,11 @@ export const AccountMutations = `
         SET u.id = apoc.create.uuid()
         SET g.id = apoc.create.uuid()
         MERGE(u)-[:OWNER]->(g)
-        RETURN u 
+        RETURN u
     """
     )
 
-    login(email: String!, password: String!): LoginPayload 
+    login(email: String!, password: String!): LoginPayload
 
     me: Account
     @cypher(

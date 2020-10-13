@@ -1,12 +1,12 @@
 export const GroupInputs = `
     input AcceptPendingRequestInput {
-        groupId: Int!
-        pendingUserId: Int!
+        groupId: String!
+        userId: String!
     }
 
     input RejectPendingRequestInput {
-        groupId: Int!
-        pendingUserId: Int!
+        groupId: String!
+        userId: String!
     }
 
 `

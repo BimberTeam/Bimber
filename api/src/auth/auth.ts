@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 interface TokenInfo {
-    id: string; 
+    id: string;
 }
 
 export const createToken = (id: string): string => {
