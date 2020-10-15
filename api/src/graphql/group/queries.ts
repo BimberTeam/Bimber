@@ -15,10 +15,10 @@ export const GroupQueries = `
         """
     )
 
-    pendingMembersList(groupId: ID): [PendingMemberListPayload]
+    pendingMembersList(input: PendingMembersListInput): [PendingMemberListPayload]
     @cypher(
         statement: """
-            MATCH (a: Account)-[:PENDING]->(g:Group{id: $groupId})
+            MATCH (a: Account)-[:PENDING]->(g:Group{id: $input.groupId})
             WHERE NOT( (g)-[:VOTE_AGAINST{id: $meId}]->(a) ) AND NOT( (g)-[:VOTE_IN_FAVOUR{id: $meId}]->(a) )
             CALL{
                 MATCH (a)-[vf:VOTE_IN_FAVOUR]->(g)

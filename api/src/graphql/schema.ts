@@ -17,7 +17,6 @@ import { GroupInputs } from "./group/inputs";
 import acceptPendingRequest from "./group/mutations/acceptPendingRequest";
 import rejectPendingRequest from "./group/mutations/rejectPendingRequest";
 import { UtilTypes } from "./common/types";
-import { UtilInputs } from "./common/inputs";
 
 export const typeDefs = `
   ${AccountTypes}
@@ -26,7 +25,6 @@ export const typeDefs = `
   ${UtilTypes}
 
   ${AccountInputs}
-  ${UtilInputs}
 
   type Query {
     ${AccountQueries}

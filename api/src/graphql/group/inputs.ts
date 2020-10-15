@@ -9,4 +9,8 @@ export const GroupInputs = `
         userId: String!
     }
 
+    input PendingMembersListInput {
+        groupId: String!
+    }
+
 `

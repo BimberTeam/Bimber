@@ -1,13 +1,13 @@
-const registerSuccessful = "'Rejestracja powiodła się!'";
+import { singleQuote } from "./../common/helper";
 
 // accept friend request messages
-const friendAdded = "'Zaakceptowano zaproszenie do znajomych!'";
-const friendAlreadyExists = "'Jesteście już znajomymi!'";
-const friendMissingRequest = "'Nie dostałeś takiego zaproszenia!'";
-const friendDeleted = "'Usunięto znajomego!'";
+const friendAdded = singleQuote("Zaakceptowano zaproszenie do znajomych!");
+const friendAlreadyExists = singleQuote("Jesteście już znajomymi!");
+const friendMissingRequest = singleQuote("Nie dostałeś takiego zaproszenia!");
+const friendDeleted = singleQuote("Usunięto znajomego!");
 
-const friendRequestSent = "'Wysłano zaproszenie do znajomych!'";
-const friendRequestDenied = "'Odrzucono prośbę o dołączenie do znajomych!'";
+const friendRequestSent = singleQuote("Wysłano zaproszenie do znajomych!");
+const friendRequestDenied = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");
 
 export const AccountMutations = `
     acceptFriendRequest(friendId: ID!): Message

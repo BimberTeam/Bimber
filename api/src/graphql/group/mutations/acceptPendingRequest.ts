@@ -4,15 +4,11 @@ import pendingRequest from '../common/pendingRequest';
 
 export default async (obj, params, ctx, resolveInfo) => {
 
-    try {
-        await pendingRequest(params, ctx);
-    } catch (error) {
-        throw error;
-    }
+    await pendingRequest(params, ctx);
 
     const session: Session = ctx.driver.session();
 
-    const distributionOfVotes = await session.run(
+    const votesDistribution = await session.run(
         `
         MATCH (a: Account{id: "${params.input.userId}"})
         MATCH (g: Group{id: "${params.input.groupId}"})
@@ -26,10 +22,10 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     await session.close();
 
-    const countOfVoteFavour = distributionOfVotes.records[0].get("result").low;
-    const countOfGroup = distributionOfVotes.records[1].get("result").low;
+    const votesInFavor = votesDistribution.records[0].get("result").low;
+    const groupCount = votesDistribution.records[1].get("result").low;
 
-    params.distributionOfVotes = (countOfVoteFavour+1) / countOfGroup;
+    params.votesDistribution = (votesInFavor+1) / groupCount;
     params.meId = ctx.user.id;
 
     return neo4jgraphql(obj, params, ctx, resolveInfo, true);

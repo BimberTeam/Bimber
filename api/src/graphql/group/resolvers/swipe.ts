@@ -1,17 +1,29 @@
-import { isAuthorized } from './../../common/helper';
+import { ensureAuthorized, singleQuote } from "./../../common/helper";
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const requestedToJoinToGroup = "'Wysłano prośbę o dołączenię do grupy !'"
-const userAlreadyBelongsToGroup = "'Już należysz do podanej grupy !'";
-const alreadyPendingToGroup = "'Już oczekujesz na dołącznie do tej grupy !'";
+const joinGroupRequested = singleQuote("Wysłano prośbę o dołączenię do grupy !");
+const userAlreadyBelongsToGroup = singleQuote("Już należysz do podanej grupy !");
+const alreadyPendingToGroup = singleQuote("Już oczekujesz na dołącznie do tej grupy !");
+const groupOwner = singleQuote("Jesteś właścicielem podanej grupy !");
 
 export default async (obj, params, ctx, resolveInfo) => {
 
     const session: Session = ctx.driver.session();
-    isAuthorized(ctx);
+    ensureAuthorized(ctx);
+
+    const alreadyGroupOwner = await session.run(
+        `
+        MATCH (g: Group {id: "${params.id}"}), (a:Account {id: "${ctx.user.id}"})
+        RETURN EXISTS((g)<-[:OWNER]-(a)) AS result
+        `,
+    );
+
+    if (getValueFromSessionResult(alreadyGroupOwner, "result") === true) {
+        throw new ApolloError(groupOwner, "200", [groupOwner]);
+    }
 
     const alreadyBelongsTo = await session.run(
         `
@@ -36,14 +48,14 @@ export default async (obj, params, ctx, resolveInfo) => {
         throw new ApolloError(alreadyPendingToGroup, "200", [alreadyPendingToGroup]);
     }
 
-    const membersCount = await session.run(
+    const groupMembers = await session.run(
         `
         MATCH (g: Group {id: "${params.id}"})<-[:BELONGS_TO]-(a:Account)
-        RETURN count(*) AS membersCount
+        RETURN count(*) AS groupMembers
         `,
     );
 
-    if (getValueFromSessionResult(membersCount, "membersCount").low === 0) {
+    if (getValueFromSessionResult(groupMembers, "groupMembers").low === 0) {
         const isPending = await session.run(
             `
             MATCH (group: Group {id: "${params.id}"})-[:OWNER]-(a:Account)
@@ -58,7 +70,7 @@ export default async (obj, params, ctx, resolveInfo) => {
                 MATCH (g: Group {id: "${params.id}"})-[:OWNER]-(Account)
                 MATCH (me:Account {id: "${ctx.user.id}"})
                 MERGE (me)-[:PENDING]-(g)
-                RETURN {status: 'OK', message: ${requestedToJoinToGroup}} AS result
+                RETURN {status: 'OK', message: ${joinGroupRequested}} AS result
                 `,
             );
             return getValueFromSessionResult(swipe, "result");
@@ -69,7 +81,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     params.meId = ctx.user.id;
     params.ttl = process.env.NEO4J_TTL;
-    params.membersCount = membersCount.records[0].get("membersCount").low;
+    params.groupMembers = groupMembers.records[0].get("groupMembers").low;
 
     return neo4jgraphql(obj, params, ctx, resolveInfo, true);
 };

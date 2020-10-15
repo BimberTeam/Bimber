@@ -1,9 +1,11 @@
-const addedUserToGroup = "'Użytkownik został dodany do grupy!";
-const voted = "'Głos został oddany!'";
-const deletedUserFromPending = "'Użytkownik został usunięty z listy oczekujących na dołcząenie do podanej grupy!'";
+import { singleQuote } from "./../common/helper";
 
-const createdNewGroup = "'Utworzono nową grupę !'";
-const requestedToJoinToGroup = "'Wysłano prośbę o dołączenię do grupy !'"
+const addedUserToGroup = singleQuote("Użytkownik został dodany do grupy!");
+const voted = singleQuote("Głos został oddany!");
+const deletedUserFromPending = singleQuote("Użytkownik został usunięty z listy oczekujących na dołcząenie do podanej grupy!");
+
+const groupCreated = singleQuote("Utworzono nową grupę !");
+const joinGroupRequested = singleQuote("Wysłano prośbę o dołączenię do grupy !");
 
 export const GroupMutations = `
     """
@@ -22,7 +24,7 @@ export const GroupMutations = `
         statement: """
         MATCH(g: Group {id: $id})
         CALL apoc.do.when(
-            $membersCount = 0,
+            $groupMembers = 0,
             \\"
                 WITH $g AS g, $ttl AS ttl
                 MATCH (g)<-[:OWNER]-(swipedAccount:Account)
@@ -35,12 +37,12 @@ export const GroupMutations = `
                 SET group.ttl = timestamp() + toInteger(ttl)
                 MERGE(me)-[:BELONGS_TO]->(group)
                 MERGE(swipedAccount)-[:BELONGS_TO]->(group)
-                RETURN {status: 'OK', message: ${createdNewGroup}} as result
+                RETURN {status: 'OK', message: ${groupCreated}} as result
             \\",
             \\"
                 MATCH(me: Account{id: $meId})
                 MERGE(me)-[:PENDING]->(g)
-                RETURN {status: 'OK', message: ${requestedToJoinToGroup}} as result
+                RETURN {status: 'OK', message: ${joinGroupRequested}} as result
             \\",
             {g:g, meId:$meId, ttl:ttl}
         ) YIELD value
@@ -54,7 +56,7 @@ export const GroupMutations = `
         MATCH (a:Account{id: $input.userId})
         MATCH (g:Group{id: $input.groupId})
         CALL apoc.do.when(
-            $distributionOfVotes >= 0.5,
+            $votesDistribution >= 0.5,
             \\"
             CALL {
                 MATCH ( (a)-[vf:VOTE_IN_FAVOUR]-(g) )
@@ -86,7 +88,7 @@ export const GroupMutations = `
         MATCH (a:Account{id: $input.userId})
         MATCH (g:Group{id: $input.groupId})
         CALL apoc.do.when(
-            $distributionOfVotes > 0.5,
+            $votesDistribution > 0.5,
             \\"
             CALL {
                 MATCH ( (a)-[vf:VOTE_IN_FAVOUR]-(g) )

@@ -1,23 +1,23 @@
-import { isAuthorized } from './../../common/helper';
+import { ensureAuthorized, singleQuote } from "./../../common/helper";
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const userIdEqualsToPendingUserId = "'ID użytkownika na którego chcesz zagłosować musi być różne od Twojego ID !'"
-const groupDoesNotExist = "'Podana grupa nie istnieje !'";
-const userNotBelongsToGroup = "'Nie należysz do podanej grupy !'";
-const userDoesNotExist = "'Podany użytkownik nie istnieje !'";
-const userDoesNotPendingToGroup = "'Użytkownik o podanym id nie oczekuje o dołączenie do podanej grupy !'";
-const hasUserAlreadyVotedMessage = "'Już oddałeś głos !'";
+const userIsPendingUser = singleQuote("ID użytkownika na którego chcesz zagłosować musi być różne od Twojego ID !");
+const groupNotExist = singleQuote("Podana grupa nie istnieje !");
+const notMemberOfGroup = singleQuote("Nie należysz do podanej grupy !");
+const userNotExists = singleQuote("Podany użytkownik nie istnieje !");
+const userNotPendingToGroup = singleQuote("Użytkownik o podanym id nie oczekuje o dołączenie do podanej grupy !");
+const userAlreadyVoted = singleQuote("Już oddałeś głos !");
 
 export default async (params, ctx) => {
 
     const session: Session = ctx.driver.session();
 
-    isAuthorized(ctx);
+    ensureAuthorized(ctx);
 
     if (ctx.user.id === params.input.userId) {
-        throw new ApolloError(userIdEqualsToPendingUserId, "400", [userIdEqualsToPendingUserId]);
+        throw new ApolloError(userIsPendingUser, "400", [userIsPendingUser]);
     }
 
     const doesGroupExist = await session.run(
@@ -28,7 +28,7 @@ export default async (params, ctx) => {
     );
 
     if (doesGroupExist.records.length === 0) {
-        throw new ApolloError(groupDoesNotExist, "400", [groupDoesNotExist]);
+        throw new ApolloError(groupNotExist, "400", [groupNotExist]);
     }
 
     const userBelongsToGroup = await session.run(
@@ -40,7 +40,7 @@ export default async (params, ctx) => {
     );
 
     if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
-        throw new ApolloError(userNotBelongsToGroup, "400", [userNotBelongsToGroup]);
+        throw new ApolloError(notMemberOfGroup, "400", [notMemberOfGroup]);
     }
 
     const pendingUserExists = await session.run(
@@ -51,7 +51,7 @@ export default async (params, ctx) => {
     );
 
     if (pendingUserExists.records.length === 0) {
-        throw new ApolloError(userDoesNotExist, "400", [userDoesNotExist]);
+        throw new ApolloError(userNotExists, "400", [userNotExists]);
     }
 
     const isUserPending = await session.run(
@@ -64,7 +64,7 @@ export default async (params, ctx) => {
     );
 
     if (isUserPending.records.length === 0) {
-        throw new ApolloError(userDoesNotPendingToGroup, "400", [userDoesNotPendingToGroup]);
+        throw new ApolloError(userNotPendingToGroup, "400", [userNotPendingToGroup]);
     }
 
     const hasUserAlreadyVoted = await session.run(
@@ -77,7 +77,7 @@ export default async (params, ctx) => {
     );
 
     if (getValueFromSessionResult(hasUserAlreadyVoted, "result") === true) {
-        throw new ApolloError(hasUserAlreadyVotedMessage, "400", [hasUserAlreadyVotedMessage]);
+        throw new ApolloError(userAlreadyVoted, "400", [userAlreadyVoted]);
     }
 
     await session.close();
