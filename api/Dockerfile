@@ -1,12 +1,21 @@
-FROM node:12
+FROM node:12-alpine AS BUILDER
 
-RUN mkdir -p /app
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY package.json .
+COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
 
-EXPOSE 4001
+RUN npm run build
+RUN npm prune --production
 
-CMD ["npm", "run", "start"]
+FROM node:12-alpine
+
+WORKDIR /usr/src/app
+
+COPY --from=BUILDER /usr/src/app/dist ./dist
+COPY --from=BUILDER /usr/src/app/node_modules ./node_modules
+
+EXPOSE 4001
+CMD ["node", "./dist/app.js"]
+
