@@ -51,7 +51,24 @@ export const AccountTypes = `
         longitude: Float,
         latitude: Float
     }
-    
+
+    type PendingMemberListPayload{
+        name: String!
+        email: String!
+        imageUrl: String
+        age: Int!
+        favoriteAlcoholName: String!
+        favoriteAlcoholType: AlcoholType!
+        description: String!
+        gender: Gender!
+        genderPreference: Gender!
+        alcoholPreference: AlcoholType!
+        agePreference: Int!
+        votesAgainst: Int!
+        votesInFavour: Int!
+        groupCount: Int!
+    }
+
     type LoginPayload {
         token: String!
     }

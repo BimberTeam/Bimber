@@ -13,7 +13,7 @@ export const AccountInputs = `
         genderPreference: Gender!
         alcoholPreference: AlcoholType!
         agePreferenceFrom: Int!
-        agePreferenceTo: Int! 
+        agePreferenceTo: Int!
     }
 
     input UpdateAccountInput {
@@ -28,6 +28,6 @@ export const AccountInputs = `
         genderPreference: Gender
         alcoholPreference: AlcoholType
         agePreferenceFrom: Int
-        agePreferenceTo: Int 
+        agePreferenceTo: Int
     }
 `;

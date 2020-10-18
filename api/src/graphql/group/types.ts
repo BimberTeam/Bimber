@@ -22,7 +22,7 @@ export const GroupTypes = `
                 RETURN a
             """
         )
-        membersCount: Int
+        groupMembers: Int
         @cypher(
         statement: """
             MATCH (this)<-[:BELONGS_TO]-(a:Account)
@@ -46,4 +46,5 @@ export const GroupTypes = `
             }
         """
         )
+
     }`;

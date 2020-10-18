@@ -6,7 +6,7 @@ export const AccountQueries = `
         RETURN a
     """
     )
-    
+
     accountExists(email: String!): Boolean
     @cypher(
     statement: """
