@@ -12,7 +12,7 @@ const groupOwnerError = singleQuote("Jesteś właścicielem podanej grupy !");
 export default async (obj, params, ctx, resolveInfo) => {
 
     const session: Session = ctx.driver.session();
-    ensureAuthorized(ctx);
+    await ensureAuthorized(ctx);
 
     const alreadyGroupOwner = await session.run(
         `

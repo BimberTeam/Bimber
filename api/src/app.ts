@@ -32,6 +32,7 @@ const server = new ApolloServer({
       driver,
       req,
       user,
+      token,
     };
   },
   introspection: true,

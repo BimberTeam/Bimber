@@ -1,7 +1,10 @@
+import { singleQuote } from './../../common/helper';
 import { ApolloError } from "apollo-server";
 import neo4j, { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { hashPassword } from "../../../auth/auth";
+
+const emailAlreadyExistsError = singleQuote("Podany email jest zajęty!");
 
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
@@ -25,7 +28,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     );
 
     if (findAccount.records.length > 0) {
-        throw new ApolloError("This user already exists!", "200", ["This user already exists!"]);
+        throw new ApolloError(emailAlreadyExistsError, "200", [emailAlreadyExistsError]);
     }
 
     await session.close();
