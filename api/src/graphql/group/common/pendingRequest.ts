@@ -3,7 +3,7 @@ import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const userIsPendingUserError = singleQuote("ID użytkownika na którego chcesz zagłosować musi być różne od Twojego ID !");
+const callerIsPendingUserError = singleQuote("ID użytkownika na którego chcesz zagłosować musi być różne od Twojego ID !");
 const groupNotFoundError = singleQuote("Podana grupa nie istnieje !");
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy !");
 const userNotFoundError = singleQuote("Podany użytkownik nie istnieje !");
@@ -32,7 +32,7 @@ export default async (params, ctx) => {
     ensureAuthorized(ctx);
 
     if (ctx.user.id === params.input.userId) {
-        throw new ApolloError(userIsPendingUserError, "400", [userIsPendingUserError]);
+        throw new ApolloError(callerIsPendingUserError, "400", [callerIsPendingUserError]);
     }
 
     const doesGroupExist = await session.run(
