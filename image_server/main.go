@@ -48,10 +48,10 @@ func main() {
 	}
 	router.Use(middlewares...)
 
-	router.PathPrefix("/image").Handler(http.StripPrefix("/image/", imageHandler)).Methods(http.MethodGet)
+	router.PathPrefix("/images").Handler(http.StripPrefix("/images/", imageHandler)).Methods(http.MethodGet)
 	router.Handle(
-		fmt.Sprintf("/image/{profile_id:%s}", UUID),
-		http.StripPrefix("/image/", uploadHandler)).Methods(http.MethodPost, http.MethodDelete)
+		fmt.Sprintf("/images/{profile_id:%s}", UUID),
+		http.StripPrefix("/images/", uploadHandler)).Methods(http.MethodPost, http.MethodDelete)
 
 	log.Info("server running on port ", cfg.Port)
 	log.Fatal(http.ListenAndServe(":"+cfg.Port, router))
