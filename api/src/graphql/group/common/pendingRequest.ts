@@ -3,12 +3,27 @@ import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const userIsPendingUser = singleQuote("ID użytkownika na którego chcesz zagłosować musi być różne od Twojego ID !");
-const groupNotExist = singleQuote("Podana grupa nie istnieje !");
-const notMemberOfGroup = singleQuote("Nie należysz do podanej grupy !");
-const userNotExists = singleQuote("Podany użytkownik nie istnieje !");
-const userNotPendingToGroup = singleQuote("Użytkownik o podanym id nie oczekuje o dołączenie do podanej grupy !");
-const userAlreadyVoted = singleQuote("Już oddałeś głos !");
+const userIsPendingUserError = singleQuote("ID użytkownika na którego chcesz zagłosować musi być różne od Twojego ID !");
+const groupNotFoundError = singleQuote("Podana grupa nie istnieje !");
+const lackingMembershipError = singleQuote("Nie należysz do podanej grupy !");
+const userNotFoundError = singleQuote("Podany użytkownik nie istnieje !");
+const pendingRelationNotFoundError = singleQuote("Użytkownik o podanym id nie oczekuje o dołączenie do podanej grupy !");
+const alreadyVotedError = singleQuote("Już oddałeś głos !");
+
+
+export class VotesDistribution {
+    private groupCount: number;
+    private votesCount: number;
+
+    constructor(groupCount: number, votesCount: number) {
+        this.groupCount = groupCount;
+        this.votesCount = votesCount;
+    }
+
+    getVotesDistribution() {
+        return (this.votesCount + 1) / this.groupCount;
+    }
+}
 
 export default async (params, ctx) => {
 
@@ -17,7 +32,7 @@ export default async (params, ctx) => {
     ensureAuthorized(ctx);
 
     if (ctx.user.id === params.input.userId) {
-        throw new ApolloError(userIsPendingUser, "400", [userIsPendingUser]);
+        throw new ApolloError(userIsPendingUserError, "400", [userIsPendingUserError]);
     }
 
     const doesGroupExist = await session.run(
@@ -28,7 +43,7 @@ export default async (params, ctx) => {
     );
 
     if (doesGroupExist.records.length === 0) {
-        throw new ApolloError(groupNotExist, "400", [groupNotExist]);
+        throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
     const userBelongsToGroup = await session.run(
@@ -40,7 +55,7 @@ export default async (params, ctx) => {
     );
 
     if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
-        throw new ApolloError(notMemberOfGroup, "400", [notMemberOfGroup]);
+        throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
     const pendingUserExists = await session.run(
@@ -51,7 +66,7 @@ export default async (params, ctx) => {
     );
 
     if (pendingUserExists.records.length === 0) {
-        throw new ApolloError(userNotExists, "400", [userNotExists]);
+        throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
     }
 
     const isUserPending = await session.run(
@@ -64,7 +79,7 @@ export default async (params, ctx) => {
     );
 
     if (isUserPending.records.length === 0) {
-        throw new ApolloError(userNotPendingToGroup, "400", [userNotPendingToGroup]);
+        throw new ApolloError(pendingRelationNotFoundError, "400", [pendingRelationNotFoundError]);
     }
 
     const hasUserAlreadyVoted = await session.run(
@@ -77,9 +92,33 @@ export default async (params, ctx) => {
     );
 
     if (getValueFromSessionResult(hasUserAlreadyVoted, "result") === true) {
-        throw new ApolloError(userAlreadyVoted, "400", [userAlreadyVoted]);
+        throw new ApolloError(alreadyVotedError, "400", [alreadyVotedError]);
     }
 
     await session.close();
 
 };
+
+
+export const votesDistribution = async (params, ctx, relation): Promise<VotesDistribution> => {
+    const session: Session = ctx.driver.session();
+
+    const votesDistribution = await session.run(
+        `
+        MATCH (a: Account {id: "${params.input.userId}"})
+        MATCH (g: Group{id: "${params.input.groupId}"})
+        MATCH ( (a)-[vf:${relation}]-(g) )
+        RETURN count(vf) as result
+        UNION ALL
+        MATCH (g: Group{id: "${params.input.groupId}"})-[b:BELONGS_TO]-(a:Account)
+        RETURN count(b) as result
+        `
+    );
+
+    await session.close();
+
+    const votesCount = votesDistribution.records[0].get("result").low;
+    const groupCount = votesDistribution.records[1].get("result").low;
+
+    return new VotesDistribution(groupCount, votesCount);
+}

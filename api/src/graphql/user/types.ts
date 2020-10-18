@@ -66,6 +66,7 @@ export const AccountTypes = `
         agePreference: Int!
         votesAgainst: Int!
         votesInFavour: Int!
+        groupCount: Int!
     }
 
     type LoginPayload {

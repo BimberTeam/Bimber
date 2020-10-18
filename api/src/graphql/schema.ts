@@ -14,8 +14,8 @@ import { AccountQueries } from "./user/queries";
 import getAccountInfoFromContex from "./common/getAccountInfoFromContext";
 import pendingMembersList from "./group/queries/pendingMembersList";
 import { GroupInputs } from "./group/inputs";
-import acceptPendingRequest from "./group/mutations/acceptPendingRequest";
-import rejectPendingRequest from "./group/mutations/rejectPendingRequest";
+import acceptGroupPendingUser from "./group/mutations/acceptPendingRequest";
+import rejectGroupPendingUser from "./group/mutations/rejectPendingRequest";
 import { UtilTypes } from "./common/types";
 
 export const typeDefs = `
@@ -58,8 +58,8 @@ const resolvers = {
     register,
     swipe,
     updateAccount,
-    acceptPendingRequest,
-    rejectPendingRequest,
+    acceptGroupPendingUser,
+    rejectGroupPendingUser,
   },
   Query: {
     me(object, params, ctx, resolveInfo) {

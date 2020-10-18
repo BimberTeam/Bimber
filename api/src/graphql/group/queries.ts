@@ -28,6 +28,10 @@ export const GroupQueries = `
                 MATCH (a)-[va:VOTE_AGAINST]->(g)
                 RETURN count(va) as votes_against
             }
+            CALL{
+                MATCH (a)-[b:BELONGS_TO]->(g)
+                RETURN count(b) as group_count
+            }
             RETURN {
                 name: a.name,
                 email: a.email,
@@ -41,7 +45,8 @@ export const GroupQueries = `
                 alcoholPreference: a.alcoholPreference,
                 agePreference: a.agePreference,
                 votesAgainst: votes_against,
-                votesInFavour: votes_in_favour
+                votesInFavour: votes_in_favour,
+                groupCount: group_count
             }
         """
     )

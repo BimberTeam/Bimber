@@ -1,11 +1,11 @@
 import { singleQuote } from "./../common/helper";
 
-const addedUserToGroup = singleQuote("Użytkownik został dodany do grupy!");
-const voted = singleQuote("Głos został oddany!");
-const deletedUserFromPending = singleQuote("Użytkownik został usunięty z listy oczekujących na dołcząenie do podanej grupy!");
+const addToGroupSuccess = singleQuote("Użytkownik został dodany do grupy!");
+const votingSuccess = singleQuote("Głos został oddany!");
+const deletedUserJoinRequestSuccess = singleQuote("Użytkownik został przegłosowany na jego niekorzyść, usunięto prośbę o dołączenie!");
 
-const groupCreated = singleQuote("Utworzono nową grupę !");
-const joinGroupRequested = singleQuote("Wysłano prośbę o dołączenię do grupy !");
+const groupCreatedSuccess = singleQuote("Utworzono nową grupę !");
+const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy !");
 
 export const GroupMutations = `
     """
@@ -37,12 +37,12 @@ export const GroupMutations = `
                 SET group.ttl = timestamp() + toInteger(ttl)
                 MERGE(me)-[:BELONGS_TO]->(group)
                 MERGE(swipedAccount)-[:BELONGS_TO]->(group)
-                RETURN {status: 'OK', message: ${groupCreated}} as result
+                RETURN {status: 'OK', message: ${groupCreatedSuccess}} as result
             \\",
             \\"
                 MATCH(me: Account{id: $meId})
                 MERGE(me)-[:PENDING]->(g)
-                RETURN {status: 'OK', message: ${joinGroupRequested}} as result
+                RETURN {status: 'OK', message: ${requestedGroupJoinSuccess}} as result
             \\",
             {g:g, meId:$meId, ttl:ttl}
         ) YIELD value
@@ -50,7 +50,7 @@ export const GroupMutations = `
         """
     )
 
-    acceptPendingRequest(input: AcceptPendingRequestInput!): Message
+    acceptGroupPendingUser(input: AcceptPendingRequestInput!): Message
     @cypher(
         statement: """
         MATCH (a:Account{id: $input.userId})
@@ -70,11 +70,11 @@ export const GroupMutations = `
             }
             MERGE (a)-[:BELONGS_TO]->(g)
             DELETE result
-            RETURN {status: 'OK', message: ${addedUserToGroup}} as result
+            RETURN {status: 'OK', message: ${addToGroupSuccess}} as result
             \\",
             \\"
             MERGE (g)-[:VOTE_IN_FAVOUR{id: $meId}]->(a)
-            RETURN {status: 'OK', message: ${voted}} as result
+            RETURN {status: 'OK', message: ${votingSuccess}} as result
             \\",
             {a:a, g:g, meId:$meId}
         ) YIELD value
@@ -82,7 +82,7 @@ export const GroupMutations = `
         """
     )
 
-    rejectPendingRequest(input: RejectPendingRequestInput!): Message
+    rejectGroupPendingUser(input: RejectPendingRequestInput!): Message
     @cypher(
         statement: """
         MATCH (a:Account{id: $input.userId})
@@ -101,11 +101,11 @@ export const GroupMutations = `
                 RETURN p as result
             }
             DELETE result
-            RETURN {status: 'OK', message: ${deletedUserFromPending}} as result
+            RETURN {status: 'OK', message: ${deletedUserJoinRequestSuccess}} as result
             \\",
             \\"
             MERGE (g)-[:VOTE_AGAINST{id: $meId}]->(a)
-            RETURN {status: 'OK', message: ${voted}} as result
+            RETURN {status: 'OK', message: ${votingSuccess}} as result
             \\",
             {a:a, g:g, meId:$meId}
         ) YIELD value

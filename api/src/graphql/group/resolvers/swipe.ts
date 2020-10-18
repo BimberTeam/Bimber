@@ -4,10 +4,10 @@ import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const joinGroupRequested = singleQuote("Wysłano prośbę o dołączenię do grupy !");
-const userAlreadyBelongsToGroup = singleQuote("Już należysz do podanej grupy !");
-const alreadyPendingToGroup = singleQuote("Już oczekujesz na dołącznie do tej grupy !");
-const groupOwner = singleQuote("Jesteś właścicielem podanej grupy !");
+const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy !");
+const lackingMembershipError = singleQuote("Już należysz do podanej grupy !");
+const alreadyPendingError = singleQuote("Już oczekujesz na dołącznie do tej grupy !");
+const groupOwnerError = singleQuote("Jesteś właścicielem podanej grupy !");
 
 export default async (obj, params, ctx, resolveInfo) => {
 
@@ -22,7 +22,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     );
 
     if (getValueFromSessionResult(alreadyGroupOwner, "result") === true) {
-        throw new ApolloError(groupOwner, "200", [groupOwner]);
+        throw new ApolloError(groupOwnerError, "200", [groupOwnerError]);
     }
 
     const alreadyBelongsTo = await session.run(
@@ -33,7 +33,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     );
 
     if (getValueFromSessionResult(alreadyBelongsTo, "result") === true) {
-        throw new ApolloError(userAlreadyBelongsToGroup, "200", [userAlreadyBelongsToGroup]);
+        throw new ApolloError(lackingMembershipError, "200", [lackingMembershipError]);
     }
 
     const alreadyPending = await session.run(
@@ -45,7 +45,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     )
 
     if (getValueFromSessionResult(alreadyPending, "result") === true) {
-        throw new ApolloError(alreadyPendingToGroup, "200", [alreadyPendingToGroup]);
+        throw new ApolloError(alreadyPendingError, "200", [alreadyPendingError]);
     }
 
     const groupMembers = await session.run(
@@ -70,7 +70,7 @@ export default async (obj, params, ctx, resolveInfo) => {
                 MATCH (g: Group {id: "${params.id}"})-[:OWNER]-(Account)
                 MATCH (me:Account {id: "${ctx.user.id}"})
                 MERGE (me)-[:PENDING]-(g)
-                RETURN {status: 'OK', message: ${joinGroupRequested}} AS result
+                RETURN {status: 'OK', message: ${requestedGroupJoinSuccess}} AS result
                 `,
             );
             return getValueFromSessionResult(swipe, "result");

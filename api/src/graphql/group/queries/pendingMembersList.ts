@@ -5,7 +5,7 @@ import { neo4jgraphql } from "neo4j-graphql-js";
 import { getValueFromSessionResult } from "../../common/helper";
 
 const groupDoesNotExist = singleQuote("Podana grupa nie istnieje !");
-const userDoesNotBelongsToGroup = singleQuote("Nie należysz do podanej grupy !");
+const lackingMembershipError = singleQuote("Nie należysz do podanej grupy !");
 
 export default async (obj, params, ctx, resolveInfo) => {
 
@@ -32,7 +32,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     );
 
     if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
-        throw new ApolloError(userDoesNotBelongsToGroup, "400", [userDoesNotBelongsToGroup]);
+        throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
     params.meId = ctx.user.id;
