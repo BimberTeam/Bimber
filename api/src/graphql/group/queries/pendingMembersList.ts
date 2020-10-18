@@ -10,7 +10,7 @@ const lackingMembershipError = singleQuote("Nie należysz do podanej grupy !");
 export default async (obj, params, ctx, resolveInfo) => {
 
     const session: Session = ctx.driver.session();
-    ensureAuthorized(ctx);
+    await ensureAuthorized(ctx);
 
     const groupExists = await session.run(
         `

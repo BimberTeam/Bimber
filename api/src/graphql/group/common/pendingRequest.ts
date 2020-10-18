@@ -29,7 +29,7 @@ export default async (params, ctx) => {
 
     const session: Session = ctx.driver.session();
 
-    ensureAuthorized(ctx);
+    await ensureAuthorized(ctx);
 
     if (ctx.user.id === params.input.userId) {
         throw new ApolloError(callerIsPendingUserError, "400", [callerIsPendingUserError]);
