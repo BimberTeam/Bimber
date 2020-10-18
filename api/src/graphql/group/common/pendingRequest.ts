@@ -100,7 +100,7 @@ export default async (params, ctx) => {
 };
 
 
-export const votesDistribution = async (params, ctx, relation): Promise<VotesDistribution> => {
+export const votesDistribution = async (params, ctx, relation: "VOTE_IN_FAVOUR" | "VOTE_AGAINST"): Promise<VotesDistribution> => {
     const session: Session = ctx.driver.session();
 
     const votesDistribution = await session.run(

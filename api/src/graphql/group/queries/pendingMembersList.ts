@@ -4,7 +4,7 @@ import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const groupDoesNotExist = singleQuote("Podana grupa nie istnieje !");
+const groupDoesNotExistError = singleQuote("Podana grupa nie istnieje !");
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy !");
 
 export default async (obj, params, ctx, resolveInfo) => {
@@ -20,7 +20,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     );
 
     if(groupExists.records.length === 0) {
-        throw new ApolloError(groupDoesNotExist, "400", [groupDoesNotExist]);
+        throw new ApolloError(groupDoesNotExistError, "400", [groupDoesNotExistError]);
     }
 
     const userBelongsToGroup = await session.run(
