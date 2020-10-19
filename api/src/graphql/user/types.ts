@@ -17,8 +17,8 @@ export const AccountTypes = `
         gender: Gender!
         genderPreference: Gender!
         alcoholPreference: AlcoholType!
-        agePreferenceFrom: Int! 
-        agePreferenceTo: Int! 
+        agePreferenceFrom: Int!
+        agePreferenceTo: Int!
     }
 
     type User {
@@ -29,11 +29,12 @@ export const AccountTypes = `
         favoriteAlcoholName: String!
         favoriteAlcoholType: AlcoholType!
         description: String!
+        latestLocation: Point
         gender: Gender!
         genderPreference: Gender!
         alcoholPreference: AlcoholType!
-        agePreferenceFrom: Int! 
-        agePreferenceTo: Int! 
+        agePreferenceFrom: Int!
+        agePreferenceTo: Int!
     }
 
     enum AlcoholType {
