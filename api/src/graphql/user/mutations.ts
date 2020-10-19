@@ -9,6 +9,8 @@ const friendDeletedSuccess = singleQuote("Usunięto znajomego!");
 const friendshipRequestSentSuccess = singleQuote("Wysłano zaproszenie do znajomych!");
 const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");
 
+const deleteAccountSuccess = singleQuote("Konto zostało usunięte!");
+
 export const AccountMutations = `
     acceptFriendRequest(friendId: ID!): Message
     @cypher(
@@ -140,11 +142,13 @@ export const AccountMutations = `
 
     login(email: String!, password: String!): LoginPayload
 
-    me: Account
+    deleteAccount: Message
     @cypher(
-    statement: """
-        MATCH (a:Account {id: $meId})
-        RETURN a
-    """
+        statement: """
+            MATCH (a:Account {id: $meId})
+            MATCH (a)-[relations]-(any)
+            DELETE relations, a
+            RETURN {status: 'OK', message: ${deleteAccountSuccess}}
+        """
     )
 `;

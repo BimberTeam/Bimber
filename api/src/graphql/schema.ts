@@ -55,6 +55,9 @@ const resolvers = {
     denyFriendRequest(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
+    deleteAccount(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
     register,
     swipe,
     updateAccount,
@@ -100,6 +103,7 @@ const schema = makeAugmentedSchema({
     mutation: false,
     query: false,
   },
+  debug: false,
   resolvers,
   typeDefs,
 });

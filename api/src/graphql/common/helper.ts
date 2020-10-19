@@ -24,6 +24,10 @@ export const ensureAuthorized = async (ctx) => {
         `,
     );
 
+    if(accountTokenResult.records.length === 0 ) {
+        throw new ApolloError(notAuthorized, "401", [notAuthorized]);
+    }
+
     const accountToken: string = getValueFromSessionResult(accountTokenResult, 'result');
 
     if(accountToken !== ctx.token) {
@@ -31,3 +35,6 @@ export const ensureAuthorized = async (ctx) => {
     }
 };
 
+export const debugQuery = (): boolean => {
+    return (process.env.DEBUG_NEO4J_QUERY === "true");
+}
