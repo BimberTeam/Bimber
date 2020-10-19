@@ -103,7 +103,6 @@ const schema = makeAugmentedSchema({
     mutation: false,
     query: false,
   },
-  debug: false,
   resolvers,
   typeDefs,
 });
