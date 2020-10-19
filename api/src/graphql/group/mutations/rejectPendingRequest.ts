@@ -1,3 +1,4 @@
+import { debugQuery } from './../../common/helper';
 import { votesDistribution as votesDistributionFun , VotesDistribution } from './../common/pendingRequest';
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
@@ -16,5 +17,5 @@ export default async (obj, params, ctx, resolveInfo) => {
     params.votesDistribution = votesDistribution.getVotesDistribution();
     params.meId = ctx.user.id;
 
-    return neo4jgraphql(obj, params, ctx, resolveInfo, true);
+    return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
 };

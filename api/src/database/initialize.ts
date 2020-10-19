@@ -16,10 +16,10 @@ export const createIndexes = async (driver: Driver, {retries: retires = 5, timeo
       {}, {Account: ["id"], Group: ["id"]}
     )
   `;
-    
+
   for (let i = 0; i < retires; i++) {
     const session: Session = driver.session();
-    
+
     let success = false;
     try {
       await session.run(initCypher);
