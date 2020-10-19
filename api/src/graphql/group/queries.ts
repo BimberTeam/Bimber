@@ -6,15 +6,6 @@ export const GroupQueries = `
         """
     )
 
-    groupList: [Group]
-    @cypher(
-        statement: """
-            MATCH (a:Account {id: $meId})
-            MATCH (a)-[:BELONGS_TO]->(g:Group)
-            RETURN g
-        """
-    )
-
     pendingMembersList(input: PendingMembersListInput): [PendingMemberListPayload]
     @cypher(
         statement: """
