@@ -1,10 +1,28 @@
-export const Group = `
+export const GroupTypes = `
     type Group {
         id: ID!
-        members: [Account] @relation(name: "BELONGS_TO", direction: "IN")
-        pendingMembers: [Account] @relation(name: "PENDING", direction: "IN")
-        requestedMembers: [Account] @relation(name: "REQUESTED", direction: "IN")
-        membersCount: Int
+        members: [User]
+        @cypher(
+            statement: """
+                MATCH (this)<-[:BELONGS_TO]-(a:Account)
+                RETURN a
+            """
+        )
+        pendingMembers: [User]
+        @cypher(
+            statement: """
+                MATCH (this)<-[:PENDING]-(a:Account)
+                RETURN a
+            """
+        )
+        requestedMembers: [User]
+        @cypher(
+            statement: """
+                MATCH (this)<-[:REQUESTED]-(a:Account)
+                RETURN a
+            """
+        )
+        groupMembers: Int
         @cypher(
         statement: """
             MATCH (this)<-[:BELONGS_TO]-(a:Account)
@@ -28,4 +46,5 @@ export const Group = `
             }
         """
         )
+
     }`;

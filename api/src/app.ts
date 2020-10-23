@@ -22,7 +22,7 @@ dotenv.config();
 
 const app = express();
 
-initializeDatabase(driver);
+initializeDatabase(driver, {retries: 5, timeout: 5000});
 
 const server = new ApolloServer({
   context: ({ req, connection }) => {
@@ -32,6 +32,7 @@ const server = new ApolloServer({
       driver,
       req,
       user,
+      token,
     };
   },
   introspection: true,

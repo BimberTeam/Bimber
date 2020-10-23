@@ -1,5 +1,18 @@
+import { singleQuote } from "./../common/helper";
+
+// accept friend request messages
+const friendAddedSuccess = singleQuote("Zaakceptowano zaproszenie do znajomych!");
+const friendAlreadyExistsError = singleQuote("Jesteście już znajomymi!");
+const friendMissingRequestError = singleQuote("Nie dostałeś takiego zaproszenia!");
+const friendDeletedSuccess = singleQuote("Usunięto znajomego!");
+
+const friendshipRequestSentSuccess = singleQuote("Wysłano zaproszenie do znajomych!");
+const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");
+
+const deleteAccountSuccess = singleQuote("Konto zostało usunięte!");
+
 export const AccountMutations = `
-    acceptFriendRequest(friendId: Int!): String
+    acceptFriendRequest(friendId: ID!): Message
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
@@ -16,15 +29,15 @@ export const AccountMutations = `
             ON MATCH SET a.is_exist = false
             WITH a, (
                 CASE a.is_exist
-                WHEN true THEN 'Friend added successfully!'
-                ELSE 'This relation already exist!'
+                WHEN true THEN {status: 'OK', message: ${friendAddedSuccess}}
+                ELSE {status: 'ERROR', message: ${friendAlreadyExistsError}}
                 END
             ) AS res
             REMOVE a.is_exist
             RETURN res
             \\",
             \\"
-            RETURN 'You cannot add this user to friends !' AS res
+            RETURN {status: 'ERROR', message: ${friendMissingRequestError}} AS res
             \\",
             {a:a, b:b, fa:fa, fb:fb}
         ) YIELD value
@@ -32,7 +45,7 @@ export const AccountMutations = `
     """
     )
 
-    removeFriend(friendId: Int!): String
+    removeFriend(friendId: ID!): Message
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
@@ -40,18 +53,18 @@ export const AccountMutations = `
         OPTIONAL MATCH (a)-[fa:FRIENDS]->(b)
         OPTIONAL MATCH (b)-[fb:FRIENDS]->(a)
         DELETE fa, fb
-        RETURN 'Friend deleted'
+        RETURN {status: 'OK', message: ${friendDeletedSuccess}}
     """
     )
 
-    sendFriendRequest(friendId: Int!): String
+    sendFriendRequest(friendId: ID!): Message
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
         MATCH(b: Account { id: $friendId })
         CALL apoc.do.case([
             EXISTS((a)-[:FRIENDS]->(b))=true OR EXISTS((b)-[:FRIENDS]->(a))=true,
-                \\"RETURN 'You are already friend with this user!' AS result\\",
+                \\"RETURN {status: 'ERROR', message: ${friendAlreadyExistsError}} AS result\\",
             EXISTS((b)-[:REQUESTED_FRIENDS]->(a))=true,
                 \\" WITH $a AS a, $b AS b
                 OPTIONAL MATCH(a)-[fa:REQUESTED_FRIENDS]->(b)
@@ -59,7 +72,7 @@ export const AccountMutations = `
                 DELETE fa, fb
                 MERGE(a)-[:FRIENDS]->(b)
                 MERGE(b)-[:FRIENDS]->(a)
-                RETURN 'Added friend' AS result \\",
+                RETURN {status: 'OK', message: ${friendAddedSuccess}} AS result \\",
             EXISTS((b)-[:REQUESTED_FRIENDS]->(a))=false,
                 \\"  WITH $a AS a, $b AS b
                 MERGE(a)-[:REQUESTED_FRIENDS]->(b)
@@ -67,8 +80,8 @@ export const AccountMutations = `
                 ON MATCH SET a.is_exist = false
                 WITH a, (
                     CASE a.is_exist
-                    WHEN true THEN 'Ok'
-                    ELSE 'This relation already exist'
+                    WHEN true THEN {status: 'OK', message: ${friendshipRequestSentSuccess}}
+                    ELSE {status: 'ERROR', message: ${friendAlreadyExistsError}}
                     END
                 ) AS result
                 REMOVE a.is_exist
@@ -81,14 +94,14 @@ export const AccountMutations = `
     """
     )
 
-    denyFriendRequest(userId: Int!): String
+    denyFriendRequest(userId: ID!): Message
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
         MATCH(b: Account { id: $userId })
         MATCH (a)-[f:REQUESTED_FRIENDS]->(b)
         DELETE f
-        RETURN 'Invitation rejected'
+        RETURN {status: 'OK', message: ${friendshipRequestDeniedSuccess}}
     """
     )
 
@@ -101,14 +114,13 @@ export const AccountMutations = `
         """
     )
 
-    register(user: RegisterAccountInput): String
+    register(user: RegisterAccountInput): Account
     @cypher(
     statement: """
         CREATE (u:Account {
             name: $user.name,
             email: $user.email,
             password: $user.password,
-            imageUrl: $user.imageUrl,
             age: $user.age,
             latestLocation: $user.latestLocation,
             favoriteAlcoholName: $user.favoriteAlcoholName,
@@ -116,24 +128,27 @@ export const AccountMutations = `
             description: $user.description,
             gender: $user.gender,
             genderPreference: $user.genderPreference,
-            agePreference: $user.agePreference,
+            agePreferenceFrom: $user.agePreferenceFrom,
+            agePreferenceTo: $user.agePreferenceTo,
             alcoholPreference: $user.alcoholPreference
         })
         CREATE (g: Group)
-        SET u.id = id(u)
-        SET g.id = id(g)
+        SET u.id = apoc.create.uuid()
+        SET g.id = apoc.create.uuid()
         MERGE(u)-[:OWNER]->(g)
-        RETURN 'Registration Complete!'
+        RETURN u
     """
     )
 
-    login(email: String!, password: String!): String
+    login(email: String!, password: String!): LoginPayload
 
-    me: Account
+    deleteAccount: Message
     @cypher(
-    statement: """
-        MATCH (a:Account {id: $meId})
-        RETURN a
-    """
+        statement: """
+            MATCH (a:Account {id: $meId})
+            MATCH (a)-[relations]-(any)
+            DELETE relations, a
+            RETURN {status: 'OK', message: ${deleteAccountSuccess}}
+        """
     )
 `;

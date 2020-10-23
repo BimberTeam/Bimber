@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
   neo4j:
@@ -15,6 +15,21 @@ services:
       - 4001:4001
     env_file:
       - api.env
+    environment:
+      - NODE_ENV=production
+    links:
+      - neo4j
+    depends_on:
+      - neo4j
+  
+  image_server:
+    build: ./image_server
+    environment:
+      - EZ=GMT
+    env_file:
+      - image_server.env
+    ports:
+      - 8080:8080
     links:
       - neo4j
     depends_on:

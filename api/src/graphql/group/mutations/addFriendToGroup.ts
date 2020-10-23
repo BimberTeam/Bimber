@@ -1,7 +1,7 @@
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
-import { getValueFromSessionResult } from "../../utils/helper";
+import { getValueFromSessionResult } from "../../common/helper";
 
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();

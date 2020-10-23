@@ -2,7 +2,7 @@ import { ApolloError } from "apollo-server";
 import { Session } from "neo4j-driver";
 import { verifyPassword } from "../../../auth/auth";
 import { createToken } from "../../../auth/auth";
-import { getValueFromSessionResult } from "./../../utils/helper";
+import { getValueFromSessionResult } from "../../common/helper";
 
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
@@ -43,5 +43,5 @@ export default async (obj, params, ctx, resolveInfo) => {
     }
     await session.close();
 
-    return token;
+    return {token};
 };

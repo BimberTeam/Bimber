@@ -3,10 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 interface TokenInfo {
-    email: string;
-    id: { low: number, high: number };
-    iat: number;
-    exp: number;
+    id: string;
 }
 
 export const createToken = (id: string): string => {
@@ -15,7 +12,7 @@ export const createToken = (id: string): string => {
 
 export const verifyToken = (token: string): TokenInfo => {
     let decodedAccount;
-    if (!token) { return null; }
+    if (!token || token === "null") { return null; }
     try {
         decodedAccount = jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {

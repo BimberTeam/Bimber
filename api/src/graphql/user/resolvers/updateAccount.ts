@@ -1,3 +1,4 @@
+import { debugQuery } from './../../common/helper';
 import { ApolloError } from "apollo-server";
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
@@ -29,6 +30,6 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     params.keys = keys;
     params.values = values;
-    params.meId = ctx.user.id.low;
-    return neo4jgraphql(obj, params, ctx, resolveInfo, true);
+    params.meId = ctx.user.id;
+    return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
 };

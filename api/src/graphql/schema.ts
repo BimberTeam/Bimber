@@ -1,22 +1,31 @@
-import { makeAugmentedSchema } from "neo4j-graphql-js";
-import { neo4jgraphql } from "neo4j-graphql-js";
-import { Group } from "./group/model";
-import { GroupMutations } from "./group/mutations/mutations";
-import swipe from "./group/mutations/swipe";
+import { makeAugmentedSchema } from "./../../node_modules/neo4j-graphql-js";
+import { neo4jgraphql } from "./../..//node_modules/neo4j-graphql-js";
+import { GroupTypes } from "./group/types";
+import { GroupMutations } from "./group/mutations";
+import swipe from "./group/resolvers/swipe";
 import { GroupQueries } from "./group/queries";
 import { AccountInputs } from "./user/inputs";
-import { Account } from "./user/model";
-import login from "./user/mutations/login";
-import { AccountMutations } from "./user/mutations/mutations";
-import register from "./user/mutations/register";
-import updateAccount from "./user/mutations/updateAccount"
+import { AccountTypes } from "./user/types";
+import login from "./user/resolvers/login";
+import { AccountMutations } from "./user/mutations";
+import register from "./user/resolvers/register";
+import updateAccount from "./user/resolvers/updateAccount"
 import { AccountQueries } from "./user/queries";
-import getAccountInfoFromContex from "./utils/getAccountInfoFromContext";
 import addFriendToGroup from "./group/mutations/addFriendToGroup";
+import getAccountInfoFromContex from "./common/getAccountInfoFromContext";
+import pendingMembersList from "./group/queries/pendingMembersList";
+import { GroupInputs } from "./group/inputs";
+import acceptGroupPendingUser from "./group/mutations/acceptPendingRequest";
+import rejectGroupPendingUser from "./group/mutations/rejectPendingRequest";
+import { UtilTypes } from "./common/types";
 
 export const typeDefs = `
-  ${Account}
-  ${Group}
+  ${AccountTypes}
+  ${GroupTypes}
+
+  ${UtilTypes}
+
+  ${AccountInputs}
 
   type Query {
     ${AccountQueries}
@@ -29,14 +38,12 @@ export const typeDefs = `
   }
 
   ${AccountInputs}
+  ${GroupInputs}
 `;
 
 const resolvers = {
   Mutation: {
     login,
-    me(object, params, ctx, resolveInfo) {
-      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
-    },
     acceptFriendRequest(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
@@ -52,18 +59,30 @@ const resolvers = {
     createGroup(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
+    deleteAccount(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
     register,
     swipe,
     updateAccount,
     addFriendToGroup,
+    acceptGroupPendingUser,
+    rejectGroupPendingUser,
   },
   Query: {
+    me(object, params, ctx, resolveInfo) {
+      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
+    accountExists(object, params, ctx, resolveInfo) {
+      return neo4jgraphql(object, params, ctx, resolveInfo);
+    },
     user(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
     group(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
+    pendingMembersList,
   },
 };
 

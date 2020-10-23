@@ -12,7 +12,8 @@ export const AccountInputs = `
         gender: Gender!
         genderPreference: Gender!
         alcoholPreference: AlcoholType!
-        agePreference: Int!
+        agePreferenceFrom: Int!
+        agePreferenceTo: Int!
     }
 
     input UpdateAccountInput {
@@ -26,6 +27,7 @@ export const AccountInputs = `
         gender: Gender
         genderPreference: Gender
         alcoholPreference: AlcoholType
-        agePreference: Int
+        agePreferenceFrom: Int
+        agePreferenceTo: Int
     }
 `;
