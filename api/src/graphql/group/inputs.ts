@@ -18,4 +18,12 @@ export const GroupInputs = `
         friendId: String!
     }
 
+    input AcceptGroupInvitationInput {
+        groupId: String!
+    }
+
+    input RejectGroupInvitationInput {
+        groupId: String!
+    }
+
 `

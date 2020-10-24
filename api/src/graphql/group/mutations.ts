@@ -7,6 +7,8 @@ const deletedUserJoinRequestSuccess = singleQuote("Użytkownik został przegłos
 const groupCreatedSuccess = singleQuote("Utworzono nową grupę !");
 const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy !");
 const groupInvitationSentSuccess = singleQuote("Wysłano zaproszenie do grupy !");
+const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane !");
+const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte !");
 
 export const GroupMutations = `
     """
@@ -131,6 +133,29 @@ export const GroupMutations = `
             MATCH(g: Group{id: $input.groupId})
             MERGE((a)-[:GROUP_INVITATION]->(g))
             RETURN {status: 'OK', message: ${groupInvitationSentSuccess}}
+        """
+    )
+
+    acceptGroupInvitation(input: AcceptGroupInvitationInput): Message
+    @cypher(
+        statement: """
+            MATCH(a: Account{id: $meId})
+            MATCH(g: Group{id: $input.groupId})
+            MATCH(a)-[gi:GROUP_INVITATION]->(g)
+            DELETE gi
+            MERGE((a)-[:PENDING]-(g))
+            RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}}
+        """
+    )
+
+    rejectGroupInvitation(input: RejectGroupInvitationInput): Message
+    @cypher(
+        statement: """
+            MATCH(a: Account{id: $meId})
+            MATCH(g: Group{id: $input.groupId})
+            MATCH(a)-[gi:GROUP_INVITATION]->(g)
+            DELETE gi
+            RETURN {status: 'OK', message: ${rejectGroupInvitationSuccess}}
         """
     )
 `;

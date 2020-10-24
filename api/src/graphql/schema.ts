@@ -18,6 +18,8 @@ import { GroupInputs } from "./group/inputs";
 import acceptGroupPendingUser from "./group/mutations/acceptPendingRequest";
 import rejectGroupPendingUser from "./group/mutations/rejectPendingRequest";
 import { UtilTypes } from "./common/types";
+import groupInvitation from "./group/mutations/groupInvitation";
+
 
 export const typeDefs = `
   ${AccountTypes}
@@ -61,6 +63,12 @@ const resolvers = {
     },
     deleteAccount(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+    },
+    acceptGroupInvitation(object, params, ctx, resolveInfo) {
+      return groupInvitation(object, params, ctx, resolveInfo);
+    },
+    rejectGroupInvitation(object, params, ctx, resolveInfo) {
+      return groupInvitation(object, params, ctx, resolveInfo);
     },
     register,
     swipe,

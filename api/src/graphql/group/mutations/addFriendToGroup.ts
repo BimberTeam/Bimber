@@ -37,7 +37,7 @@ export default async (obj, params, ctx, resolveInfo) => {
         throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
     }
 
-    const lackingFriendship = await session.run(
+    const friendshipExists = await session.run(
         `
         MATCH (me: Account{id: "${ctx.user.id}"})
         MATCH (a: Account{id: "${params.input.friendId}"})
@@ -45,7 +45,7 @@ export default async (obj, params, ctx, resolveInfo) => {
         `,
     );
 
-    if (getValueFromSessionResult(lackingFriendship, "result") === false) {
+    if (getValueFromSessionResult(friendshipExists, "result") === false) {
         throw new ApolloError(lackingFriendshipError, "400", [lackingFriendshipError]);
     }
 
