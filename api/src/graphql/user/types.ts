@@ -35,6 +35,13 @@ export const AccountTypes = `
                 RETURN g
             """
         )
+        groupInvitations: [Group!]!
+        @cypher(
+            statement: """
+                MATCH (this)-[:GROUP_INVITATION]->(g:Group)
+                RETURN g
+            """
+        )
         latestLocation: Point
         favoriteAlcoholName: String!
         favoriteAlcoholType: AlcoholType!
