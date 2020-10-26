@@ -10,9 +10,7 @@ const lackingFriendshipError = singleQuote("Podany użytkownik nie jest Twoim zn
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy!");
 
 export default async (obj, params, ctx, resolveInfo) => {
-
     const session: Session = ctx.driver.session();
-
     await ensureAuthorized(ctx);
 
     const doesGroupExist = await session.run(
