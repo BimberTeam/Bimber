@@ -3,7 +3,6 @@ export const AccountInputs = `
         name: String!
         email: String!
         password: String!
-        imageUrl: String
         age: Int!
         latestLocation: Point
         favoriteAlcoholName: String!

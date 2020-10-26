@@ -26,7 +26,6 @@ export const GroupQueries = `
             RETURN {
                 name: a.name,
                 email: a.email,
-                imageUrl: a.imageUrl,
                 age: a.age,
                 favoriteAlcoholName: a.favoriteAlcoholName,
                 favoriteAlcoholType: a.favoriteAlcoholType,

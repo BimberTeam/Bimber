@@ -17,14 +17,14 @@ export const AccountTypes = `
         sentFriendRequests: [User!]!
         @cypher(
             statement: """
-                MATCH (this)<-[:REQUESTED_FRIENDS]-(a:Account)
+                MATCH (this)-[:REQUESTED_FRIENDS]->(a:Account)
                 RETURN a
             """
         )
         friendRequests: [User!]!
         @cypher(
             statement: """
-                MATCH (this)-[:REQUESTED_FRIENDS]->(a:Account)
+                MATCH (this)<-[:REQUESTED_FRIENDS]-(a:Account)
                 RETURN a
             """
         )
@@ -88,7 +88,6 @@ export const AccountTypes = `
     type PendingMemberListPayload{
         name: String!
         email: String!
-        imageUrl: String
         age: Int!
         favoriteAlcoholName: String!
         favoriteAlcoholType: AlcoholType!
