@@ -5,8 +5,8 @@ import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const groupNotFoundError = singleQuote("Podana grupa nie istnieje !");
-const lackingInvitationError = singleQuote("Nie masz zaproszenia do tej grupy !");
+const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
+const lackingInvitationError = singleQuote("Nie masz zaproszenia do tej grupy!");
 
 export default async (obj, params, ctx, resolveInfo) => {
 
