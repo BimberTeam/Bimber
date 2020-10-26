@@ -29,4 +29,8 @@ export const AccountInputs = `
         agePreferenceFrom: Int
         agePreferenceTo: Int
     }
+
+    input CreateGroupInput {
+        usersId: [ID!]!
+    }
 `;

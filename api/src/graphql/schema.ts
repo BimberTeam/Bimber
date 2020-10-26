@@ -11,12 +11,15 @@ import { AccountMutations } from "./user/mutations";
 import register from "./user/resolvers/register";
 import updateAccount from "./user/resolvers/updateAccount"
 import { AccountQueries } from "./user/queries";
+import addFriendToGroup from "./group/mutations/addFriendToGroup";
 import getAccountInfoFromContex from "./common/getAccountInfoFromContext";
 import pendingMembersList from "./group/queries/pendingMembersList";
 import { GroupInputs } from "./group/inputs";
 import acceptGroupPendingUser from "./group/mutations/acceptPendingRequest";
 import rejectGroupPendingUser from "./group/mutations/rejectPendingRequest";
 import { UtilTypes } from "./common/types";
+import groupInvitation from "./group/mutations/groupInvitation";
+import createGroup from "./group/mutations/createGroup";
 
 export const typeDefs = `
   ${AccountTypes}
@@ -58,9 +61,17 @@ const resolvers = {
     deleteAccount(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
+    acceptGroupInvitation(object, params, ctx, resolveInfo) {
+      return groupInvitation(object, params, ctx, resolveInfo);
+    },
+    rejectGroupInvitation(object, params, ctx, resolveInfo) {
+      return groupInvitation(object, params, ctx, resolveInfo);
+    },
     register,
+    createGroup,
     swipe,
     updateAccount,
+    addFriendToGroup,
     acceptGroupPendingUser,
     rejectGroupPendingUser,
   },

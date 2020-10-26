@@ -13,4 +13,17 @@ export const GroupInputs = `
         groupId: String!
     }
 
+    input AddFriendToGroupInput {
+        groupId: String!
+        friendId: String!
+    }
+
+    input AcceptGroupInvitationInput {
+        groupId: String!
+    }
+
+    input RejectGroupInvitationInput {
+        groupId: String!
+    }
+
 `

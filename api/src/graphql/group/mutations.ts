@@ -4,8 +4,11 @@ const addToGroupSuccess = singleQuote("Użytkownik został dodany do grupy!");
 const votingSuccess = singleQuote("Głos został oddany!");
 const deletedUserJoinRequestSuccess = singleQuote("Użytkownik został przegłosowany na jego niekorzyść, usunięto prośbę o dołączenie!");
 
-const groupCreatedSuccess = singleQuote("Utworzono nową grupę !");
-const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy !");
+const groupCreatedSuccess = singleQuote("Utworzono nową grupę!");
+const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy!");
+const groupInvitationSentSuccess = singleQuote("Wysłano zaproszenie do grupy!");
+const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane!");
+const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte!");
 
 export const GroupMutations = `
     """
@@ -110,6 +113,55 @@ export const GroupMutations = `
             {a:a, g:g, meId:$meId}
         ) YIELD value
         RETURN value.result
+        """
+    )
+
+    createGroup(input: CreateGroupInput): Message
+    @cypher(
+        statement: """
+            CALL {
+                CREATE(g: Group)
+                SET g.id = apoc.create.uuid()
+                RETURN g
+            }
+            MATCH(me: Account{id: $meId})
+            MATCH(users: Account) WHERE users.id IN $input.usersId
+            MERGE(me)-[:BELONGS_TO]->(g)
+            MERGE(users)-[:GROUP_INVITATION]->(g)
+            RETURN {status: 'OK', message: ${groupCreatedSuccess}}
+        """
+    )
+
+    addFriendToGroup(input: AddFriendToGroupInput): Message
+    @cypher(
+        statement: """
+            MATCH(a: Account{id: $input.friendId})
+            MATCH(g: Group{id: $input.groupId})
+            MERGE((a)-[:GROUP_INVITATION]->(g))
+            RETURN {status: 'OK', message: ${groupInvitationSentSuccess}}
+        """
+    )
+
+    acceptGroupInvitation(input: AcceptGroupInvitationInput): Message
+    @cypher(
+        statement: """
+            MATCH(a: Account{id: $meId})
+            MATCH(g: Group{id: $input.groupId})
+            MATCH(a)-[gi:GROUP_INVITATION]->(g)
+            DELETE gi
+            MERGE((a)-[:PENDING]-(g))
+            RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}}
+        """
+    )
+
+    rejectGroupInvitation(input: RejectGroupInvitationInput): Message
+    @cypher(
+        statement: """
+            MATCH(a: Account{id: $meId})
+            MATCH(g: Group{id: $input.groupId})
+            MATCH(a)-[gi:GROUP_INVITATION]->(g)
+            DELETE gi
+            RETURN {status: 'OK', message: ${rejectGroupInvitationSuccess}}
         """
     )
 `;
