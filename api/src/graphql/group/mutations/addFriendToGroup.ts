@@ -4,10 +4,10 @@ import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const groupNotFoundError = singleQuote("Podana grupa nie istnieje !");
-const userNotFoundError = singleQuote("Podany użytkownik nie istnieje !");
-const lackingFriendshipError = singleQuote("Podany użytkownik nie jest Twoim znajomym !");
-const lackingMembershipError = singleQuote("Nie należysz do podanej grupy !");
+const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
+const userNotFoundError = singleQuote("Podany użytkownik nie istnieje!");
+const lackingFriendshipError = singleQuote("Podany użytkownik nie jest Twoim znajomym!");
+const lackingMembershipError = singleQuote("Nie należysz do podanej grupy!");
 
 export default async (obj, params, ctx, resolveInfo) => {
 

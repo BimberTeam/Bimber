@@ -19,7 +19,7 @@ import acceptGroupPendingUser from "./group/mutations/acceptPendingRequest";
 import rejectGroupPendingUser from "./group/mutations/rejectPendingRequest";
 import { UtilTypes } from "./common/types";
 import groupInvitation from "./group/mutations/groupInvitation";
-
+import createGroup from "./group/mutations/createGroup";
 
 export const typeDefs = `
   ${AccountTypes}
@@ -58,9 +58,6 @@ const resolvers = {
     denyFriendRequest(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
-    createGroup(object, params, ctx, resolveInfo) {
-      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
-    },
     deleteAccount(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
@@ -71,6 +68,7 @@ const resolvers = {
       return groupInvitation(object, params, ctx, resolveInfo);
     },
     register,
+    createGroup,
     swipe,
     updateAccount,
     addFriendToGroup,

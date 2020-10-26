@@ -4,11 +4,11 @@ const addToGroupSuccess = singleQuote("Użytkownik został dodany do grupy!");
 const votingSuccess = singleQuote("Głos został oddany!");
 const deletedUserJoinRequestSuccess = singleQuote("Użytkownik został przegłosowany na jego niekorzyść, usunięto prośbę o dołączenie!");
 
-const groupCreatedSuccess = singleQuote("Utworzono nową grupę !");
-const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy !");
-const groupInvitationSentSuccess = singleQuote("Wysłano zaproszenie do grupy !");
-const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane !");
-const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte !");
+const groupCreatedSuccess = singleQuote("Utworzono nową grupę!");
+const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy!");
+const groupInvitationSentSuccess = singleQuote("Wysłano zaproszenie do grupy!");
+const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane!");
+const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte!");
 
 export const GroupMutations = `
     """
@@ -116,12 +116,18 @@ export const GroupMutations = `
         """
     )
 
-    createGroup: Message
+    createGroup(input: CreateGroupInput): Message
     @cypher(
         statement: """
+            CALL {
+                CREATE(g: Group)
+                SET g.id = apoc.create.uuid()
+                RETURN g
+            }
             MATCH(me: Account{id: $meId})
-            CREATE(g: Group)
+            MATCH(users: Account) WHERE users.id IN $input.usersId
             MERGE(me)-[:BELONGS_TO]->(g)
+            MERGE(users)-[:GROUP_INVITATION]->(g)
             RETURN {status: 'OK', message: ${groupCreatedSuccess}}
         """
     )
