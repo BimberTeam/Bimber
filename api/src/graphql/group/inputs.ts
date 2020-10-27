@@ -1,29 +1,37 @@
 export const GroupInputs = `
     input AcceptPendingRequestInput {
-        groupId: String!
-        userId: String!
+        groupId: ID!
+        userId: ID!
     }
 
     input RejectPendingRequestInput {
-        groupId: String!
-        userId: String!
+        groupId: ID!
+        userId: ID!
     }
 
     input PendingMembersListInput {
-        groupId: String!
+        groupId: ID!
     }
 
     input AddFriendToGroupInput {
-        groupId: String!
-        friendId: String!
+        groupId: ID!
+        friendId: ID!
     }
 
     input AcceptGroupInvitationInput {
-        groupId: String!
+        groupId: ID!
     }
 
     input RejectGroupInvitationInput {
-        groupId: String!
+        groupId: ID!
+    }
+
+    input SwipeToDislikeInput {
+        groupId: ID!
+    }
+
+    input SwipeToLikeInput {
+        groupId: ID!
     }
 
 `

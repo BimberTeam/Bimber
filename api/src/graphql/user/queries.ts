@@ -10,8 +10,8 @@ export const AccountQueries = `
     accountExists(email: String!): Boolean
     @cypher(
     statement: """
-    MATCH(account: Account{email: $email})
-    return count(account)=1 as result
+        MATCH(account: Account{email: $email})
+        RETURN count(account)=1 as result
     """
     )
 
