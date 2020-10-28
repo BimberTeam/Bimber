@@ -23,7 +23,7 @@ export const GroupMutations = `
         Otherwise new relationship ('REQUESTED') will be created between the caller and requested group.
         Caller will be pending until accepted by majority of the group members.
     """
-    swipeToLike(input: SwipeToLikeInput!): Message
+    swipeToLike(input: SwipeInput!): Message
     @cypher(
         statement: """
         MATCH(g: Group {id: $input.groupId})
@@ -54,7 +54,7 @@ export const GroupMutations = `
         """
     )
 
-    swipeToDislike(input: SwipeToDislikeInput!): Message
+    swipeToDislike(input: SwipeInput!): Message
     @cypher(
         statement: """
         MATCH(g: Group {id: $input.groupId})

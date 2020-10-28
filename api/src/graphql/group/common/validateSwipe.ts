@@ -3,13 +3,25 @@ import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { getValueFromSessionResult } from "../../common/helper";
 
-const lackingMembershipError = singleQuote("Już należysz do podanej grupy !");
-const alreadyPendingError = singleQuote("Już oczekujesz na dołącznie do tej grupy !");
-const groupOwnerError = singleQuote("Jesteś właścicielem podanej grupy !");
+const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
+const lackingMembershipError = singleQuote("Już należysz do podanej grupy!");
+const alreadyPendingError = singleQuote("Już oczekujesz na dołącznie do tej grupy!");
+const groupOwnerError = singleQuote("Jesteś właścicielem podanej grupy!");
 
 export default async (params, ctx) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
+
+    const doesGroupExist = await session.run(
+        `
+        MATCH (g: Group{id: "${params.input.groupId}"})
+        RETURN g as result
+        `,
+    );
+
+    if (doesGroupExist.records.length === 0) {
+        throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
+    }
 
     const alreadyGroupOwner = await session.run(
         `

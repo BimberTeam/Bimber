@@ -26,11 +26,7 @@ export const GroupInputs = `
         groupId: ID!
     }
 
-    input SwipeToDislikeInput {
-        groupId: ID!
-    }
-
-    input SwipeToLikeInput {
+    input SwipeInput {
         groupId: ID!
     }
 

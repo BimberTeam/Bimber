@@ -2,13 +2,13 @@ import { ensureAuthorized, singleQuote, debugQuery } from "../../common/helper";
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { getValueFromSessionResult } from "../../common/helper";
-import swipe from "../common/swipe";
+import validateSwipe from "../common/validateSwipe";
 
 const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy !");
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
-    await swipe(params, ctx);
+    await validateSwipe(params, ctx);
     const session: Session = ctx.driver.session();
 
     const groupMembers = await session.run(
