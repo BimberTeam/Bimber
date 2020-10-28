@@ -2,7 +2,8 @@ import { makeAugmentedSchema } from "./../../node_modules/neo4j-graphql-js";
 import { neo4jgraphql } from "./../..//node_modules/neo4j-graphql-js";
 import { GroupTypes } from "./group/types";
 import { GroupMutations } from "./group/mutations";
-import swipe from "./group/resolvers/swipe";
+import swipeToLike from "./group/resolvers/swipeToLike";
+import swipeToDislike from "./group/resolvers/swipeToDislike";
 import { GroupQueries } from "./group/queries";
 import { AccountInputs } from "./user/inputs";
 import { AccountTypes } from "./user/types";
@@ -69,7 +70,8 @@ const resolvers = {
     },
     register,
     createGroup,
-    swipe,
+    swipeToLike,
+    swipeToDislike,
     updateAccount,
     addFriendToGroup,
     acceptGroupPendingUser,

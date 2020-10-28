@@ -9,6 +9,7 @@ const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączeni�
 const groupInvitationSentSuccess = singleQuote("Wysłano zaproszenie do grupy!");
 const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane!");
 const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte!");
+const swipeToDislikeSuccess = singleQuote("Podana grupa została zignorowana!");
 
 export const GroupMutations = `
     """
@@ -22,10 +23,10 @@ export const GroupMutations = `
         Otherwise new relationship ('REQUESTED') will be created between the caller and requested group.
         Caller will be pending until accepted by majority of the group members.
     """
-    swipe(id: ID!): Message
+    swipeToLike(input: SwipeInput!): Message
     @cypher(
         statement: """
-        MATCH(g: Group {id: $id})
+        MATCH(g: Group {id: $input.groupId})
         CALL apoc.do.when(
             $groupMembers = 0,
             \\"
@@ -50,6 +51,16 @@ export const GroupMutations = `
             {g:g, meId:$meId, ttl:ttl}
         ) YIELD value
         RETURN value.result
+        """
+    )
+
+    swipeToDislike(input: SwipeInput!): Message
+    @cypher(
+        statement: """
+        MATCH(g: Group {id: $input.groupId})
+        MATCH(me:Account {id: $meId})
+        MERGE(me)-[:DISLIKE]->(g)
+        RETURN {status: 'OK', message: ${swipeToDislikeSuccess}}
         """
     )
 
