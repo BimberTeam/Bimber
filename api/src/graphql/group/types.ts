@@ -33,7 +33,7 @@ export const GroupTypes = `
         @cypher(
         statement: """
             MATCH (this)<-[:BELONGS_TO]-(a:Account)
-            RETURN coalesce(avg(a.age), 0.0)
+            RETURN avg(a.age)
         """
         )
         averageLocation: Coords
@@ -41,8 +41,8 @@ export const GroupTypes = `
         statement: """
             MATCH (this)<-[:BELONGS_TO]-(a:Account)
             RETURN {
-                longitude: coalesce(avg(a.latestLocation.longitude), 0.0),
-                latitude: coalesce(avg(a.latestLocation.latitude), 0.0)
+                longitude: avg(a.latestLocation.longitude),
+                latitude: avg(a.latestLocation.latitude)
             }
         """
         )
