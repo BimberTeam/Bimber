@@ -10,9 +10,8 @@ const alreadyPendingError = singleQuote("Już oczekujesz na dołącznie do tej g
 const groupOwnerError = singleQuote("Jesteś właścicielem podanej grupy !");
 
 export default async (obj, params, ctx, resolveInfo) => {
-
-    const session: Session = ctx.driver.session();
     await ensureAuthorized(ctx);
+    const session: Session = ctx.driver.session();
 
     const alreadyGroupOwner = await session.run(
         `

@@ -59,6 +59,8 @@ export default async (obj, params, ctx, resolveInfo) => {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
+    await session.close();
+
     params.meId = ctx.user.id;
     return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
 };

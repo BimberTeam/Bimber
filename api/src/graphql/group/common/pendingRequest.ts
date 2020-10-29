@@ -26,9 +26,7 @@ export class VotesDistribution {
 }
 
 export default async (params, ctx) => {
-
     const session: Session = ctx.driver.session();
-
     await ensureAuthorized(ctx);
 
     if (ctx.user.id === params.input.userId) {
