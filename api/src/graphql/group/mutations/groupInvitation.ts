@@ -9,8 +9,8 @@ const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
 const lackingInvitationError = singleQuote("Nie masz zaproszenia do tej grupy!");
 
 export default async (obj, params, ctx, resolveInfo) => {
-    const session: Session = ctx.driver.session();
     await ensureAuthorized(ctx);
+    const session: Session = ctx.driver.session();
 
     const doesGroupExist = await session.run(
         `
