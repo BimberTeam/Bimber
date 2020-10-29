@@ -33,4 +33,13 @@ export const AccountInputs = `
     input CreateGroupInput {
         usersId: [ID!]!
     }
+
+    input FriendInput{
+        id: ID!
+    }
+
+    input LoginInput{
+        email: String!
+        password: String!
+    }
 `;
