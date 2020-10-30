@@ -31,7 +31,7 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
 
 export const retrieveToken = (req, connection): string => {
     if (connection) {
-        return connection.context.token;
+        return connection.context.Authorization || connection.context.token;
     }
     const token = req.headers.authorization || "";
     return token;

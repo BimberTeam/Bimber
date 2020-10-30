@@ -4,6 +4,8 @@ import { GroupTypes } from "./group/types";
 import { GroupMutations } from "./group/mutations";
 import swipeToLike from "./group/resolvers/swipeToLike";
 import swipeToDislike from "./group/resolvers/swipeToDislike";
+import sendChatMessage from "./chat/resolvers/sendChatMessage";
+import loadChatMessages from "./chat/resolvers/loadChatMessages";
 import { GroupQueries } from "./group/queries";
 import { AccountInputs } from "./user/inputs";
 import { AccountTypes } from "./user/types";
@@ -21,30 +23,47 @@ import rejectGroupPendingUser from "./group/mutations/rejectPendingRequest";
 import { UtilTypes } from "./common/types";
 import groupInvitation from "./group/mutations/groupInvitation";
 import createGroup from "./group/mutations/createGroup";
+import { DateScalar } from "./scalars";
+import { ChatQueries } from "./chat/queries";
+import { ChatMutations } from "./chat/mutations";
+import { ChatSubscriptions } from "./chat/subscriptions";
+import { pubsub } from "./pubsub";
+import { ensureAuthorized } from "./common/helper";
+import { ChatTypes } from "./chat/types";
+import { ChatInputs } from "./chat/inputs";
 
 export const typeDefs = `
+  scalar BimberDate
+
   ${AccountTypes}
   ${GroupTypes}
-
   ${UtilTypes}
-
   ${AccountInputs}
+  ${ChatTypes}
 
   type Query {
     ${AccountQueries}
+    ${ChatQueries}
     ${GroupQueries}
   }
 
   type Mutation {
     ${AccountMutations}
+    ${ChatMutations}
     ${GroupMutations}
+  }
+  
+  type Subscription {
+    ${ChatSubscriptions}
   }
 
   ${AccountInputs}
   ${GroupInputs}
+  ${ChatInputs}
 `;
 
 const resolvers = {
+  BimberDate: DateScalar,
   Mutation: {
     login,
     acceptFriendRequest(object, params, ctx, resolveInfo) {
@@ -76,6 +95,7 @@ const resolvers = {
     addFriendToGroup,
     acceptGroupPendingUser,
     rejectGroupPendingUser,
+    sendChatMessage
   },
   Query: {
     me(object, params, ctx, resolveInfo) {
@@ -91,7 +111,17 @@ const resolvers = {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
     pendingMembersList,
+    loadChatMessages
   },
+  Subscription: {
+    newChatMessage: {
+      subscribe: async (object, params, ctx) => {
+        await ensureAuthorized(ctx);
+        return pubsub.asyncIterator(`newChatMessage:${params.input.groupId}`);
+      } 
+    }
+
+  }
 };
 
 const schema = makeAugmentedSchema({
@@ -103,6 +133,7 @@ const schema = makeAugmentedSchema({
     },
     mutation: false,
     query: false,
+    subscription: false
   },
   resolvers,
   typeDefs,
