@@ -1,26 +1,31 @@
+import { singleQuote } from './../../common/helper';
 import { ApolloError } from "apollo-server";
 import { Session } from "neo4j-driver";
 import { verifyPassword } from "../../../auth/auth";
 import { createToken } from "../../../auth/auth";
 import { getValueFromSessionResult } from "../../common/helper";
 
+const emailNotFoundError = singleQuote("Podany email nie istnieje!");
+const incorrectPassword = singleQuote("Wprowadzono nie poprawne hasło!");
+const unexpectedError = singleQuote("Wystąpił niespodziewany błąd!");
+
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
     const findAccount = await session.run(
         `
-        MATCH (account:Account {email: "${params.email}"}) return account
+        MATCH (account:Account {email: "${params.input.email}"}) return account
         `,
     );
 
     if (findAccount.records.length === 0) {
-        throw new ApolloError("Email not found!", "200", ["Email not found!"]);
+        throw new ApolloError(emailNotFoundError, "200", [emailNotFoundError]);
     }
 
     const hashedPassword = findAccount.records[0].get("account").properties.password;
 
-    if (!verifyPassword(params.password, hashedPassword)) {
-        throw new ApolloError("Incorrect Password !", "200", ["Incorrect Password !"]);
+    if (!verifyPassword(params.input.password, hashedPassword)) {
+        throw new ApolloError(incorrectPassword, "200", [incorrectPassword]);
     }
 
     const account = {
@@ -32,15 +37,16 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const setToken = await session.run(
         `
-        MATCH (account:Account {email: "${params.email}"})
+        MATCH (account:Account {email: "${params.input.email}"})
         SET account.token = '${token}'
         return 'ok' AS result
         `,
     );
 
     if (getValueFromSessionResult(setToken, "result") !== "ok") {
-        throw new ApolloError("Unexpected Error !", "200", ["Unexpected Error!"]);
+        throw new ApolloError(unexpectedError, "200", [unexpectedError]);
     }
+
     await session.close();
 
     return {token};

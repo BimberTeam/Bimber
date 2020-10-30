@@ -12,11 +12,11 @@ const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołąc
 const deleteAccountSuccess = singleQuote("Konto zostało usunięte!");
 
 export const AccountMutations = `
-    acceptFriendRequest(friendId: ID!): Message
+    acceptFriendRequest(input: FriendInput!): Message
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
-        MATCH(b: Account { id: $friendId })
+        MATCH(b: Account { id: $input.id })
         OPTIONAL MATCH(a)-[fa:REQUESTED_FRIENDS]->(b)
         OPTIONAL MATCH(b)-[fb:REQUESTED_FRIENDS]->(a)
         CALL apoc.do.when(
@@ -45,11 +45,11 @@ export const AccountMutations = `
     """
     )
 
-    removeFriend(friendId: ID!): Message
+    removeFriend(input: FriendInput!): Message
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
-        MATCH(b: Account { id: $friendId })
+        MATCH(b: Account { id: $input.id })
         OPTIONAL MATCH (a)-[fa:FRIENDS]->(b)
         OPTIONAL MATCH (b)-[fb:FRIENDS]->(a)
         DELETE fa, fb
@@ -57,11 +57,11 @@ export const AccountMutations = `
     """
     )
 
-    sendFriendRequest(friendId: ID!): Message
+    sendFriendRequest(input: FriendInput!): Message
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
-        MATCH(b: Account { id: $friendId })
+        MATCH(b: Account { id: $input.id })
         CALL apoc.do.case([
             EXISTS((a)-[:FRIENDS]->(b))=true OR EXISTS((b)-[:FRIENDS]->(a))=true,
                 \\"RETURN {status: 'ERROR', message: ${friendAlreadyExistsError}} AS result\\",
@@ -94,18 +94,18 @@ export const AccountMutations = `
     """
     )
 
-    denyFriendRequest(userId: ID!): Message
+    denyFriendRequest(input: FriendInput!): Message
     @cypher(
     statement: """
         MATCH(a: Account { id: $meId })
-        MATCH(b: Account { id: $userId })
-        MATCH (a)-[f:REQUESTED_FRIENDS]->(b)
+        MATCH(b: Account { id: $input.id })
+        MATCH (a)<-[f:REQUESTED_FRIENDS]-(b)
         DELETE f
         RETURN {status: 'OK', message: ${friendshipRequestDeniedSuccess}}
     """
     )
 
-    updateAccount(account:UpdateAccountInput!): User
+    updateAccount(input: UpdateAccountInput!): User
     @cypher(
         statement: """
             MATCH(a: Account { id: $meId })
@@ -114,23 +114,23 @@ export const AccountMutations = `
         """
     )
 
-    register(user: RegisterAccountInput): Account
+    register(input: RegisterAccountInput): Account
     @cypher(
     statement: """
         CREATE (u:Account {
-            name: $user.name,
-            email: $user.email,
-            password: $user.password,
-            age: $user.age,
-            latestLocation: $user.latestLocation,
-            favoriteAlcoholName: $user.favoriteAlcoholName,
-            favoriteAlcoholType: $user.favoriteAlcoholType,
-            description: $user.description,
-            gender: $user.gender,
-            genderPreference: $user.genderPreference,
-            agePreferenceFrom: $user.agePreferenceFrom,
-            agePreferenceTo: $user.agePreferenceTo,
-            alcoholPreference: $user.alcoholPreference
+            name: $input.name,
+            email: $input.email,
+            password: $input.password,
+            age: $input.age,
+            latestLocation: $input.latestLocation,
+            favoriteAlcoholName: $input.favoriteAlcoholName,
+            favoriteAlcoholType: $input.favoriteAlcoholType,
+            description: $input.description,
+            gender: $input.gender,
+            genderPreference: $input.genderPreference,
+            agePreferenceFrom: $input.agePreferenceFrom,
+            agePreferenceTo: $input.agePreferenceTo,
+            alcoholPreference: $input.alcoholPreference
         })
         CREATE (g: Group)
         SET u.id = apoc.create.uuid()
@@ -140,14 +140,15 @@ export const AccountMutations = `
     """
     )
 
-    login(email: String!, password: String!): LoginPayload
+    login(input: LoginInput!): LoginPayload
 
     deleteAccount: Message
     @cypher(
         statement: """
             MATCH (a:Account {id: $meId})
+            MATCH (a)-[:OWNER]-(g:Group)
             MATCH (a)-[relations]-(any)
-            DELETE relations, a
+            DELETE relations, a, g
             RETURN {status: 'OK', message: ${deleteAccountSuccess}}
         """
     )

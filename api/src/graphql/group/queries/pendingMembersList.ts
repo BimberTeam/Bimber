@@ -8,9 +8,8 @@ const groupDoesNotExistError = singleQuote("Podana grupa nie istnieje !");
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy !");
 
 export default async (obj, params, ctx, resolveInfo) => {
-
-    const session: Session = ctx.driver.session();
     await ensureAuthorized(ctx);
+    const session: Session = ctx.driver.session();
 
     const groupExists = await session.run(
         `
@@ -34,6 +33,8 @@ export default async (obj, params, ctx, resolveInfo) => {
     if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
+
+    await session.close();
 
     params.meId = ctx.user.id;
     return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
