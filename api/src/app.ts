@@ -5,6 +5,8 @@ import neo4j from "neo4j-driver";
 import { retrieveToken, verifyToken } from "./auth/auth";
 import { initializeDatabase } from "./database/initialize";
 import { schema } from "./graphql/schema";
+import {createServer} from "http";
+import { initializeRedisClient } from "./database/redis";
 
 const driver = neo4j.driver(
   process.env.NEO4J_URI || "bolt://localhost:7687",
@@ -23,6 +25,7 @@ dotenv.config();
 const app = express();
 
 initializeDatabase(driver, {retries: 5, timeout: 5000});
+initializeRedisClient();
 
 const server = new ApolloServer({
   context: ({ req, connection }) => {
@@ -46,6 +49,9 @@ const host = process.env.GRAPHQL_SERVER_HOST || "0.0.0.0";
 
 server.applyMiddleware({ app, path });
 
-app.listen({ host, port, path }, () => {
+const ws = createServer(app);
+server.installSubscriptionHandlers(ws);
+
+ws.listen({ host, port, path }, () => {
   console.log(`GraphQL server ready at http://${host}:${port}${path}`);
 });

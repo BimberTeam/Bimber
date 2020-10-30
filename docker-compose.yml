@@ -1,6 +1,13 @@
 version: '3.7'
 
 services:
+  redis:
+    image: redis:6.0.9
+    # change password when in production
+    command: redis-server --requirepass redis_pass
+    ports:
+      - "6379:6379"
+
   neo4j:
     build: ./neo4j
     ports:
