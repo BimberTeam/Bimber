@@ -6,6 +6,7 @@ import swipeToLike from "./group/resolvers/swipeToLike";
 import swipeToDislike from "./group/resolvers/swipeToDislike";
 import sendChatMessage from "./chat/resolvers/sendChatMessage";
 import loadChatMessages from "./chat/resolvers/loadChatMessages";
+import chatThumbnails from "./chat/resolvers/chatThumbnails";
 import { GroupQueries } from "./group/queries";
 import { AccountInputs } from "./user/inputs";
 import { AccountTypes } from "./user/types";
@@ -95,7 +96,7 @@ const resolvers = {
     addFriendToGroup,
     acceptGroupPendingUser,
     rejectGroupPendingUser,
-    sendChatMessage
+    sendChatMessage,
   },
   Query: {
     me(object, params, ctx, resolveInfo) {
@@ -111,7 +112,8 @@ const resolvers = {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
     pendingMembersList,
-    loadChatMessages
+    loadChatMessages,
+    chatThumbnails
   },
   Subscription: {
     newChatMessage: {

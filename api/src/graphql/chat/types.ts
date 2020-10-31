@@ -5,4 +5,10 @@ export const ChatTypes = `
         date: BimberDate! 
         message: String!
     }
+
+    type ChatThumbnail {
+        groupId: ID!
+        name: String!
+        lastMessage: ChatMessage
+    }
 `;
