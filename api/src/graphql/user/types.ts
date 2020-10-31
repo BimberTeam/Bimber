@@ -47,7 +47,7 @@ export const AccountTypes = `
         favoriteAlcoholType: AlcoholType!
         description: String!
         gender: Gender!
-        genderPreference: Gender!
+        genderPreference: Gender
         alcoholPreference: AlcoholType!
         agePreferenceFrom: Int!
         agePreferenceTo: Int!
@@ -63,7 +63,7 @@ export const AccountTypes = `
         description: String!
         latestLocation: Point
         gender: Gender!
-        genderPreference: Gender!
+        genderPreference: Gender
         alcoholPreference: AlcoholType!
         agePreferenceFrom: Int!
         agePreferenceTo: Int!
@@ -93,7 +93,7 @@ export const AccountTypes = `
         favoriteAlcoholType: AlcoholType!
         description: String!
         gender: Gender!
-        genderPreference: Gender!
+        genderPreference: Gender
         alcoholPreference: AlcoholType!
         agePreference: Int!
         votesAgainst: Int!
