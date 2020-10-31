@@ -13,8 +13,8 @@ export default async (obj, params, ctx, resolveInfo) => {
         params.input.latestLocation = new neo4j.types.Point(
         // magic number info : https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point-wgs84-2d
             4326,
-            params.input.latestLocation.longitude,
-            params.input.latestLocation.latitude,
+            params.input.latestLocation.longitude + 0.000001,
+            params.input.latestLocation.latitude + 0.000001,
         );
     }
 
