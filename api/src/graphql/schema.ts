@@ -32,6 +32,7 @@ import { pubsub } from "./pubsub";
 import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
+import updateLocation from "./user/resolvers/updateLocation";
 
 export const typeDefs = `
   scalar BimberDate
@@ -53,7 +54,7 @@ export const typeDefs = `
     ${ChatMutations}
     ${GroupMutations}
   }
-  
+
   type Subscription {
     ${ChatSubscriptions}
   }
@@ -97,6 +98,7 @@ const resolvers = {
     acceptGroupPendingUser,
     rejectGroupPendingUser,
     sendChatMessage,
+    updateLocation
   },
   Query: {
     me(object, params, ctx, resolveInfo) {
@@ -120,7 +122,7 @@ const resolvers = {
       subscribe: async (object, params, ctx) => {
         await ensureAuthorized(ctx);
         return pubsub.asyncIterator(`newChatMessage:${params.input.groupId}`);
-      } 
+      }
     }
 
   }

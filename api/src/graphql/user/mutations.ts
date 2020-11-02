@@ -10,6 +10,7 @@ const friendshipRequestSentSuccess = singleQuote("Wysłano zaproszenie do znajom
 const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");
 
 const deleteAccountSuccess = singleQuote("Konto zostało usunięte!");
+const updatedLocationSuccess = singleQuote("Zaktualizowano lokalizacje!");
 
 export const AccountMutations = `
     acceptFriendRequest(input: FriendInput!): Message
@@ -122,7 +123,6 @@ export const AccountMutations = `
             email: $input.email,
             password: $input.password,
             age: $input.age,
-            latestLocation: $input.latestLocation,
             favoriteAlcoholName: $input.favoriteAlcoholName,
             favoriteAlcoholType: $input.favoriteAlcoholType,
             description: $input.description,
@@ -150,6 +150,15 @@ export const AccountMutations = `
             MATCH (a)-[relations]-(any)
             DELETE relations, a, g
             RETURN {status: 'OK', message: ${deleteAccountSuccess}}
+        """
+    )
+
+    updateLocation(input: CoordsInput): Message
+    @cypher(
+        statement: """
+            MATCH (a:Account {id: $meId})
+            SET a.latestLocation = $location
+            RETURN {status: 'OK', message: ${updatedLocationSuccess}}
         """
     )
 `;

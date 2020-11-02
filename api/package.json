@@ -5,7 +5,7 @@
     "main": "dist/app.js",
     "scripts": {
         "build": "tsc",
-        "start": "nodemon --exec ts-node src/app.ts",
+        "start": "NODE_ENV=production nodemon --exec ts-node src/app.ts",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
