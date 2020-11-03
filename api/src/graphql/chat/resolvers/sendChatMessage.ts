@@ -1,5 +1,6 @@
+import { Session } from "neo4j-driver";
 import { redisClient } from "../../../database/redis";
-import { ensureAuthorized } from "../../common/helper";
+import { ensureAuthorized, getValueFromSessionResult } from "../../common/helper";
 import { pubsub } from "../../pubsub";
 
 export default async (obj, params, ctx, resolveInfo) => {
@@ -8,10 +9,22 @@ export default async (obj, params, ctx, resolveInfo) => {
     let userId = ctx.user.id;
     let {groupId, message} = params.input;
     
+    const session: Session = ctx.driver.session();
+
+    const result = await session.run(
+        `
+        MATCH (a:Account{id: "${userId}"})
+        RETURN a.name as name
+        `,
+    );
+    
+    const name = getValueFromSessionResult(result, "name");
+    
     const chatMessage = {
         userId,
         groupId,
         message,
+        name,
         date: new Date().getTime()
     }
     
