@@ -153,7 +153,7 @@ export const AccountMutations = `
         """
     )
 
-    updateLocation(input: CoordsInput): Message
+    updateLocation(input: UpdateLocationInput): Message
     @cypher(
         statement: """
             MATCH (a:Account {id: $meId})

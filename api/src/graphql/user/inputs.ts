@@ -42,7 +42,7 @@ export const AccountInputs = `
         password: String!
     }
 
-    input CoordsInput {
+    input UpdateLocationInput {
         longitude: Float,
         latitude: Float
     }
