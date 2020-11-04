@@ -15,13 +15,6 @@ export const GroupTypes = `
                 RETURN a
             """
         )
-        requestedMembers: [User]
-        @cypher(
-            statement: """
-                MATCH (this)<-[:REQUESTED]-(a:Account)
-                RETURN a
-            """
-        )
         groupMembers: Int
         @cypher(
         statement: """
@@ -45,6 +38,16 @@ export const GroupTypes = `
                 latitude: avg(a.latestLocation.latitude) + 0.000000001
             }
         """
-        )
+        ),
+    },
 
-    }`;
+    type GroupInfoPayload {
+        id: ID!
+        friendsCandidate: [User]
+        members: [User]
+        pendingMembers: [User]
+        groupMembers: Int
+        averageAge: Float
+        averageLocation: Coords
+    },
+`;

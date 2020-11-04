@@ -32,6 +32,7 @@ import { pubsub } from "./pubsub";
 import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
+import groupInfo from "./group/queries/groupInfo";
 
 export const typeDefs = `
   scalar BimberDate
@@ -53,7 +54,7 @@ export const typeDefs = `
     ${ChatMutations}
     ${GroupMutations}
   }
-  
+
   type Subscription {
     ${ChatSubscriptions}
   }
@@ -113,14 +114,15 @@ const resolvers = {
     },
     pendingMembersList,
     loadChatMessages,
-    chatThumbnails
+    chatThumbnails,
+    groupInfo
   },
   Subscription: {
     newChatMessage: {
       subscribe: async (object, params, ctx) => {
         await ensureAuthorized(ctx);
         return pubsub.asyncIterator(`newChatMessage:${params.input.groupId}`);
-      } 
+      }
     }
 
   }

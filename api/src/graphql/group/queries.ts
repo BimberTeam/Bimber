@@ -7,6 +7,10 @@ export const GroupQueries = `
         """
     )
 
+    groupInfo(id: ID!): GroupInfoPayload
+
+    groupCandidates(id: ID!): [User]
+
     pendingMembersList(input: PendingMembersListInput): [PendingMemberListPayload]
     @cypher(
         statement: """
