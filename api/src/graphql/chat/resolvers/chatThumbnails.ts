@@ -24,7 +24,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const result = await session.run(
         `
-        MATCH (a:Account{id: "${ctx.user.id}"})-[:BELONGS_TO]->(g:Group)<-[:BELONGS_TO *0..]-(members:Account{}) 
+        MATCH (a:Account{id: "${ctx.user.id}"})-[:BELONGS_TO]->(g:Group)<-[:BELONGS_TO *0..]-(members:Account{})
         RETURN g.id as groupId, apoc.text.join(collect(members.name), ", ") as name
         `,
     );
@@ -39,5 +39,5 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     await session.close();
 
-    return thumbnails; 
+    return thumbnails;
 };

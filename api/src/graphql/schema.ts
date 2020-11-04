@@ -34,6 +34,7 @@ import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
 import groupInfo from "./group/queries/groupInfo";
 import groupCandidates from "./group/queries/groupCandidates";
+import updateLocation from "./user/resolvers/updateLocation";
 
 export const typeDefs = `
   scalar BimberDate
@@ -99,6 +100,7 @@ const resolvers = {
     acceptGroupPendingUser,
     rejectGroupPendingUser,
     sendChatMessage,
+    updateLocation
   },
   Query: {
     me(object, params, ctx, resolveInfo) {
