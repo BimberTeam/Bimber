@@ -10,6 +10,15 @@ export const GroupQueries = `
     groupInfo(id: ID!): GroupInfoPayload
 
     groupCandidates(id: ID!): [User]
+    @cypher(
+        statement: """
+        MATCH (me: Account{id: $meId})
+        MATCH (group: Group{id: $id})
+        MATCH (a: Account)-[:FRIENDS]->(me)
+        WHERE NOT EXISTS ( (a)-[:PENDING]-(group) ) AND NOT EXISTS ( (a)-[:BELONGS_TO]-(group) ) AND NOT EXISTS ( (a)-[:GROUP_INVITATION]-(group) )
+        RETURN a
+        """
+    )
 
     pendingMembersList(input: PendingMembersListInput): [PendingMemberListPayload]
     @cypher(

@@ -33,6 +33,7 @@ import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
 import groupInfo from "./group/queries/groupInfo";
+import groupCandidates from "./group/queries/groupCandidates";
 
 export const typeDefs = `
   scalar BimberDate
@@ -115,7 +116,8 @@ const resolvers = {
     pendingMembersList,
     loadChatMessages,
     chatThumbnails,
-    groupInfo
+    groupInfo,
+    groupCandidates
   },
   Subscription: {
     newChatMessage: {

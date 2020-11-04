@@ -13,7 +13,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const doesGroupExist = await session.run(
         `
-        MATCH (g: Group{id: "${params.input.groupId}"})
+        MATCH (g: Group{id: "${params.id}"})
         RETURN g as result
         `,
     );
@@ -25,7 +25,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     const userBelongsToGroup = await session.run(
         `
         MATCH (a: Account {id: "${ctx.user.id}"})
-        MATCH (g: Group{id: "${params.input.groupId}"})
+        MATCH (g: Group{id: "${params.id}"})
         RETURN EXISTS( (a)-[:BELONGS_TO]-(g) ) as result
         `,
     );

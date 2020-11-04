@@ -15,6 +15,13 @@ export const GroupTypes = `
                 RETURN a
             """
         )
+        groupInvitations: [User]
+        @cypher(
+            statement: """
+                MATCH (this)<-[:GROUP_INVITATION]-(a:Account)
+                RETURN a
+            """
+        )
         groupMembers: Int
         @cypher(
         statement: """
@@ -44,6 +51,7 @@ export const GroupTypes = `
     type GroupInfoPayload {
         id: ID!
         friendsCandidate: [User]
+        groupInvitations: [User]
         members: [User]
         pendingMembers: [User]
         groupMembers: Int

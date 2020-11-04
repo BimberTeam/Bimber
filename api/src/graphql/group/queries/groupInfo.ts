@@ -69,6 +69,10 @@ export default async (obj, params, ctx, resolveInfo) => {
             RETURN collect(a) AS pendingMembers
         }
         CALL {
+            OPTIONAL MATCH (group)<-[:GROUP_INVITATION]-(a:Account)
+            RETURN collect(a) AS groupInvitations
+        }
+        CALL {
             MATCH (group)<-[:BELONGS_TO]-(a:Account)
             RETURN avg(a.age) + 0.000000001 AS averageAge
         }
@@ -94,6 +98,7 @@ export default async (obj, params, ctx, resolveInfo) => {
             friendsCandidate: friendsCandidate,
             members: members,
             pendingMembers: pendingMembers,
+            groupInvitations: groupInvitations,
             averageAge: averageAge,
             groupMembers: groupMembers,
             averageLocation: averageLocation
@@ -108,6 +113,7 @@ export default async (obj, params, ctx, resolveInfo) => {
         "friendsCandidate": mapLocation(getValueFromSessionResult(test, "result").friendsCandidate),
         "members": mapLocation(getValueFromSessionResult(test, "result").members),
         "pendingMembers": mapLocation(getValueFromSessionResult(test, "result").pendingMembers),
+        "groupInvitations": mapLocation(getValueFromSessionResult(test, "result").groupInvitations),
         "averageAge": getValueFromSessionResult(test, "result").averageAge,
         "groupMembers": getValueFromSessionResult(test, "result").groupMembers.low,
         "averageLocation": getValueFromSessionResult(test, "result").averageLocation
