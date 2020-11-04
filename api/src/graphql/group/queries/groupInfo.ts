@@ -1,13 +1,17 @@
 import { ensureAuthorized, debugQuery, singleQuote } from './../../common/helper';
 import { ApolloError } from "apollo-server"
-import { Session } from "neo4j-driver";
+import { Point, Session } from "neo4j-driver";
 import { getValueFromSessionResult } from "../../common/helper";
 
 const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy!");
 
+interface Coords{
+    latitude: number
+    longitude: number
+}
 
-const castLocation = (location)  => {
+const castLocation = (location: Point): Coords  => {
     if (location !== undefined) {
         return {
             "latitude": location['x'],
@@ -21,7 +25,7 @@ const castLocation = (location)  => {
     }
 }
 
-const mapLocation = (list) =>  {
+const typeConversion = (list: any): any =>  {
     return list.map(
         element => {
             element["properties"]['latestLocation'] = castLocation(element["properties"]['latestLocation']);
@@ -69,16 +73,8 @@ export default async (obj, params, ctx, resolveInfo) => {
             RETURN collect(a) AS pendingMembers
         }
         CALL {
-            OPTIONAL MATCH (group)<-[:GROUP_INVITATION]-(a:Account)
-            RETURN collect(a) AS groupInvitations
-        }
-        CALL {
             MATCH (group)<-[:BELONGS_TO]-(a:Account)
             RETURN avg(a.age) + 0.000000001 AS averageAge
-        }
-        CALL {
-            MATCH (group)<-[:BELONGS_TO]-(a:Account)
-            RETURN count(*) AS groupMembers
         }
         CALL {
             MATCH (group)<-[:BELONGS_TO]-(a:Account)
@@ -90,32 +86,29 @@ export default async (obj, params, ctx, resolveInfo) => {
         CALL {
             WITH me
             MATCH (group)<-[:BELONGS_TO]-(a:Account)
-            WHERE NOT EXISTS( (me)<-[:FRIENDS]-(a:Account) ) AND NOT EXISTS( (me)<-[:PENDING]-(a:Account) ) AND NOT a in [me]
-            RETURN collect(a) AS friendsCandidate
+            WHERE NOT EXISTS( (me)<-[:FRIENDS]-(a:Account) ) AND NOT EXISTS( (me)<-[:REQUESTED_FRIENDS]-(a:Account) ) AND NOT a in [me]
+            RETURN collect(a) AS friendCandidates
         }
         RETURN {
             id: group.id,
-            friendsCandidate: friendsCandidate,
+            friendCandidates: friendCandidates,
             members: members,
             pendingMembers: pendingMembers,
-            groupInvitations: groupInvitations,
             averageAge: averageAge,
-            groupMembers: groupMembers,
             averageLocation: averageLocation
         } AS result
         `
     )
 
-    await session.close();
+    const {id,friendCandidates, members, pendingMembers, averageAge, averageLocation} = getValueFromSessionResult(test, "result");
 
+    await session.close();
     return {
-        "id": getValueFromSessionResult(test, "result").id,
-        "friendsCandidate": mapLocation(getValueFromSessionResult(test, "result").friendsCandidate),
-        "members": mapLocation(getValueFromSessionResult(test, "result").members),
-        "pendingMembers": mapLocation(getValueFromSessionResult(test, "result").pendingMembers),
-        "groupInvitations": mapLocation(getValueFromSessionResult(test, "result").groupInvitations),
-        "averageAge": getValueFromSessionResult(test, "result").averageAge,
-        "groupMembers": getValueFromSessionResult(test, "result").groupMembers.low,
-        "averageLocation": getValueFromSessionResult(test, "result").averageLocation
+        "id": id,
+        "friendCandidates": typeConversion(friendCandidates),
+        "members": typeConversion(members),
+        "pendingMembers": typeConversion(pendingMembers),
+        "averageAge": averageAge,
+        "averageLocation": averageLocation
     }
 };

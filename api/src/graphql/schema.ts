@@ -33,7 +33,7 @@ import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
 import groupInfo from "./group/queries/groupInfo";
-import groupCandidates from "./group/queries/groupCandidates";
+import groupInvitationProposals from "./group/queries/groupInvitationProposals";
 import updateLocation from "./user/resolvers/updateLocation";
 
 export const typeDefs = `
@@ -119,7 +119,7 @@ const resolvers = {
     loadChatMessages,
     chatThumbnails,
     groupInfo,
-    groupCandidates
+    groupInvitationProposals
   },
   Subscription: {
     newChatMessage: {

@@ -9,7 +9,7 @@ export const GroupQueries = `
 
     groupInfo(id: ID!): GroupInfoPayload
 
-    groupCandidates(id: ID!): [User]
+    groupInvitationProposals(id: ID!): [User]
     @cypher(
         statement: """
         MATCH (me: Account{id: $meId})
