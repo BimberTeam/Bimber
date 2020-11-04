@@ -4,7 +4,6 @@ export const AccountInputs = `
         email: String!
         password: String!
         age: Int!
-        latestLocation: Point
         favoriteAlcoholName: String!
         favoriteAlcoholType: AlcoholType!
         description: String!
@@ -41,5 +40,10 @@ export const AccountInputs = `
     input LoginInput{
         email: String!
         password: String!
+    }
+
+    input UpdateLocationInput {
+        longitude: Float,
+        latitude: Float
     }
 `;

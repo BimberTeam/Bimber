@@ -9,16 +9,6 @@ const emailAlreadyExistsError = singleQuote("Podany email jest zajęty!");
 export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
-    if (params.input.latestLocation) {
-        params.input.latestLocation = new neo4j.types.Point(
-        // magic number info : https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point-wgs84-2d
-            4326,
-            params.input.latestLocation.longitude + 0.000001,
-            params.input.latestLocation.latitude + 0.000001,
-        );
-    }
-
-
     params.input.password = await hashPassword(params.input.password);
 
     const findAccount = await session.run(
