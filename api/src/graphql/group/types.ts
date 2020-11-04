@@ -15,13 +15,6 @@ export const GroupTypes = `
                 RETURN a
             """
         )
-        groupMembers: Int
-        @cypher(
-        statement: """
-            MATCH (this)<-[:BELONGS_TO]-(a:Account)
-            RETURN count(*)
-        """
-        )
         averageAge: Float
         @cypher(
         statement: """
@@ -46,7 +39,6 @@ export const GroupTypes = `
         friendCandidates: [User]
         members: [User]
         pendingMembers: [User]
-        groupMembers: Int
         averageAge: Float
         averageLocation: Coords
     },
