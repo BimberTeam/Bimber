@@ -1,4 +1,3 @@
-
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 
