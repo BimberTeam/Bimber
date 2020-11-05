@@ -8,6 +8,8 @@ const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
 const userNotFoundError = singleQuote("Podany użytkownik nie istnieje!");
 const lackingFriendshipError = singleQuote("Podany użytkownik nie jest Twoim znajomym!");
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy!");
+const friendBelongsToGroupError = singleQuote("Podany użytkownik już należy do tej grupy!");
+const friendAlreadyInvitedError = singleQuote("Podany użytkownik już został zaproszony do tej grupy!");
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
@@ -26,7 +28,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const friendExists = await session.run(
         `
-        MATCH (a: Account{id: "${params.input.friendId}"})
+        MATCH (a: Account{id: "${params.input.userId}"})
         RETURN a as result
         `,
     );
@@ -38,7 +40,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     const friendshipExists = await session.run(
         `
         MATCH (me: Account{id: "${ctx.user.id}"})
-        MATCH (a: Account{id: "${params.input.friendId}"})
+        MATCH (a: Account{id: "${params.input.userId}"})
         RETURN EXISTS( (a)-[:FRIENDS]-(me) ) as result
         `,
     );
@@ -57,6 +59,30 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
+    }
+
+    const friendBelongsToGroup = await session.run(
+        `
+        MATCH (a: Account {id: "${params.input.userId}"})
+        MATCH (g: Group{id: "${params.input.groupId}"})
+        RETURN EXISTS( (a)-[:BELONGS_TO]-(g) ) as result
+        `,
+    );
+
+    if (getValueFromSessionResult(friendBelongsToGroup, "result") === true) {
+        throw new ApolloError(friendBelongsToGroupError, "400", [friendBelongsToGroupError]);
+    }
+
+    const friendAlreadyInvited= await session.run(
+        `
+        MATCH (a: Account {id: "${params.input.userId}"})
+        MATCH (g: Group{id: "${params.input.groupId}"})
+        RETURN EXISTS( (a)-[:GROUP_INVITATION]-(g) ) as result
+        `,
+    );
+
+    if (getValueFromSessionResult(friendAlreadyInvited, "result") === true) {
+        throw new ApolloError(friendAlreadyInvitedError, "400", [friendAlreadyInvitedError]);
     }
 
     await session.close();
