@@ -1,8 +1,8 @@
-import { ensureAuthorized, debugQuery, singleQuote } from '../../common/helper';
+import { userBelongsToGroup } from './../../common/helper';
+import { ensureAuthorized, debugQuery, singleQuote, groupExist } from '../../common/helper';
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
-import { getValueFromSessionResult } from "../../common/helper";
 
 const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy!");
@@ -11,26 +11,11 @@ export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
-    const doesGroupExist = await session.run(
-        `
-        MATCH (g: Group{id: "${params.id}"})
-        RETURN g as result
-        `,
-    );
-
-    if (doesGroupExist.records.length === 0) {
+    if (await groupExist(session, params.id) === false) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
-    const userBelongsToGroup = await session.run(
-        `
-        MATCH (a: Account {id: "${ctx.user.id}"})
-        MATCH (g: Group{id: "${params.id}"})
-        RETURN EXISTS( (a)-[:BELONGS_TO]-(g) ) as result
-        `,
-    );
-
-    if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
+    if (await userBelongsToGroup(session, params.id, ctx.user.id) === false) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 

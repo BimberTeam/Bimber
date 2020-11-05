@@ -1,4 +1,4 @@
-import { ensureAuthorized, debugQuery, singleQuote } from './../../common/helper';
+import { ensureAuthorized, singleQuote, groupExist, userBelongsToGroup } from './../../common/helper';
 import { ApolloError } from "apollo-server"
 import { Point, Session } from "neo4j-driver";
 import { getValueFromSessionResult } from "../../common/helper";
@@ -37,30 +37,15 @@ export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
-    const doesGroupExist = await session.run(
-        `
-        MATCH (g: Group{id: "${params.id}"})
-        RETURN g as result
-        `,
-    );
-
-    if (doesGroupExist.records.length === 0) {
+    if (await groupExist(session, params.id) === false) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
-    const userBelongsToGroup = await session.run(
-        `
-        MATCH (a: Account {id: "${ctx.user.id}"})
-        MATCH (g: Group{id: "${params.id}"})
-        RETURN EXISTS( (a)-[:BELONGS_TO]-(g) ) as result
-        `,
-    );
-
-    if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
+    if (await userBelongsToGroup(session, params.id, ctx.user.id) === false) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
-    const test = await session.run(
+    const getGroupInfo = await session.run(
         `
         MATCH(group: Group {id: "${params.id}"})
         MATCH(me: Account {id: "${ctx.user.id}"})
@@ -100,7 +85,7 @@ export default async (obj, params, ctx, resolveInfo) => {
         `
     )
 
-    const {id,friendCandidates, members, pendingMembers, averageAge, averageLocation} = getValueFromSessionResult(test, "result");
+    const {id, friendCandidates, members, pendingMembers, averageAge, averageLocation} = getValueFromSessionResult(getGroupInfo, "result");
 
     await session.close();
     return {

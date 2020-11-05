@@ -1,8 +1,7 @@
-import { ensureAuthorized, debugQuery, singleQuote } from './../../common/helper';
+import { ensureAuthorized, debugQuery, singleQuote, groupExist, userExist, friendshipExist, userBelongsToGroup } from './../../common/helper';
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
-import { getValueFromSessionResult } from "../../common/helper";
 
 const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
 const userNotFoundError = singleQuote("Podany użytkownik nie istnieje!");
@@ -13,49 +12,19 @@ export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
-    const doesGroupExist = await session.run(
-        `
-        MATCH (g: Group{id: "${params.input.groupId}"})
-        RETURN g as result
-        `,
-    );
-
-    if (doesGroupExist.records.length === 0) {
+    if ( await groupExist(session, params.input.groupId) === false) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
-    const friendExists = await session.run(
-        `
-        MATCH (a: Account{id: "${params.input.friendId}"})
-        RETURN a as result
-        `,
-    );
-
-    if (friendExists.records.length === 0) {
+    if (await userExist(session, params.input.friendId) === false) {
         throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
     }
 
-    const friendshipExists = await session.run(
-        `
-        MATCH (me: Account{id: "${ctx.user.id}"})
-        MATCH (a: Account{id: "${params.input.friendId}"})
-        RETURN EXISTS( (a)-[:FRIENDS]-(me) ) as result
-        `,
-    );
-
-    if (getValueFromSessionResult(friendshipExists, "result") === false) {
+    if (await friendshipExist(session, ctx.user.id, params.input.friendId) === false) {
         throw new ApolloError(lackingFriendshipError, "400", [lackingFriendshipError]);
     }
 
-    const userBelongsToGroup = await session.run(
-        `
-        MATCH (a: Account {id: "${ctx.user.id}"})
-        MATCH (g: Group{id: "${params.input.groupId}"})
-        RETURN EXISTS( (a)-[:BELONGS_TO]-(g) ) as result
-        `,
-    );
-
-    if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
+    if (await userBelongsToGroup(session, params.input.groupId, ctx.user.id) === false) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
