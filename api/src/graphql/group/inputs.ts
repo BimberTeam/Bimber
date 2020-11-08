@@ -15,7 +15,7 @@ export const GroupInputs = `
 
     input AddFriendToGroupInput {
         groupId: ID!
-        friendId: ID!
+        userId: ID!
     }
 
     input AcceptGroupInvitationInput {

@@ -146,9 +146,9 @@ export const GroupMutations = `
     addFriendToGroup(input: AddFriendToGroupInput): Message
     @cypher(
         statement: """
-            MATCH(a: Account{id: $input.friendId})
+            MATCH(a: Account{id: $input.userId})
             MATCH(g: Group{id: $input.groupId})
-            MERGE((a)-[:GROUP_INVITATION]->(g))
+            MERGE((a)-[:GROUP_INVITATION{inviterId: $meId}]->(g))
             RETURN {status: 'OK', message: ${groupInvitationSentSuccess}}
         """
     )
@@ -159,8 +159,9 @@ export const GroupMutations = `
             MATCH(a: Account{id: $meId})
             MATCH(g: Group{id: $input.groupId})
             MATCH(a)-[gi:GROUP_INVITATION]->(g)
+            MERGE( (a)-[:PENDING]-(g) )
+            MERGE( (g)-[:VOTE_IN_FAVOUR{id: gi.inviterId}]->(a) )
             DELETE gi
-            MERGE((a)-[:PENDING]-(g))
             RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}}
         """
     )
