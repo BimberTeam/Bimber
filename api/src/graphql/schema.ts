@@ -106,7 +106,7 @@ const resolvers = {
     me(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
-    accountExistss(object, params, ctx, resolveInfo) {
+    accountExists(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
     user(object, params, ctx, resolveInfo) {

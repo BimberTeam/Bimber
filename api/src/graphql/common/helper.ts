@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server"
-import { session, Session } from "neo4j-driver";
+import { Session } from "neo4j-driver";
 
 export const singleQuote = (string: String) => { return `'${string}'` }
 
