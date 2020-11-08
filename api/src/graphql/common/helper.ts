@@ -115,13 +115,13 @@ export const friendshipExist = async (session: Session, meID: string, friendId: 
 export const accountExists = async (session: Session, email: string): Promise<boolean> => {
     const findAccount = await session.run(
         `
-        MATCH (account:Account {email: "${email}"})
-        RETURN account
+        OPTIONAL MATCH (account:Account {email: "${email}"})
+        RETURN account IS NULL AS result
         `,
     );
 
-    if (findAccount.records.length > 0) {
-        return true;
+    if (getValueFromSessionResult(findAccount, "result") === true) {
+        return false;
     }
-    return false;
+    return true;
 }
