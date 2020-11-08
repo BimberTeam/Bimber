@@ -1,4 +1,4 @@
-import { ensureAuthorized, singleQuote, debugQuery, groupExist, userBelongsToGroup} from "./../../common/helper";
+import { ensureAuthorized, singleQuote, debugQuery, groupExists, userBelongsToGroup} from "./../../common/helper";
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
@@ -10,7 +10,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
-    if (await groupExist(session, params.input.groupId) === false) {
+    if (await groupExists(session, params.input.groupId) === false) {
         throw new ApolloError(groupDoesNotExistError, "400", [groupDoesNotExistError]);
     }
 

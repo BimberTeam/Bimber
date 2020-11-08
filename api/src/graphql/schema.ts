@@ -33,7 +33,7 @@ import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
 import groupInfo from "./group/queries/groupInfo";
-import groupInvitationProposals from "./group/queries/groupInvitationProposals";
+import groupMembersProposal from "./group/queries/groupMembersProposal";
 import updateLocation from "./user/resolvers/updateLocation";
 
 export const typeDefs = `
@@ -106,7 +106,7 @@ const resolvers = {
     me(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
     },
-    accountExists(object, params, ctx, resolveInfo) {
+    accountExistss(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
     user(object, params, ctx, resolveInfo) {
@@ -119,7 +119,7 @@ const resolvers = {
     loadChatMessages,
     chatThumbnails,
     groupInfo,
-    groupInvitationProposals
+    groupMembersProposal
   },
   Subscription: {
     newChatMessage: {

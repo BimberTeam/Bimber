@@ -1,4 +1,4 @@
-import { debugQuery, singleQuote, ensureAuthorized, accountExist } from './../../common/helper';
+import { debugQuery, singleQuote, ensureAuthorized, accountExists } from './../../common/helper';
 import { ApolloError } from "apollo-server";
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
@@ -11,7 +11,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     if (params.input.email !== undefined) {
 
-        if (await accountExist(session, params.input.email) === true) {
+        if (await accountExists(session, params.input.email) === true) {
             throw new ApolloError(emailAlreadyExistsError, "200", [emailAlreadyExistsError]);
         }
 

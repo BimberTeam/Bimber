@@ -1,4 +1,4 @@
-import { ensureAuthorized, singleQuote, groupExist, userBelongsToGroup } from './../../common/helper';
+import { ensureAuthorized, singleQuote, groupExists, userBelongsToGroup } from './../../common/helper';
 import { ApolloError } from "apollo-server"
 import { Point, Session } from "neo4j-driver";
 import { getValueFromSessionResult } from "../../common/helper";
@@ -25,7 +25,7 @@ const castLocation = (location: Point): Coords  => {
     }
 }
 
-const typeConversion = (list: any): any =>  {
+const mapPropertiesList = (list: any): any =>  {
     return list.map(
         element => {
             element["properties"]['latestLocation'] = castLocation(element["properties"]['latestLocation']);
@@ -37,7 +37,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
-    if (await groupExist(session, params.id) === false) {
+    if (await groupExists(session, params.id) === false) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
@@ -90,9 +90,9 @@ export default async (obj, params, ctx, resolveInfo) => {
     await session.close();
     return {
         "id": id,
-        "friendCandidates": typeConversion(friendCandidates),
-        "members": typeConversion(members),
-        "pendingMembers": typeConversion(pendingMembers),
+        "friendCandidates": mapPropertiesList(friendCandidates),
+        "members": mapPropertiesList(members),
+        "pendingMembers": mapPropertiesList(pendingMembers),
         "averageAge": averageAge,
         "averageLocation": averageLocation
     }

@@ -39,21 +39,21 @@ export const debugQuery = (): boolean => {
     return (process.env.DEBUG_NEO4J_QUERY === "true");
 }
 
-export const userExist = async (session: Session, userID: string): Promise<boolean> => {
-    const userExists = await session.run(
+export const userExists = async (session: Session, userID: string): Promise<boolean> => {
+    const userExistss = await session.run(
         `
         MATCH (a: Account{id: "${userID}"})
         RETURN a
         `,
     );
 
-    if (userExists.records.length === 0) {
+    if (userExistss.records.length === 0) {
         return false;
     }
     return true;
 }
 
-export const groupExist = async (session: Session, groupId: string): Promise<boolean> => {
+export const groupExists = async (session: Session, groupId: string): Promise<boolean> => {
     const doesGroupExist = await session.run(
         `
         MATCH (g: Group{id: "${groupId}"})
@@ -112,7 +112,7 @@ export const friendshipExist = async (session: Session, meID: string, friendId: 
     return true;
 }
 
-export const accountExist = async (session: Session, email: string): Promise<boolean> => {
+export const accountExists = async (session: Session, email: string): Promise<boolean> => {
     const findAccount = await session.run(
         `
         MATCH (account:Account {email: "${email}"})

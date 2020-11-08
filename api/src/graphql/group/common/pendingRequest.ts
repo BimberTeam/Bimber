@@ -1,4 +1,4 @@
-import { ensureAuthorized, groupExist, singleQuote, userExist } from "./../../common/helper";
+import { ensureAuthorized, groupExists, singleQuote, userExists } from "./../../common/helper";
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { getValueFromSessionResult, userBelongsToGroup } from "../../common/helper";
@@ -33,7 +33,7 @@ export default async (params, ctx) => {
         throw new ApolloError(callerIsPendingUserError, "400", [callerIsPendingUserError]);
     }
 
-    if (await groupExist(session, params.input.groupId) === false) {
+    if (await groupExists(session, params.input.groupId) === false) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
@@ -41,7 +41,7 @@ export default async (params, ctx) => {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
-    if (await userExist(session,params.input.userId )) {
+    if (await userExists(session,params.input.userId )) {
         throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
     }
 

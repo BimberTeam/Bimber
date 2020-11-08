@@ -1,5 +1,5 @@
 import { Session } from 'neo4j-driver';
-import { singleQuote, userExist, friendshipExist } from './../../common/helper';
+import { singleQuote, userExists, friendshipExist } from './../../common/helper';
 import { ensureAuthorized, debugQuery } from '../../common/helper';
 import { neo4jgraphql } from "neo4j-graphql-js";
 import { ApolloError } from 'apollo-server';
@@ -12,7 +12,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
     for (const userId of params.input.usersId) {
-        if (await userExist(session, userId) == false) {
+        if (await userExists(session, userId) == false) {
             throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
         }
 

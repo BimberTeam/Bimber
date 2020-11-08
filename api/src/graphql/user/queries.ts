@@ -7,7 +7,7 @@ export const AccountQueries = `
     """
     )
 
-    accountExists(email: String!): Boolean
+    accountExistss(email: String!): Boolean
     @cypher(
     statement: """
         MATCH(account: Account{email: $email})
