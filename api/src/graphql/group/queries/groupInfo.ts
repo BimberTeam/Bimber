@@ -11,24 +11,17 @@ interface Coords{
     longitude: number
 }
 
-const castLocation = (location: Point): Coords  => {
-    if (location !== undefined) {
-        return {
-            "latitude": location['x'],
-            "longitude": location['y']
-         };
-    } else {
-        return {
-            "latitude": null,
-            "longitude": null
-         };
-    }
+const mapPointToLocation = (point: Point): Coords  => {
+    return {
+        "latitude": point && point['x'] || null,
+        "longitude": point && point['y'] || null,
+    };
 }
 
-const mapPropertiesList = (list: any): any =>  {
+const mapLocationAndGetProperties = (list: any): any =>  {
     return list.map(
         element => {
-            element["properties"]['latestLocation'] = castLocation(element["properties"]['latestLocation']);
+            element["properties"]['latestLocation'] = mapPointToLocation(element["properties"]['latestLocation']);
             return element["properties"];
         });
 };
@@ -90,9 +83,9 @@ export default async (obj, params, ctx, resolveInfo) => {
     await session.close();
     return {
         "id": id,
-        "friendCandidates": mapPropertiesList(friendCandidates),
-        "members": mapPropertiesList(members),
-        "pendingMembers": mapPropertiesList(pendingMembers),
+        "friendCandidates": mapLocationAndGetProperties(friendCandidates),
+        "members": mapLocationAndGetProperties(members),
+        "pendingMembers": mapLocationAndGetProperties(pendingMembers),
         "averageAge": averageAge,
         "averageLocation": averageLocation
     }

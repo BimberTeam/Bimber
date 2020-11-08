@@ -18,11 +18,11 @@ export default async (obj, params, ctx, resolveInfo) => {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
-    if (await userExists(session, params.input.friendId) === false) {
+    if (await userExists(session, params.input.userId) === false) {
         throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
     }
 
-    if (await friendshipExist(session, ctx.user.id, params.input.friendId) === false) {
+    if (await friendshipExist(session, ctx.user.id, params.input.userId) === false) {
         throw new ApolloError(lackingFriendshipError, "400", [lackingFriendshipError]);
     }
 
@@ -30,11 +30,11 @@ export default async (obj, params, ctx, resolveInfo) => {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
-    if (await userBelongsToGroup(session, params.input.groupId, params.input.friendId) === false) {
+    if (await userBelongsToGroup(session, params.input.groupId, params.input.userId) === true) {
         throw new ApolloError(friendBelongsToGroupError, "400", [friendBelongsToGroupError]);
     }
 
-    if (await groupInvitationExist(session, params.input.groupId, params.input.friendId) === false) {
+    if (await groupInvitationExist(session, params.input.groupId, params.input.userId) === true) {
         throw new ApolloError(friendAlreadyInvitedError, "400", [friendAlreadyInvitedError]);
     }
 

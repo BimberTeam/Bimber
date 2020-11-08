@@ -4,7 +4,6 @@ import { neo4jgraphql } from 'neo4j-graphql-js';
 import { ensureAuthorized, singleQuote } from "../../common/helper";
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
-import { getValueFromSessionResult } from "../../common/helper";
 
 const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
 const lackingInvitationError = singleQuote("Nie masz zaproszenia do tej grupy!");

@@ -33,7 +33,7 @@ import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
 import groupInfo from "./group/queries/groupInfo";
-import groupMembersProposal from "./group/queries/groupMembersProposal";
+import listFriendsWithoutGroupMembership from "./group/queries/listFriendsWithoutGroupMembership";
 import updateLocation from "./user/resolvers/updateLocation";
 
 export const typeDefs = `
@@ -119,7 +119,7 @@ const resolvers = {
     loadChatMessages,
     chatThumbnails,
     groupInfo,
-    groupMembersProposal
+    listFriendsWithoutGroupMembership
   },
   Subscription: {
     newChatMessage: {
