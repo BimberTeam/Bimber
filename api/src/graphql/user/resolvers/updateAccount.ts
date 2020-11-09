@@ -1,23 +1,18 @@
-import { debugQuery, singleQuote, ensureAuthorized } from './../../common/helper';
+import { debugQuery, singleQuote, ensureAuthorized, accountExists } from './../../common/helper';
 import { ApolloError } from "apollo-server";
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 
-const emailNotUniqueError = singleQuote("Podany email już istnieje !");
+const emailAlreadyExistsError = singleQuote("Podany email już istnieje !");
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
     if (params.input.email !== undefined) {
-        const findAccount = await session.run(
-            `
-            MATCH (a:Account {email: "${params.input.email}"}) return a
-            `,
-        );
 
-        if (findAccount.records.length > 0) {
-            throw new ApolloError(emailNotUniqueError, "200", [emailNotUniqueError]);
+        if (await accountExists(session, params.input.email) === true) {
+            throw new ApolloError(emailAlreadyExistsError, "200", [emailAlreadyExistsError]);
         }
 
         await session.close();

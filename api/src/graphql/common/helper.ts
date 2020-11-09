@@ -38,3 +38,72 @@ export const ensureAuthorized = async (ctx) => {
 export const debugQuery = (): boolean => {
     return (process.env.DEBUG_NEO4J_QUERY === "true");
 }
+
+export const userExists = async (session: Session, userID: string): Promise<boolean> => {
+    const userExists = await session.run(
+        `
+        OPTIONAL MATCH (a: Account{id: "${userID}"})
+        RETURN a IS NULL AS result
+        `,
+    );
+
+    return getValueFromSessionResult(userExists, "result") !== true;
+}
+
+export const groupExists = async (session: Session, groupId: string): Promise<boolean> => {
+    const doesGroupExist = await session.run(
+        `
+        OPTIONAL MATCH (g: Group{id: "${groupId}"})
+        RETURN g IS NULL AS result
+        `,
+    );
+
+    return getValueFromSessionResult(doesGroupExist, "result") !== true;
+}
+
+export const userBelongsToGroup = async (session: Session, groupId: string, userId: string): Promise<boolean> => {
+    const userBelongsToGroup = await session.run(
+        `
+        MATCH (a: Account {id: "${userId}"})
+        MATCH (g: Group{id: "${groupId}"})
+        RETURN EXISTS( (a)-[:BELONGS_TO]-(g) ) as result
+        `,
+    );
+
+    return getValueFromSessionResult(userBelongsToGroup, "result") !== false;
+}
+
+export const groupInvitationExist = async (session: Session, groupId: string, userId: string): Promise<boolean> => {
+    const groupInvitationExist = await session.run(
+        `
+        MATCH (a: Account{id: "${userId}"})
+        MATCH (g: Group{id: "${groupId}"})
+        RETURN EXISTS( (a)-[:GROUP_INVITATION]-(g) ) as result
+        `,
+    );
+
+    return getValueFromSessionResult(groupInvitationExist, "result") !== false;
+}
+
+export const friendshipExist = async (session: Session, meID: string, friendId: string): Promise<boolean> => {
+    const friendshipExist = await session.run(
+        `
+        MATCH (me: Account{id: "${meID}"})
+        MATCH (a: Account{id: "${friendId}"})
+        RETURN EXISTS( (a)-[:FRIENDS]-(me) ) as result
+        `,
+    );
+
+    return getValueFromSessionResult(friendshipExist, "result") !== false;
+}
+
+export const accountExists = async (session: Session, email: string): Promise<boolean> => {
+    const accountExists = await session.run(
+        `
+        OPTIONAL MATCH (account:Account {email: "${email}"})
+        RETURN account IS NULL AS result
+        `,
+    );
+
+    return getValueFromSessionResult(accountExists, "result") !== true;
+}

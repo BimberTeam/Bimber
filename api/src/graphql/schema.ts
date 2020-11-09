@@ -32,6 +32,8 @@ import { pubsub } from "./pubsub";
 import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
+import groupInfo from "./group/queries/groupInfo";
+import listFriendsWithoutGroupMembership from "./group/queries/listFriendsWithoutGroupMembership";
 import updateLocation from "./user/resolvers/updateLocation";
 
 export const typeDefs = `
@@ -115,7 +117,9 @@ const resolvers = {
     },
     pendingMembersList,
     loadChatMessages,
-    chatThumbnails
+    chatThumbnails,
+    groupInfo,
+    listFriendsWithoutGroupMembership
   },
   Subscription: {
     newChatMessage: {

@@ -1,6 +1,5 @@
 import { debugQuery } from './../../common/helper';
 import { votesDistribution as votesDistributionFun , VotesDistribution } from './../common/pendingRequest';
-import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
 import pendingRequest from '../common/pendingRequest';
 

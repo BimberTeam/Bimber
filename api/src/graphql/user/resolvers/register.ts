@@ -1,4 +1,4 @@
-import { singleQuote, debugQuery } from './../../common/helper';
+import { singleQuote, debugQuery, accountExists } from './../../common/helper';
 import { ApolloError } from "apollo-server";
 import neo4j, { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
@@ -11,13 +11,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     params.input.password = await hashPassword(params.input.password);
 
-    const findAccount = await session.run(
-        `
-        MATCH (a:Account {email: "${params.input.email}"}) return a
-        `,
-    );
-
-    if (findAccount.records.length > 0) {
+    if (await accountExists(session, params.input.email) === true) {
         throw new ApolloError(emailAlreadyExistsError, "200", [emailAlreadyExistsError]);
     }
 
