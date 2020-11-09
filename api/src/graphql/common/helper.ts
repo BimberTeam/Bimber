@@ -40,31 +40,25 @@ export const debugQuery = (): boolean => {
 }
 
 export const userExists = async (session: Session, userID: string): Promise<boolean> => {
-    const userExistss = await session.run(
+    const userExists = await session.run(
         `
-        MATCH (a: Account{id: "${userID}"})
-        RETURN a
+        OPTIONAL MATCH (a: Account{id: "${userID}"})
+        RETURN a IS NULL AS result
         `,
     );
 
-    if (userExistss.records.length === 0) {
-        return false;
-    }
-    return true;
+    return getValueFromSessionResult(userExists, "result") !== true;
 }
 
 export const groupExists = async (session: Session, groupId: string): Promise<boolean> => {
     const doesGroupExist = await session.run(
         `
-        MATCH (g: Group{id: "${groupId}"})
-        RETURN g
+        OPTIONAL MATCH (g: Group{id: "${groupId}"})
+        RETURN g IS NULL AS result
         `,
     );
 
-    if (doesGroupExist.records.length === 0) {
-        return false;
-    }
-    return true;
+    return getValueFromSessionResult(doesGroupExist, "result") !== true;
 }
 
 export const userBelongsToGroup = async (session: Session, groupId: string, userId: string): Promise<boolean> => {
@@ -76,10 +70,7 @@ export const userBelongsToGroup = async (session: Session, groupId: string, user
         `,
     );
 
-    if (getValueFromSessionResult(userBelongsToGroup, "result") === false) {
-       return false;
-    }
-    return true;
+    return getValueFromSessionResult(userBelongsToGroup, "result") !== false;
 }
 
 export const groupInvitationExist = async (session: Session, groupId: string, userId: string): Promise<boolean> => {
@@ -91,10 +82,7 @@ export const groupInvitationExist = async (session: Session, groupId: string, us
         `,
     );
 
-    if (getValueFromSessionResult(groupInvitationExist, "result") === false) {
-        return false;
-    }
-    return true;
+    return getValueFromSessionResult(groupInvitationExist, "result") !== false;
 }
 
 export const friendshipExist = async (session: Session, meID: string, friendId: string): Promise<boolean> => {
@@ -106,22 +94,16 @@ export const friendshipExist = async (session: Session, meID: string, friendId: 
         `,
     );
 
-    if (getValueFromSessionResult(friendshipExist, "result") === false) {
-        return false;
-    }
-    return true;
+    return getValueFromSessionResult(friendshipExist, "result") !== false;
 }
 
 export const accountExists = async (session: Session, email: string): Promise<boolean> => {
-    const findAccount = await session.run(
+    const accountExists = await session.run(
         `
         OPTIONAL MATCH (account:Account {email: "${email}"})
         RETURN account IS NULL AS result
         `,
     );
 
-    if (getValueFromSessionResult(findAccount, "result") === true) {
-        return false;
-    }
-    return true;
+    return getValueFromSessionResult(accountExists, "result") !== true;
 }

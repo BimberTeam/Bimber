@@ -35,7 +35,7 @@ export const GroupTypes = `
     },
 
     type GroupInfoPayload {
-        id: ID!
+        groupId: ID!
         friendCandidates: [User]
         members: [User]
         pendingMembers: [User]

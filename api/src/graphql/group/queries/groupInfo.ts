@@ -68,7 +68,7 @@ export default async (obj, params, ctx, resolveInfo) => {
             RETURN collect(a) AS friendCandidates
         }
         RETURN {
-            id: group.id,
+            groupId: group.id,
             friendCandidates: friendCandidates,
             members: members,
             pendingMembers: pendingMembers,
@@ -78,11 +78,11 @@ export default async (obj, params, ctx, resolveInfo) => {
         `
     )
 
-    const {id, friendCandidates, members, pendingMembers, averageAge, averageLocation} = getValueFromSessionResult(getGroupInfo, "result");
+    const {groupId, friendCandidates, members, pendingMembers, averageAge, averageLocation} = getValueFromSessionResult(getGroupInfo, "result");
 
     await session.close();
     return {
-        "id": id,
+        "groupId": groupId,
         "friendCandidates": mapLocationAndGetProperties(friendCandidates),
         "members": mapLocationAndGetProperties(members),
         "pendingMembers": mapLocationAndGetProperties(pendingMembers),

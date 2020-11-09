@@ -37,12 +37,12 @@ export default async (params, ctx) => {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
-    if (await userBelongsToGroup(session, params.input.groupId, ctx.user.id) === false) {
-        throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
+    if (await userExists(session, params.input.userId ) === false) {
+        throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
     }
 
-    if (await userExists(session,params.input.userId )) {
-        throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
+    if (await userBelongsToGroup(session, params.input.groupId, ctx.user.id) === false) {
+        throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
     const isUserPending = await session.run(
