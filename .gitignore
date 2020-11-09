@@ -1,3 +1,5 @@
 dist/
 node_modules
 api/.env
+data_generator/.idea
+data_generator/virtualenv
