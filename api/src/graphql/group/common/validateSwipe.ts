@@ -22,7 +22,7 @@ export default async (params, ctx) => {
         RETURN EXISTS((g)<-[:OWNER]-(a)) AS result
         `;
 
-    if (await executeQuery<boolean>(session, alreadyGroupOwnerQuery, "result") === true) {
+    if (await executeQuery<boolean>(session, alreadyGroupOwnerQuery) === true) {
         throw new ApolloError(groupOwnerError, "400", [groupOwnerError]);
     }
 

@@ -57,7 +57,7 @@ export default async (params, ctx) => {
         RETURN EXISTS( (a)-[:VOTE_IN_FAVOUR{id: me.id}]-(g) ) OR EXISTS( (a)-[:VOTE_AGAINST{id: me.id}]-(g) ) as result
         `;
 
-    if (await executeQuery<boolean>(session, hasUserAlreadyVotedQuery, "result") === true) {
+    if (await executeQuery<boolean>(session, hasUserAlreadyVotedQuery) === true) {
         throw new ApolloError(alreadyVotedError, "400", [alreadyVotedError]);
     }
 

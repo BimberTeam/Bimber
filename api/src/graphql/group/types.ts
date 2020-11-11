@@ -26,12 +26,4 @@ export const GroupTypes = `
         """
         ),
     },
-
-    type GroupInfoPayload {
-        groupId: ID!
-        friendCandidates: [User]
-        members: [User]
-        averageAge: Float
-        averageLocation: Coords
-    },
 `;

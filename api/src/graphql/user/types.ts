@@ -66,6 +66,7 @@ export const AccountTypes = `
         VODKA
         BEER
         WINE
+        OTHER
     }
 
     enum Gender {

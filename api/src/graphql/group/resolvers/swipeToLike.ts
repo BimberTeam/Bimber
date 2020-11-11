@@ -29,7 +29,7 @@ export default async (obj, params, ctx, resolveInfo) => {
             RETURN EXISTS( (a)-[:PENDING]->(meGroup) ) AS result
             `;
 
-        if (await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery, "result") === false) {
+        if (await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery) === false) {
 
             const swipeQuery =
                 `
@@ -39,7 +39,7 @@ export default async (obj, params, ctx, resolveInfo) => {
                 RETURN {status: 'OK', message: ${requestedGroupJoinSuccess}} AS result
                 `;
 
-            return await executeQuery<Message>(session, swipeQuery, "result");
+            return await executeQuery<Message>(session, swipeQuery);
         }
     }
 

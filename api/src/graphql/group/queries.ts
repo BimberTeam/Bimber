@@ -7,8 +7,6 @@ export const GroupQueries = `
         """
     )
 
-    groupInfo(id: ID!): GroupInfoPayload
-
     groupMembersWithoutFriendship(groupId: ID!): [User]
     @cypher(
         statement: """

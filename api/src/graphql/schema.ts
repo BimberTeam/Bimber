@@ -32,7 +32,6 @@ import { pubsub } from "./pubsub";
 import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
-import groupInfo from "./group/queries/groupInfo";
 import listFriendsWithoutGroupMembership from "./group/queries/listFriendsWithoutGroupMembership";
 import updateLocation from "./user/resolvers/updateLocation";
 import groupMembersWithoutFriendship from "./group/queries/groupMembersWithoutFriendship";
@@ -120,7 +119,6 @@ const resolvers = {
     groupCandidates,
     loadChatMessages,
     chatThumbnails,
-    groupInfo,
     listFriendsWithoutGroupMembership,
     groupMembersWithoutFriendship,
     groupCandidatesResult,

@@ -4,16 +4,12 @@ import { Session } from "neo4j-driver";
 export const singleQuote = (string: String) => { return `'${string}'` }
 
 const notAuthorized = singleQuote("unauthorized");
-const unexpectedError = singleQuote("Niespodziwany błąd podczas wywoływania Query!");
+const unexpectedError = singleQuote("Wystąpił niespodziewany błąd podczas wywoływania Query!");
 
 export interface Message {
     status: string,
     message: string
 }
-
-export const getValueFromSessionResult = (sessionResult, key: string) => {
-    return sessionResult.records[0].get(key);
-};
 
 export const executeQuery = async <T>(session: Session, query: string, key: string = "result"): Promise<T> => {
     const queryResult = await session.run(query);
@@ -39,7 +35,7 @@ export const ensureAuthorized = async (ctx) => {
         RETURN a.token as result
         `;
 
-    const accountToken: string = await executeQuery<string>(session, accountTokenResultQuery, 'result');
+    const accountToken: string = await executeQuery<string>(session, accountTokenResultQuery);
 
     if (accountToken !== ctx.token) {
         throw new ApolloError(notAuthorized, "401", [notAuthorized]);
@@ -67,7 +63,7 @@ export const groupExists = async (session: Session, groupId: string): Promise<bo
         RETURN g IS NULL AS result
         `;
 
-    return await executeQuery<boolean>(session, doesGroupExistQuery, "result") !== true;
+    return await executeQuery<boolean>(session, doesGroupExistQuery) !== true;
 }
 
 export const userBelongsToGroup = async (session: Session, groupId: string, userId: string): Promise<boolean> => {
@@ -78,7 +74,7 @@ export const userBelongsToGroup = async (session: Session, groupId: string, user
         RETURN EXISTS( (a)-[:BELONGS_TO]-(g) ) as result
         `;
 
-    return await executeQuery<boolean>(session, userBelongsToGroupQuery, "result") !== false;
+    return await executeQuery<boolean>(session, userBelongsToGroupQuery) !== false;
 }
 
 export const groupInvitationExist = async (session: Session, groupId: string, userId: string): Promise<boolean> => {
@@ -89,7 +85,7 @@ export const groupInvitationExist = async (session: Session, groupId: string, us
         RETURN EXISTS( (a)-[:GROUP_INVITATION]-(g) ) as result
         `;
 
-    return await executeQuery<boolean>(session, groupInvitationExistQuery, "result") !== false;
+    return await executeQuery<boolean>(session, groupInvitationExistQuery) !== false;
 }
 
 export const friendshipExist = async (session: Session, meID: string, friendId: string): Promise<boolean> => {
@@ -100,7 +96,7 @@ export const friendshipExist = async (session: Session, meID: string, friendId: 
         RETURN EXISTS( (a)-[:FRIENDS]-(me) ) as result
         `;
 
-    return await executeQuery<boolean>(session, friendshipExistQuery, "result") !== false;
+    return await executeQuery<boolean>(session, friendshipExistQuery) !== false;
 }
 
 export const accountExists = async (session: Session, email: string): Promise<boolean> => {
@@ -110,7 +106,7 @@ export const accountExists = async (session: Session, email: string): Promise<bo
         RETURN account IS NULL AS result
         `;
 
-    return await executeQuery<boolean>(session, accountExistsQuery, "result") !== true;
+    return await executeQuery<boolean>(session, accountExistsQuery) !== true;
 }
 
 export const userAlreadyPendingToGroup = async (session: Session, groupId: string, userId: string): Promise<boolean>  => {
@@ -120,5 +116,5 @@ export const userAlreadyPendingToGroup = async (session: Session, groupId: strin
         RETURN EXISTS( (me)-[:PENDING]->(group) ) AS result
     `;
 
-    return await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery, "result") === true;
+    return await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery) === true;
 }
