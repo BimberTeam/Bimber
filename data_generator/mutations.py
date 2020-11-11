@@ -44,3 +44,116 @@ mutation Login($email: String!, $password: String!) {
   }
 }
 """)
+
+acceptFriendRequest = gql("""
+mutation AcceptFriendRequest($input: FriendInput!){
+    acceptFriendRequest(input: $input) {
+      message
+      status
+    }
+  }
+""")
+
+denyFriendRequest = gql("""
+mutation DenyFriendRequest($input: FriendInput!){
+    denyFriendRequest(input: $input) {
+      message
+      status
+    }
+}
+""")
+
+removeFriend = gql("""
+mutation RemoveFriend($input: FriendInput!){
+    removeFriend(input: $input) {
+      message
+      status
+    }
+  }
+""")
+
+addFriend = gql("""
+mutation SendFriendRequest($input: FriendInput!){
+    sendFriendRequest(input: $input) {
+      message
+      status
+    }
+  }
+""")
+
+
+updateLocation = gql("""
+mutation UpdateLocation($latitude: Float, $longitude: Float){
+  updateLocation(input: {
+    latitude: $latitude,
+    longitude: $longitude}){
+      message
+      status
+    }
+}
+""")
+
+acceptGroupRequest = gql("""
+mutation AcceptGroupInvitation($input: AcceptGroupInvitationInput!){
+   acceptGroupInvitation(input: $input) {
+      message
+      status
+    }
+  }
+""")
+
+rejectGroupRequest = gql("""
+mutation RejectGroupInvitation($input: RejectGroupInvitationInput!){
+    rejectGroupInvitation(input: $input) {
+      message
+      status
+    }
+}
+""")
+
+createGroup = gql("""
+mutation CreateGroup($usersId: [ID!]!){
+    createGroup(input: {
+    usersId: $usersId
+    }) {
+      message
+      status
+    }
+}
+""")
+
+addToGroup = gql("""
+mutation AddFriendToGroup($groupId: ID!, $friendId: ID!){
+    addFriendToGroup(input: {
+    friendId: $friendId,
+    groupId: $groupId
+    }) {
+      message
+      status
+    }
+}
+""")
+
+voteFor = gql("""
+mutation AcceptGroupPendingUser($groupId: ID!, $userId: ID!){
+    acceptGroupPendingUser(input: {
+    userId: $userId,
+    groupId: $groupId
+    }) {
+      message
+      status
+    }
+}
+""")
+
+voteAgainst = gql("""
+mutation RejectGroupPendingUser($groupId: ID!, $userId: ID!){
+    rejectGroupPendingUser(input: {
+    userId: $userId,
+    groupId: $groupId
+    }) {
+      message
+      status
+    }
+}
+""")

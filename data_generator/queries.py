@@ -16,6 +16,24 @@ query Me {
     alcoholPreference
     agePreferenceFrom
     agePreferenceTo
+    friends {
+      id
+      name
+    }
+    friendRequests {
+      id
+      name
+    }
+    groups {
+      id
+    }
+    groupInvitations {
+      id
+    }
+    latestLocation {
+      latitude
+      longitude
+    }
   }
 }
 """)

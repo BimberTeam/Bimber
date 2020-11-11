@@ -3,10 +3,10 @@ from gql.transport.aiohttp import AIOHTTPTransport
 from faker import Faker
 import random
 import json
-from mutations import register, login
+from mutations import *
 from queries import me
 fake = Faker()
-alcohols = ["BEER", "WINE", "VODKA", "OTHER"]
+alcohols = ["BEER", "WINE", "VODKA"]
 genders = ["MALE", "FEMALE"]
 gender_preferences = ["MALE", "FEMALE", None]
 
@@ -38,6 +38,7 @@ class User(object):
 
     def register(self):
         data = self.getClient().execute(register, variable_values=self.toJson())
+        self.id = data['register']['id']
         print(data)
     
     def login(self):
@@ -45,6 +46,39 @@ class User(object):
         self.token = data['login']['token']
         print(self.token)
 
+    def updateLocation(self):
+        (lat, lng) = fake.local_latlng(country_code='PL', coords_only=True)
+        variable = {"longitude": float(lng), "latitude": float(lat)}
+        data = self.getClient().execute(updateLocation, variable_values=json.dumps(variable))
+        print(data)
+
     def queryMe(self):
         data = self.getClient().execute(me)
         print(data)
+        return data
+
+    def addFriend(self, id):
+        variable = {"input": {"id": id}}
+        data = self.getClient().execute(addFriend, variable_values=json.dumps(variable))
+        print(data)
+
+    def acceptFriendRequests(self):
+        users = self.queryMe()['me']['friendRequests']
+        for user in users:
+            variable = {"input": {"id": str(user['id'])}}
+            data = self.getClient().execute(acceptFriendRequest, variable_values=json.dumps(variable))
+            print(data)
+
+    def createGroup(self):
+        friends = self.queryMe()['me']['friends']
+        friends_id = list(map(lambda x: x['id'], friends))
+        variable = {"usersId": friends_id}
+        data = self.getClient().execute(createGroup, variable_values=json.dumps(variable))
+        print(data)
+
+    def acceptGroupRequests(self):
+        groups = self.queryMe()['me']['groupInvitations']
+        for group in groups:
+            variable = {"input": {"groupId": str(group['id'])}}   
+            data = self.getClient().execute(acceptGroupRequest, variable_values=json.dumps(variable))
+            print(data)
