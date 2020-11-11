@@ -4,10 +4,22 @@ import { Session } from "neo4j-driver";
 export const singleQuote = (string: String) => { return `'${string}'` }
 
 const notAuthorized = singleQuote("unauthorized");
+const unexpectedError = singleQuote("Wystąpił niespodziewany błąd podczas wywoływania Query!");
 
-export const getValueFromSessionResult = (sessionResult, key: string) => {
-    return sessionResult.records[0].get(key);
-};
+export interface Message {
+    status: string,
+    message: string
+}
+
+export const executeQuery = async <T>(session: Session, query: string, key: string = "result"): Promise<T> => {
+    const queryResult = await session.run(query);
+
+    if (queryResult.records.length === 0) {
+        throw new ApolloError(unexpectedError, "400", [unexpectedError]);
+    }
+
+    return queryResult.records[0].get(key);
+}
 
 export const ensureAuthorized = async (ctx) => {
 
@@ -17,20 +29,15 @@ export const ensureAuthorized = async (ctx) => {
 
     const session: Session = ctx.driver.session();
 
-    const accountTokenResult = await session.run(
+    const accountTokenResultQuery =
         `
         MATCH (a: Account{id: "${ctx.user.id}"})
         RETURN a.token as result
-        `,
-    );
+        `;
 
-    if(accountTokenResult.records.length === 0 ) {
-        throw new ApolloError(notAuthorized, "401", [notAuthorized]);
-    }
+    const accountToken: string = await executeQuery<string>(session, accountTokenResultQuery);
 
-    const accountToken: string = getValueFromSessionResult(accountTokenResult, 'result');
-
-    if(accountToken !== ctx.token) {
+    if (accountToken !== ctx.token) {
         throw new ApolloError(notAuthorized, "401", [notAuthorized]);
     }
 };
@@ -40,70 +47,74 @@ export const debugQuery = (): boolean => {
 }
 
 export const userExists = async (session: Session, userID: string): Promise<boolean> => {
-    const userExists = await session.run(
+    const userExistsQuery =
         `
         OPTIONAL MATCH (a: Account{id: "${userID}"})
         RETURN a IS NULL AS result
-        `,
-    );
+        `;
 
-    return getValueFromSessionResult(userExists, "result") !== true;
+    return await executeQuery<boolean>(session, userExistsQuery) !== true;
 }
 
 export const groupExists = async (session: Session, groupId: string): Promise<boolean> => {
-    const doesGroupExist = await session.run(
+    const doesGroupExistQuery =
         `
         OPTIONAL MATCH (g: Group{id: "${groupId}"})
         RETURN g IS NULL AS result
-        `,
-    );
+        `;
 
-    return getValueFromSessionResult(doesGroupExist, "result") !== true;
+    return await executeQuery<boolean>(session, doesGroupExistQuery) !== true;
 }
 
 export const userBelongsToGroup = async (session: Session, groupId: string, userId: string): Promise<boolean> => {
-    const userBelongsToGroup = await session.run(
+    const userBelongsToGroupQuery =
         `
         MATCH (a: Account {id: "${userId}"})
         MATCH (g: Group{id: "${groupId}"})
         RETURN EXISTS( (a)-[:BELONGS_TO]-(g) ) as result
-        `,
-    );
+        `;
 
-    return getValueFromSessionResult(userBelongsToGroup, "result") !== false;
+    return await executeQuery<boolean>(session, userBelongsToGroupQuery) !== false;
 }
 
 export const groupInvitationExist = async (session: Session, groupId: string, userId: string): Promise<boolean> => {
-    const groupInvitationExist = await session.run(
+    const groupInvitationExistQuery =
         `
         MATCH (a: Account{id: "${userId}"})
         MATCH (g: Group{id: "${groupId}"})
         RETURN EXISTS( (a)-[:GROUP_INVITATION]-(g) ) as result
-        `,
-    );
+        `;
 
-    return getValueFromSessionResult(groupInvitationExist, "result") !== false;
+    return await executeQuery<boolean>(session, groupInvitationExistQuery) !== false;
 }
 
 export const friendshipExist = async (session: Session, meID: string, friendId: string): Promise<boolean> => {
-    const friendshipExist = await session.run(
+    const friendshipExistQuery =
         `
         MATCH (me: Account{id: "${meID}"})
         MATCH (a: Account{id: "${friendId}"})
         RETURN EXISTS( (a)-[:FRIENDS]-(me) ) as result
-        `,
-    );
+        `;
 
-    return getValueFromSessionResult(friendshipExist, "result") !== false;
+    return await executeQuery<boolean>(session, friendshipExistQuery) !== false;
 }
 
 export const accountExists = async (session: Session, email: string): Promise<boolean> => {
-    const accountExists = await session.run(
+    const accountExistsQuery =
         `
         OPTIONAL MATCH (account:Account {email: "${email}"})
         RETURN account IS NULL AS result
-        `,
-    );
+        `;
 
-    return getValueFromSessionResult(accountExists, "result") !== true;
+    return await executeQuery<boolean>(session, accountExistsQuery) !== true;
+}
+
+export const userAlreadyPendingToGroup = async (session: Session, groupId: string, userId: string): Promise<boolean>  => {
+    const userAlreadyPendingToGroupQuery = `
+        MATCH (group: Group {id: "${groupId}"})
+        MATCH (me:Account {id: "${userId}"})
+        RETURN EXISTS( (me)-[:PENDING]->(group) ) AS result
+    `;
+
+    return await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery) === true;
 }

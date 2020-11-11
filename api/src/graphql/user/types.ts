@@ -14,13 +14,6 @@ export const AccountTypes = `
                 RETURN a
             """
         )
-        sentFriendRequests: [User!]!
-        @cypher(
-            statement: """
-                MATCH (this)-[:REQUESTED_FRIENDS]->(a:Account)
-                RETURN a
-            """
-        )
         friendRequests: [User!]!
         @cypher(
             statement: """
@@ -73,6 +66,7 @@ export const AccountTypes = `
         VODKA
         BEER
         WINE
+        OTHER
     }
 
     enum Gender {
@@ -85,17 +79,8 @@ export const AccountTypes = `
         latitude: Float
     }
 
-    type PendingMemberListPayload{
-        name: String!
-        email: String!
-        age: Int!
-        favoriteAlcoholName: String!
-        favoriteAlcoholType: AlcoholType!
-        description: String!
-        gender: Gender!
-        genderPreference: Gender
-        alcoholPreference: AlcoholType!
-        agePreference: Int!
+    type GroupCandidatesPayload{
+        user: User!
         votesAgainst: Int!
         votesInFavour: Int!
         groupCount: Int!
