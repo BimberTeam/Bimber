@@ -13,7 +13,7 @@ export const GroupInputs = `
         groupId: ID!
     }
 
-    input GroupCandidatesResult {
+    input GroupCandidatesResultInput {
         groupId: ID!
     }
 

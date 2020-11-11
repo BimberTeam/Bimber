@@ -23,6 +23,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     await session.close();
 
+    params.ttl = process.env.NEO4J_TTL;
     params.meId = ctx.user.id;
     return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
 };

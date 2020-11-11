@@ -1,4 +1,4 @@
-import { userAlreadyPendingToGroup, executeQuery, Message } from './../../common/helper';
+import { executeQuery, Message } from './../../common/helper';
 import { ensureAuthorized, singleQuote, debugQuery } from "../../common/helper";
 import { Session, Integer } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";

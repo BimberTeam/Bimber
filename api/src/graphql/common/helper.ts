@@ -53,7 +53,7 @@ export const userExists = async (session: Session, userID: string): Promise<bool
         RETURN a IS NULL AS result
         `;
 
-    return true;
+    return await executeQuery<boolean>(session, userExistsQuery) !== true;
 }
 
 export const groupExists = async (session: Session, groupId: string): Promise<boolean> => {

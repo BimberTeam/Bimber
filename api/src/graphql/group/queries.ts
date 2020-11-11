@@ -29,7 +29,7 @@ export const GroupQueries = `
         """
     )
 
-    groupCandidatesResult(input: GroupCandidatesResult): [GroupCandidatesPayload]
+    groupCandidatesResult(input: GroupCandidatesResultInput): [GroupCandidatesPayload]
 
     groupCandidates(input: GroupCandidatesInput): [User]
     @cypher(

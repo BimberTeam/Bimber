@@ -139,12 +139,14 @@ export const GroupMutations = `
             CALL {
                 CREATE(g: Group)
                 SET g.id = apoc.create.uuid()
+                SET group:TTL
+                SET group.ttl = timestamp() + toInteger(ttl)
                 RETURN g
             }
             MATCH(me: Account{id: $meId})
             MATCH(users: Account) WHERE users.id IN $input.usersId
             MERGE(me)-[:BELONGS_TO]->(g)
-            MERGE(users)-[:GROUP_INVITATION{id: $meId}]->(g)
+            MERGE(users)-[:GROUP_INVITATION{inviterId: $meId}]->(g)
             RETURN {status: 'OK', message: ${groupCreatedSuccess}}
         """
     )
@@ -162,13 +164,30 @@ export const GroupMutations = `
     acceptGroupInvitation(input: AcceptGroupInvitationInput): Message
     @cypher(
         statement: """
+            CALL {
+                MATCH(group: Group{id: $input.groupId})
+                MATCH(group)-[:BELONGS_TO]-(members: Account)
+                RETURN count(members) as groupMembers
+            }
             MATCH(a: Account{id: $meId})
             MATCH(g: Group{id: $input.groupId})
             MATCH(a)-[gi:GROUP_INVITATION]->(g)
-            MERGE( (a)-[:PENDING]-(g) )
-            MERGE( (g)-[:VOTE_IN_FAVOUR{id: gi.inviterId}]->(a) )
-            DELETE gi
-            RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}}
+            CALL apoc.do.when(
+                groupMembers < 3,
+                \\"
+                    MERGE( (a)-[:BELONGS_TO]->(g) )
+                    DELETE gi
+                    RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}} AS result
+                \\",
+                \\"
+                    MERGE( (a)-[:PENDING]-(g) )
+                    MERGE( (g)-[:VOTE_IN_FAVOUR{id: gi.inviterId}]->(a) )
+                    DELETE gi
+                    RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}} AS result
+                \\",
+                {a:a, g:g, groupMembers:groupMembers, gi:gi}
+            ) YIELD value
+            RETURN value.result
         """
     )
 
