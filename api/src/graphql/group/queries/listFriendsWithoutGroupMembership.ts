@@ -11,11 +11,11 @@ export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
-    if (await groupExists(session, params.id) === false) {
+    if (!await groupExists(session, params.id)) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
-    if (await userBelongsToGroup(session, params.id, ctx.user.id) === false) {
+    if (!await userBelongsToGroup(session, params.id, ctx.user.id)) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 

@@ -15,31 +15,31 @@ export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
-    if ( await groupExists(session, params.input.groupId) === false) {
+    if (!await groupExists(session, params.input.groupId)) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
-    if (await userExists(session, params.input.userId) === false) {
+    if (!await userExists(session, params.input.userId)) {
         throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
     }
 
-    if (await friendshipExist(session, ctx.user.id, params.input.userId) === false) {
+    if (!await friendshipExist(session, ctx.user.id, params.input.userId)) {
         throw new ApolloError(lackingFriendshipError, "400", [lackingFriendshipError]);
     }
 
-    if (await userBelongsToGroup(session, params.input.groupId, ctx.user.id) === false) {
+    if (!await userBelongsToGroup(session, params.input.groupId, ctx.user.id)) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
-    if (await userBelongsToGroup(session, params.input.groupId, params.input.userId) === true) {
+    if (await userBelongsToGroup(session, params.input.groupId, params.input.userId)) {
         throw new ApolloError(friendBelongsToGroupError, "400", [friendBelongsToGroupError]);
     }
 
-    if (await groupInvitationExist(session, params.input.groupId, params.input.userId) === true) {
+    if (await groupInvitationExist(session, params.input.groupId, params.input.userId)) {
         throw new ApolloError(friendAlreadyInvitedError, "400", [friendAlreadyInvitedError]);
     }
 
-    if (await userAlreadyPendingToGroup(session, params.input.groupId, params.input.userId) === true) {
+    if (await userAlreadyPendingToGroup(session, params.input.groupId, params.input.userId)) {
         throw new ApolloError(alreadyPendingError, "200", [alreadyPendingError]);
     }
 

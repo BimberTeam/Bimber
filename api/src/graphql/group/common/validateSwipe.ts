@@ -12,7 +12,7 @@ export default async (params, ctx) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
 
-    if (await groupExists(session, params.input.groupId) === false) {
+    if (!await groupExists(session, params.input.groupId)) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
@@ -22,15 +22,15 @@ export default async (params, ctx) => {
         RETURN EXISTS((g)<-[:OWNER]-(a)) AS result
         `;
 
-    if (await executeQuery<boolean>(session, alreadyGroupOwnerQuery) === true) {
+    if (await executeQuery<boolean>(session, alreadyGroupOwnerQuery)) {
         throw new ApolloError(groupOwnerError, "400", [groupOwnerError]);
     }
 
-    if (await userBelongsToGroup(session, params.input.groupId, ctx.user.id) === true) {
+    if (await userBelongsToGroup(session, params.input.groupId, ctx.user.id)) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
-    if (await userAlreadyPendingToGroup(session, params.input.groupId, ctx.user.id ) === true) {
+    if (await userAlreadyPendingToGroup(session, params.input.groupId, ctx.user.id )) {
         throw new ApolloError(alreadyPendingError, "400", [alreadyPendingError]);
     }
 

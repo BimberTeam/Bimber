@@ -33,19 +33,19 @@ export default async (params, ctx) => {
         throw new ApolloError(callerIsPendingUserError, "400", [callerIsPendingUserError]);
     }
 
-    if (await groupExists(session, params.input.groupId) === false) {
+    if (!await groupExists(session, params.input.groupId)) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
     }
 
-    if (await userExists(session, params.input.userId ) === false) {
+    if (!await userExists(session, params.input.userId )) {
         throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
     }
 
-    if (await userBelongsToGroup(session, params.input.groupId, ctx.user.id) === false) {
+    if (!await userBelongsToGroup(session, params.input.groupId, ctx.user.id)) {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
-    if ( await userAlreadyPendingToGroup(session, params.input.groupId, params.input.userId) === false) {
+    if (!await userAlreadyPendingToGroup(session, params.input.groupId, params.input.userId)) {
         throw new ApolloError(pendingRelationNotFoundError, "400", [pendingRelationNotFoundError]);
     }
 
@@ -57,7 +57,7 @@ export default async (params, ctx) => {
         RETURN EXISTS( (a)-[:VOTE_IN_FAVOUR{id: me.id}]-(g) ) OR EXISTS( (a)-[:VOTE_AGAINST{id: me.id}]-(g) ) as result
         `;
 
-    if (await executeQuery<boolean>(session, hasUserAlreadyVotedQuery) === true) {
+    if (await executeQuery<boolean>(session, hasUserAlreadyVotedQuery)) {
         throw new ApolloError(alreadyVotedError, "400", [alreadyVotedError]);
     }
 

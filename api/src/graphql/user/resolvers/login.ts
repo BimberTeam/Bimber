@@ -41,7 +41,7 @@ export default async (obj, params, ctx, resolveInfo) => {
         RETURN true AS result
         `;
 
-    if (await executeQuery(session, setTokenQuery) !== true) {
+    if (!await executeQuery(session, setTokenQuery)) {
         throw new ApolloError(unexpectedError, "200", [unexpectedError]);
     }
 

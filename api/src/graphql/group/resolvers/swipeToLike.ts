@@ -18,7 +18,6 @@ export default async (obj, params, ctx, resolveInfo) => {
         `;
 
     const groupMembers = await executeQuery<Integer>(session, groupMembersQuery, "groupMembers");
-    console.log(groupMembers.low);
 
     if (groupMembers.low === 0) {
 
@@ -29,7 +28,7 @@ export default async (obj, params, ctx, resolveInfo) => {
             RETURN EXISTS( (a)-[:PENDING]->(meGroup) ) AS result
             `;
 
-        if (await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery) === false) {
+        if (!await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery)) {
 
             const swipeQuery =
                 `

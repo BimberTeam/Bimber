@@ -12,11 +12,11 @@ export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
     for (const userId of params.input.usersId) {
-        if (await userExists(session, userId) == false) {
+        if (!await userExists(session, userId)) {
             throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
         }
 
-        if (await friendshipExist(session, ctx.user.id, userId) === false) {
+        if (!await friendshipExist(session, ctx.user.id, userId)) {
             throw new ApolloError(lackingFriendshipError, "400", [lackingFriendshipError]);
         }
     }
