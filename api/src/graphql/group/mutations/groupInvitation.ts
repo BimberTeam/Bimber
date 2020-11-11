@@ -1,4 +1,4 @@
-import { groupExists, groupInvitationExist } from './../../common/helper';
+import { groupExists, groupInvitationExist, userAlreadyPendingToGroup } from './../../common/helper';
 import { debugQuery } from '../../common/helper';
 import { neo4jgraphql } from 'neo4j-graphql-js';
 import { ensureAuthorized, singleQuote } from "../../common/helper";

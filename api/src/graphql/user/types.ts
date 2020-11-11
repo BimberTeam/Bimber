@@ -14,13 +14,6 @@ export const AccountTypes = `
                 RETURN a
             """
         )
-        sentFriendRequests: [User!]!
-        @cypher(
-            statement: """
-                MATCH (this)-[:REQUESTED_FRIENDS]->(a:Account)
-                RETURN a
-            """
-        )
         friendRequests: [User!]!
         @cypher(
             statement: """

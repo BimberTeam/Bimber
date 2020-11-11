@@ -47,10 +47,6 @@ export default async (obj, params, ctx, resolveInfo) => {
             RETURN collect(a) AS members
         }
         CALL {
-            OPTIONAL MATCH (group)<-[:PENDING]-(a:Account)
-            RETURN collect(a) AS pendingMembers
-        }
-        CALL {
             MATCH (group)<-[:BELONGS_TO]-(a:Account)
             RETURN avg(a.age) + 0.000000001 AS averageAge
         }
@@ -71,21 +67,19 @@ export default async (obj, params, ctx, resolveInfo) => {
             groupId: group.id,
             friendCandidates: friendCandidates,
             members: members,
-            pendingMembers: pendingMembers,
             averageAge: averageAge,
             averageLocation: averageLocation
         } AS result
         `
     )
 
-    const {groupId, friendCandidates, members, pendingMembers, averageAge, averageLocation} = getValueFromSessionResult(getGroupInfo, "result");
+    const {groupId, friendCandidates, members, averageAge, averageLocation} = getValueFromSessionResult(getGroupInfo, "result");
 
     await session.close();
     return {
         "groupId": groupId,
         "friendCandidates": mapLocationAndGetProperties(friendCandidates),
         "members": mapLocationAndGetProperties(members),
-        "pendingMembers": mapLocationAndGetProperties(pendingMembers),
         "averageAge": averageAge,
         "averageLocation": averageLocation
     }

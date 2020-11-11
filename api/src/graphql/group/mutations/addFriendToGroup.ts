@@ -1,4 +1,4 @@
-import { ensureAuthorized, debugQuery, singleQuote, groupExists, userExists, friendshipExist, userBelongsToGroup, groupInvitationExist } from './../../common/helper';
+import { ensureAuthorized, debugQuery, singleQuote, groupExists, userExists, friendshipExist, userBelongsToGroup, groupInvitationExist, userAlreadyPendingToGroup } from './../../common/helper';
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
@@ -9,6 +9,7 @@ const lackingFriendshipError = singleQuote("Podany użytkownik nie jest Twoim zn
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy!");
 const friendBelongsToGroupError = singleQuote("Podany użytkownik już należy do tej grupy!");
 const friendAlreadyInvitedError = singleQuote("Podany użytkownik już został zaproszony do tej grupy!");
+const alreadyPendingError = singleQuote("Podany użytkownik już oczekuje na dołącznie do tej grupy!");
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
@@ -36,6 +37,10 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     if (await groupInvitationExist(session, params.input.groupId, params.input.userId) === true) {
         throw new ApolloError(friendAlreadyInvitedError, "400", [friendAlreadyInvitedError]);
+    }
+
+    if (await userAlreadyPendingToGroup(session, params.input.groupId, params.input.userId) === true) {
+        throw new ApolloError(alreadyPendingError, "200", [alreadyPendingError]);
     }
 
     await session.close();

@@ -1,7 +1,7 @@
+import { userAlreadyPendingToGroup, executeQuery, Message } from './../../common/helper';
 import { ensureAuthorized, singleQuote, debugQuery } from "../../common/helper";
-import { Session } from "neo4j-driver";
+import { Session, Integer } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";
-import { getValueFromSessionResult } from "../../common/helper";
 import validateSwipe from "../common/validateSwipe";
 
 const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy !");
@@ -11,32 +11,35 @@ export default async (obj, params, ctx, resolveInfo) => {
     await validateSwipe(params, ctx);
     const session: Session = ctx.driver.session();
 
-    const groupMembers = await session.run(
+    const groupMembersQuery =
         `
         MATCH (g: Group {id: "${params.input.groupId}"})<-[:BELONGS_TO]-(a:Account)
         RETURN count(*) AS groupMembers
-        `,
-    );
+        `;
 
-    if (getValueFromSessionResult(groupMembers, "groupMembers").low === 0) {
-        const isPending = await session.run(
+    const groupMembers = await executeQuery<Integer>(session, groupMembersQuery, "groupMembers");
+    console.log(groupMembers.low);
+
+    if (groupMembers.low === 0) {
+
+        const userAlreadyPendingToGroupQuery =
             `
-            MATCH (a:Account)-[:OWNER]-(group: Group {id: "${params.input.groupId}"})
-            MATCH (me:Account {id: "${ctx.user.id}"})-[:OWNER]-(meGroup: Group)
+            MATCH (a:Account)-[:OWNER]-(group: Group {id:"${params.input.groupId}"})
+            MATCH (me:Account {id:"${ctx.user.id}"})-[:OWNER]-(meGroup: Group)
             RETURN EXISTS( (a)-[:PENDING]->(meGroup) ) AS result
-            `,
-        );
+            `;
 
-        if (getValueFromSessionResult(isPending, "result") === false) {
-            const swipe = await session.run(
+        if (await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery, "result") === false) {
+
+            const swipeQuery =
                 `
                 MATCH (g: Group {id: "${params.input.groupId}"})-[:OWNER]-(Account)
                 MATCH (me:Account {id: "${ctx.user.id}"})
                 MERGE (me)-[:PENDING]-(g)
                 RETURN {status: 'OK', message: ${requestedGroupJoinSuccess}} AS result
-                `,
-            );
-            return getValueFromSessionResult(swipe, "result");
+                `;
+
+            return await executeQuery<Message>(session, swipeQuery, "result");
         }
     }
 
@@ -44,7 +47,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     params.meId = ctx.user.id;
     params.ttl = process.env.NEO4J_TTL;
-    params.groupMembers = groupMembers.records[0].get("groupMembers").low;
+    params.groupMembers = groupMembers.low;
 
     return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
 };

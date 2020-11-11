@@ -1,13 +1,13 @@
-import { ensureAuthorized, groupExists, singleQuote, userExists } from "./../../common/helper";
+import { ensureAuthorized, executeQuery, groupExists, singleQuote, userExists } from "./../../common/helper";
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
-import { getValueFromSessionResult, userBelongsToGroup } from "../../common/helper";
+import { userBelongsToGroup, userAlreadyPendingToGroup } from "../../common/helper";
 
 const callerIsPendingUserError = singleQuote("ID użytkownika na którego chcesz zagłosować musi być różne od Twojego ID !");
 const groupNotFoundError = singleQuote("Podana grupa nie istnieje !");
 const lackingMembershipError = singleQuote("Nie należysz do podanej grupy !");
 const userNotFoundError = singleQuote("Podany użytkownik nie istnieje !");
-const pendingRelationNotFoundError = singleQuote("Użytkownik o podanym id nie oczekuje o dołączenie do podanej grupy !");
+const pendingRelationNotFoundError = singleQuote("Podany użytkownik nie oczekuje o dołączenie do podanej grupy !");
 const alreadyVotedError = singleQuote("Już oddałeś głos !");
 
 
@@ -45,29 +45,19 @@ export default async (params, ctx) => {
         throw new ApolloError(lackingMembershipError, "400", [lackingMembershipError]);
     }
 
-    const isUserPending = await session.run(
-        `
-        MATCH (a: Account{id: "${params.input.userId}"})
-        MATCH (g: Group{id: "${params.input.groupId}"})
-        MATCH (a)-[relation:PENDING]-(g)
-        RETURN relation as result
-        `,
-    );
-
-    if (isUserPending.records.length === 0) {
+    if ( await userAlreadyPendingToGroup(session, params.input.groupId, params.input.userId) === false) {
         throw new ApolloError(pendingRelationNotFoundError, "400", [pendingRelationNotFoundError]);
     }
 
-    const hasUserAlreadyVoted = await session.run(
+    const hasUserAlreadyVotedQuery =
         `
         MATCH (a: Account{id: "${params.input.userId}"})
         MATCH (me: Account{id: "${ctx.user.id}"})
         MATCH (g: Group{id: "${params.input.groupId}"})
         RETURN EXISTS( (a)-[:VOTE_IN_FAVOUR{id: me.id}]-(g) ) OR EXISTS( (a)-[:VOTE_AGAINST{id: me.id}]-(g) ) as result
-        `,
-    );
+        `;
 
-    if (getValueFromSessionResult(hasUserAlreadyVoted, "result") === true) {
+    if (await executeQuery<boolean>(session, hasUserAlreadyVotedQuery, "result") === true) {
         throw new ApolloError(alreadyVotedError, "400", [alreadyVotedError]);
     }
 
