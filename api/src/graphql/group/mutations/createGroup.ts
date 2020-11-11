@@ -12,17 +12,18 @@ export default async (obj, params, ctx, resolveInfo) => {
     const session: Session = ctx.driver.session();
 
     for (const userId of params.input.usersId) {
-        if (await userExists(session, userId) == false) {
+        if (!await userExists(session, userId)) {
             throw new ApolloError(userNotFoundError, "400", [userNotFoundError]);
         }
 
-        if (await friendshipExist(session, ctx.user.id, userId) === false) {
+        if (!await friendshipExist(session, ctx.user.id, userId)) {
             throw new ApolloError(lackingFriendshipError, "400", [lackingFriendshipError]);
         }
     }
 
     await session.close();
 
+    params.ttl = process.env.NEO4J_TTL;
     params.meId = ctx.user.id;
     return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
 };

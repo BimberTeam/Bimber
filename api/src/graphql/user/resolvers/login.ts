@@ -1,9 +1,8 @@
-import { singleQuote } from './../../common/helper';
+import { singleQuote, executeQuery } from './../../common/helper';
 import { ApolloError } from "apollo-server";
 import { Session } from "neo4j-driver";
 import { verifyPassword } from "../../../auth/auth";
 import { createToken } from "../../../auth/auth";
-import { getValueFromSessionResult } from "../../common/helper";
 
 const emailNotFoundError = singleQuote("Podany email nie istnieje!");
 const incorrectPassword = singleQuote("Wprowadzono nie poprawne hasło!");
@@ -35,15 +34,14 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const token = createToken(account.id);
 
-    const setToken = await session.run(
+    const setTokenQuery =
         `
         MATCH (account:Account {email: "${params.input.email}"})
         SET account.token = '${token}'
-        return 'ok' AS result
-        `,
-    );
+        RETURN true AS result
+        `;
 
-    if (getValueFromSessionResult(setToken, "result") !== "ok") {
+    if (!await executeQuery(session, setTokenQuery)) {
         throw new ApolloError(unexpectedError, "200", [unexpectedError]);
     }
 

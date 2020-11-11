@@ -11,7 +11,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     if (params.input.email !== undefined) {
 
-        if (await accountExists(session, params.input.email) === true) {
+        if (await accountExists(session, params.input.email)) {
             throw new ApolloError(emailAlreadyExistsError, "200", [emailAlreadyExistsError]);
         }
 

@@ -8,13 +8,6 @@ export const GroupTypes = `
                 RETURN a
             """
         )
-        pendingMembers: [User]
-        @cypher(
-            statement: """
-                MATCH (this)<-[:PENDING]-(a:Account)
-                RETURN a
-            """
-        )
         averageAge: Float
         @cypher(
         statement: """
@@ -32,14 +25,5 @@ export const GroupTypes = `
             }
         """
         ),
-    },
-
-    type GroupInfoPayload {
-        groupId: ID!
-        friendCandidates: [User]
-        members: [User]
-        pendingMembers: [User]
-        averageAge: Float
-        averageLocation: Coords
     },
 `;

@@ -73,12 +73,18 @@ export const GroupMutations = `
             $votesDistribution >= 0.5,
             \\"
             CALL {
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[vf:VOTE_IN_FAVOUR]-(g) )
                 RETURN vf as result
                 UNION ALL
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[va:VOTE_AGAINST]-(g) )
                 RETURN va as result
                 UNION ALL
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[p:PENDING]->(g) )
                 RETURN p as result
             }
@@ -90,7 +96,7 @@ export const GroupMutations = `
             MERGE (g)-[:VOTE_IN_FAVOUR{id: $meId}]->(a)
             RETURN {status: 'OK', message: ${votingSuccess}} as result
             \\",
-            {a:a, g:g, meId:$meId}
+            {a:a, g:g, meId:$meId, input: input }
         ) YIELD value
         RETURN value.result
         """
@@ -133,12 +139,14 @@ export const GroupMutations = `
             CALL {
                 CREATE(g: Group)
                 SET g.id = apoc.create.uuid()
+                SET group:TTL
+                SET group.ttl = timestamp() + toInteger(ttl)
                 RETURN g
             }
             MATCH(me: Account{id: $meId})
             MATCH(users: Account) WHERE users.id IN $input.usersId
             MERGE(me)-[:BELONGS_TO]->(g)
-            MERGE(users)-[:GROUP_INVITATION]->(g)
+            MERGE(users)-[:GROUP_INVITATION{inviterId: $meId}]->(g)
             RETURN {status: 'OK', message: ${groupCreatedSuccess}}
         """
     )
@@ -156,13 +164,30 @@ export const GroupMutations = `
     acceptGroupInvitation(input: AcceptGroupInvitationInput): Message
     @cypher(
         statement: """
+            CALL {
+                MATCH(group: Group{id: $input.groupId})
+                MATCH(group)-[:BELONGS_TO]-(members: Account)
+                RETURN count(members) as groupMembers
+            }
             MATCH(a: Account{id: $meId})
             MATCH(g: Group{id: $input.groupId})
             MATCH(a)-[gi:GROUP_INVITATION]->(g)
-            MERGE( (a)-[:PENDING]-(g) )
-            MERGE( (g)-[:VOTE_IN_FAVOUR{id: gi.inviterId}]->(a) )
-            DELETE gi
-            RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}}
+            CALL apoc.do.when(
+                groupMembers < 3,
+                \\"
+                    MERGE( (a)-[:BELONGS_TO]->(g) )
+                    DELETE gi
+                    RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}} AS result
+                \\",
+                \\"
+                    MERGE( (a)-[:PENDING]-(g) )
+                    MERGE( (g)-[:VOTE_IN_FAVOUR{id: gi.inviterId}]->(a) )
+                    DELETE gi
+                    RETURN {status: 'OK', message: ${acceptGroupInvitationSuccess}} AS result
+                \\",
+                {a:a, g:g, groupMembers:groupMembers, gi:gi}
+            ) YIELD value
+            RETURN value.result
         """
     )
 
