@@ -1,4 +1,4 @@
-import { ensureAuthorized, singleQuote, debugQuery, groupExists, userBelongsToGroup} from "./../../common/helper";
+import { ensureAuthorized, singleQuote, debugQuery, groupExists, userBelongsToGroup} from "../../common/helper";
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 import { neo4jgraphql } from "neo4j-graphql-js";

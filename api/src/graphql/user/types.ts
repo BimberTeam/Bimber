@@ -78,17 +78,8 @@ export const AccountTypes = `
         latitude: Float
     }
 
-    type PendingMemberListPayload{
-        name: String!
-        email: String!
-        age: Int!
-        favoriteAlcoholName: String!
-        favoriteAlcoholType: AlcoholType!
-        description: String!
-        gender: Gender!
-        genderPreference: Gender
-        alcoholPreference: AlcoholType!
-        agePreference: Int!
+    type GroupCandidatesPayload{
+        user: User!
         votesAgainst: Int!
         votesInFavour: Int!
         groupCount: Int!

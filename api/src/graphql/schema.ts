@@ -17,7 +17,7 @@ import updateAccount from "./user/resolvers/updateAccount"
 import { AccountQueries } from "./user/queries";
 import addFriendToGroup from "./group/mutations/addFriendToGroup";
 import getAccountInfoFromContex from "./common/getAccountInfoFromContext";
-import pendingMembersList from "./group/queries/pendingMembersList";
+import groupCandidates from "./group/queries/groupCandidates";
 import { GroupInputs } from "./group/inputs";
 import acceptGroupPendingUser from "./group/mutations/acceptPendingRequest";
 import rejectGroupPendingUser from "./group/mutations/rejectPendingRequest";
@@ -35,6 +35,8 @@ import { ChatInputs } from "./chat/inputs";
 import groupInfo from "./group/queries/groupInfo";
 import listFriendsWithoutGroupMembership from "./group/queries/listFriendsWithoutGroupMembership";
 import updateLocation from "./user/resolvers/updateLocation";
+import groupMembersWithoutFriendship from "./group/queries/groupMembersWithoutFriendship";
+import groupCandidatesResult from "./group/queries/groupCandidatesResult";
 
 export const typeDefs = `
   scalar BimberDate
@@ -115,11 +117,13 @@ const resolvers = {
     group(object, params, ctx, resolveInfo) {
       return neo4jgraphql(object, params, ctx, resolveInfo);
     },
-    pendingMembersList,
+    groupCandidates,
     loadChatMessages,
     chatThumbnails,
     groupInfo,
-    listFriendsWithoutGroupMembership
+    listFriendsWithoutGroupMembership,
+    groupMembersWithoutFriendship,
+    groupCandidatesResult,
   },
   Subscription: {
     newChatMessage: {

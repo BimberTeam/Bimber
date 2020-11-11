@@ -9,7 +9,11 @@ export const GroupInputs = `
         userId: ID!
     }
 
-    input PendingMembersListInput {
+    input GroupCandidatesInput {
+        groupId: ID!
+    }
+
+    input GroupCandidatesResult {
         groupId: ID!
     }
 

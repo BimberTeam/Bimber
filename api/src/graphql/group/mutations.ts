@@ -73,12 +73,18 @@ export const GroupMutations = `
             $votesDistribution >= 0.5,
             \\"
             CALL {
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[vf:VOTE_IN_FAVOUR]-(g) )
                 RETURN vf as result
                 UNION ALL
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[va:VOTE_AGAINST]-(g) )
                 RETURN va as result
                 UNION ALL
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[p:PENDING]->(g) )
                 RETURN p as result
             }
@@ -90,7 +96,7 @@ export const GroupMutations = `
             MERGE (g)-[:VOTE_IN_FAVOUR{id: $meId}]->(a)
             RETURN {status: 'OK', message: ${votingSuccess}} as result
             \\",
-            {a:a, g:g, meId:$meId}
+            {a:a, g:g, meId:$meId, input: input }
         ) YIELD value
         RETURN value.result
         """
@@ -138,7 +144,7 @@ export const GroupMutations = `
             MATCH(me: Account{id: $meId})
             MATCH(users: Account) WHERE users.id IN $input.usersId
             MERGE(me)-[:BELONGS_TO]->(g)
-            MERGE(users)-[:GROUP_INVITATION]->(g)
+            MERGE(users)-[:GROUP_INVITATION{id: $meId}]->(g)
             RETURN {status: 'OK', message: ${groupCreatedSuccess}}
         """
     )

@@ -8,6 +8,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     const votesDistribution: VotesDistribution = await votesDistributionFun(params, ctx, "VOTE_IN_FAVOUR");
 
     params.votesDistribution = votesDistribution.getVotesDistribution();
+    console.log(params.votesDistribution);
     params.meId = ctx.user.id;
 
     return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
