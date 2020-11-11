@@ -1,5 +1,5 @@
 from user import User
-
+import random
 
 def create_users(number):
     users = []
@@ -8,19 +8,29 @@ def create_users(number):
         user.register()
         user.login()
         user.updateLocation()
+        user.uploadImage()
+        user.queryMe()
         users.append(user)
     return users
 
 
-def add_users_to_friends(users):
-    for i in range(0, len(users)):
-        for j in range(i+1, len(users)):
-            users[i].addFriend(users[j].id)
-        users[i].acceptFriendRequests()
+def add_users_to_friends(users, probability):
+    sended_requests = dict()
+    for user in users:
+        sended_requests[user.id] = set()
+        for _ in range(int(probability*len(users))):
+            friend = random.choice(users)
+            sended_requests[user.id].add(friend.id)
+            friend.addFriend(user.id)
+    for user in users:
+        friends_requests = sended_requests[user.id]
+        for _ in range(int(probability*len(friends_requests))):
+            friend = random.sample(friends_requests, 1)
+            user.acceptFriendRequest(friend[0])
 
 
 
 
-users = create_users(2)
-add_users_to_friends(users)
-users[0].createGroup()
+users = create_users(5)
+add_users_to_friends(users, 0.5)
+users[0].createGroupFromFriends()

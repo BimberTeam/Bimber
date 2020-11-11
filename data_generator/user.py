@@ -5,6 +5,11 @@ import random
 import json
 from mutations import *
 from queries import me
+import urllib.request
+import os
+import requests
+GRAPHQL_URL="http://192.168.68.239:4001/graphql"
+IMAGE_SERVER="http://192.168.68.239:8080/images/"
 fake = Faker()
 alcohols = ["BEER", "WINE", "VODKA"]
 genders = ["MALE", "FEMALE"]
@@ -27,9 +32,9 @@ class User(object):
         self.token = None
 
     def getClient(self):
-        transport = AIOHTTPTransport(url="http://192.168.68.239:4001/graphql")
+        transport = AIOHTTPTransport(url=GRAPHQL_URL)
         if self.token != None:
-            transport = AIOHTTPTransport(url="http://192.168.68.239:4001/graphql", headers={'Authorization': str(self.token)})
+            transport = AIOHTTPTransport(url=GRAPHQL_URL, headers={'Authorization': str(self.token)})
         client = Client(transport=transport, fetch_schema_from_transport=True)
         return client
 
@@ -52,6 +57,14 @@ class User(object):
         data = self.getClient().execute(updateLocation, variable_values=json.dumps(variable))
         print(data)
 
+    def uploadImage(self):
+        urllib.request.urlretrieve("https://picsum.photos/500/700", "user.jpg")
+        files = {'file': open('user.jpg', 'rb')}
+        headers = {'Authorization': self.token}
+        response = requests.post(IMAGE_SERVER + self.id, files=files, headers=headers)
+        print(response)
+        os.remove("user.jpg")
+
     def queryMe(self):
         data = self.getClient().execute(me)
         print(data)
@@ -62,23 +75,42 @@ class User(object):
         data = self.getClient().execute(addFriend, variable_values=json.dumps(variable))
         print(data)
 
-    def acceptFriendRequests(self):
+    def acceptAllFriendRequests(self):
         users = self.queryMe()['me']['friendRequests']
         for user in users:
-            variable = {"input": {"id": str(user['id'])}}
-            data = self.getClient().execute(acceptFriendRequest, variable_values=json.dumps(variable))
-            print(data)
+            self.acceptFriendRequest(user['id'])   
 
-    def createGroup(self):
+    def acceptFriendRequest(self, id):
+        variable = {"input": {"id": str(id)}}
+        data = self.getClient().execute(acceptFriendRequest, variable_values=json.dumps(variable))
+        print(data)
+
+    def createGroupFromFriends(self):
         friends = self.queryMe()['me']['friends']
         friends_id = list(map(lambda x: x['id'], friends))
-        variable = {"usersId": friends_id}
+        self.createGroup(friends_id)
+
+    def createGroup(self, user_ids):
+        variable = {"usersId": user_ids}
         data = self.getClient().execute(createGroup, variable_values=json.dumps(variable))
         print(data)
 
-    def acceptGroupRequests(self):
+    def acceptAllGroupRequests(self):
         groups = self.queryMe()['me']['groupInvitations']
         for group in groups:
-            variable = {"input": {"groupId": str(group['id'])}}   
-            data = self.getClient().execute(acceptGroupRequest, variable_values=json.dumps(variable))
-            print(data)
+            self.acceptGroupRequest(group['id'])
+           
+    def acceptGroupRequest(self, id):
+        variable = {"input": {"groupId": id}}   
+        data = self.getClient().execute(acceptGroupRequest, variable_values=json.dumps(variable))
+        print(data)
+
+    def vote_for(self, group_id, user_id):
+        variable = {"groupId": group_id, "userId": user_id}
+        data = self.getClient().execute(voteFor, variable_values=json.dumps(variable))
+        print(data)
+
+    def vote_against(self, group_id, user_id):
+        variable = {"groupId": group_id, "userId": user_id}
+        data = self.getClient().execute(voteAgainst, variable_values=json.dumps(variable))
+        print(data)
