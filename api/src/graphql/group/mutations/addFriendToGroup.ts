@@ -10,10 +10,15 @@ const lackingMembershipError = singleQuote("Nie należysz do podanej grupy!");
 const friendBelongsToGroupError = singleQuote("Podany użytkownik już należy do tej grupy!");
 const friendAlreadyInvitedError = singleQuote("Podany użytkownik już został zaproszony do tej grupy!");
 const alreadyPendingError = singleQuote("Podany użytkownik już oczekuje na dołącznie do tej grupy!");
+const requestedFriendIsMeError = singleQuote("Nie możesz zaprosić samego siebie do znajomych!");
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
     const session: Session = ctx.driver.session();
+
+    if (params.input.userId === ctx.user.id) {
+        throw new ApolloError(requestedFriendIsMeError, "400", [requestedFriendIsMeError]);
+    }
 
     if (!await groupExists(session, params.input.groupId)) {
         throw new ApolloError(groupNotFoundError, "400", [groupNotFoundError]);
