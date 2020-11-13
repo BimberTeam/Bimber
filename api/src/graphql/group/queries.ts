@@ -13,7 +13,7 @@ export const GroupQueries = `
         MATCH(group: Group {id: $groupId})
         MATCH(me: Account {id: $meId})
         MATCH (group)<-[:BELONGS_TO]-(a:Account)
-        WHERE NOT EXISTS( (me)<-[:FRIENDS]-(a:Account) ) AND NOT EXISTS( (me)<-[:REQUESTED_FRIENDS]-(a:Account) ) AND NOT a in [me]
+        WHERE NOT EXISTS( (me)<-[:FRIENDS]-(a:Account) ) AND NOT EXISTS( (me)-[:REQUESTED_FRIENDS]-(a:Account) ) AND NOT a in [me]
         RETURN a
         """
     )

@@ -139,8 +139,8 @@ export const GroupMutations = `
             CALL {
                 CREATE(g: Group)
                 SET g.id = apoc.create.uuid()
-                SET group:TTL
-                SET group.ttl = timestamp() + toInteger(ttl)
+                SET g:TTL
+                SET g.ttl = timestamp() + toInteger($ttl)
                 RETURN g
             }
             MATCH(me: Account{id: $meId})
