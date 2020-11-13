@@ -8,12 +8,14 @@ from queries import me
 import urllib.request
 import os
 import requests
-GRAPHQL_URL="http://192.168.68.239:4001/graphql"
-IMAGE_SERVER="http://192.168.68.239:8080/images/"
+
+GRAPHQL_URL="http://0.0.0.0:4001/graphql"
+IMAGE_SERVER="http://0.0.0.0:8080/images/"
 fake = Faker()
 alcohols = ["BEER", "WINE", "VODKA"]
 genders = ["MALE", "FEMALE"]
 gender_preferences = ["MALE", "FEMALE", None]
+
 
 class User(object):
     def __init__(self):
@@ -45,7 +47,7 @@ class User(object):
         data = self.getClient().execute(register, variable_values=self.toJson())
         self.id = data['register']['id']
         print(data)
-    
+
     def login(self):
         data = self.getClient().execute(login, variable_values=self.toJson())
         self.token = data['login']['token']
@@ -67,7 +69,7 @@ class User(object):
 
     def queryMe(self):
         data = self.getClient().execute(me)
-        print(data)
+        # print(data)
         return data
 
     def addFriend(self, id):
@@ -78,7 +80,7 @@ class User(object):
     def acceptAllFriendRequests(self):
         users = self.queryMe()['me']['friendRequests']
         for user in users:
-            self.acceptFriendRequest(user['id'])   
+            self.acceptFriendRequest(user['id'])
 
     def acceptFriendRequest(self, id):
         variable = {"input": {"id": str(id)}}
@@ -99,9 +101,9 @@ class User(object):
         groups = self.queryMe()['me']['groupInvitations']
         for group in groups:
             self.acceptGroupRequest(group['id'])
-           
+
     def acceptGroupRequest(self, id):
-        variable = {"input": {"groupId": id}}   
+        variable = {"input": {"groupId": id}}
         data = self.getClient().execute(acceptGroupRequest, variable_values=json.dumps(variable))
         print(data)
 

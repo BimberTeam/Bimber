@@ -37,7 +37,7 @@ mutation Register(
 login = gql("""
 mutation Login($email: String!, $password: String!) {
   login(input: {
-    email: $email, 
+    email: $email,
     password: $password
   }) {
     token
