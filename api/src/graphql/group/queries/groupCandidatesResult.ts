@@ -18,8 +18,8 @@ interface Neo4jNumber {
 
 const mapPointToLocation = (point: Point): Coords  => {
     return {
-        "latitude": point && point['x'] || null,
-        "longitude": point && point['y'] || null,
+        "latitude": point && point['y'] || null,
+        "longitude": point && point['x'] || null,
     };
 }
 
