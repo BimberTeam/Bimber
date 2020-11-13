@@ -118,3 +118,13 @@ export const userAlreadyPendingToGroup = async (session: Session, groupId: strin
 
     return await executeQuery<boolean>(session, userAlreadyPendingToGroupQuery) === true;
 }
+
+export const friendRequestExists = async (session: Session, userID: string, friendId: string): Promise<boolean>  => {
+    const friendRequestExistsQuery = `
+        MATCH (a:Account {id: "${userID}"})
+        MATCH (b:Account {id: "${friendId}"})
+        RETURN EXISTS( (a)-[:REQUESTED_FRIENDS]->(b) ) AS result
+    `;
+
+    return await executeQuery<boolean>(session, friendRequestExistsQuery) === true;
+}

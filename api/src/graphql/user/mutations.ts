@@ -18,31 +18,12 @@ export const AccountMutations = `
     statement: """
         MATCH(a: Account { id: $meId })
         MATCH(b: Account { id: $input.id })
-        OPTIONAL MATCH(a)-[fa:REQUESTED_FRIENDS]->(b)
-        OPTIONAL MATCH(b)-[fb:REQUESTED_FRIENDS]->(a)
-        CALL apoc.do.when(
-            EXISTS( (b)-[:REQUESTED_FRIENDS]->(a)  ) = true,
-            \\"
-            DELETE fa, fb
-            MERGE(a)-[:FRIENDS]->(b)
-            MERGE(b)-[:FRIENDS]->(a)
-            ON CREATE SET a.is_exist = true
-            ON MATCH SET a.is_exist = false
-            WITH a, (
-                CASE a.is_exist
-                WHEN true THEN {status: 'OK', message: ${friendAddedSuccess}}
-                ELSE {status: 'ERROR', message: ${friendAlreadyExistsError}}
-                END
-            ) AS res
-            REMOVE a.is_exist
-            RETURN res
-            \\",
-            \\"
-            RETURN {status: 'ERROR', message: ${friendMissingRequestError}} AS res
-            \\",
-            {a:a, b:b, fa:fa, fb:fb}
-        ) YIELD value
-        RETURN value.res
+        MATCH (a)<-[f:REQUESTED_FRIENDS]-(b)
+        DELETE f
+        MERGE(a)-[:FRIENDS]->(b)
+        MERGE(b)-[:FRIENDS]->(a)
+        RETURN {status: 'OK', message: ${friendAddedSuccess}}
+
     """
     )
 
@@ -64,8 +45,6 @@ export const AccountMutations = `
         MATCH(a: Account { id: $meId })
         MATCH(b: Account { id: $input.id })
         CALL apoc.do.case([
-            EXISTS((a)-[:FRIENDS]->(b))=true OR EXISTS((b)-[:FRIENDS]->(a))=true,
-                \\"RETURN {status: 'ERROR', message: ${friendAlreadyExistsError}} AS result\\",
             EXISTS((b)-[:REQUESTED_FRIENDS]->(a))=true,
                 \\" WITH $a AS a, $b AS b
                 OPTIONAL MATCH(a)-[fa:REQUESTED_FRIENDS]->(b)
@@ -77,16 +56,7 @@ export const AccountMutations = `
             EXISTS((b)-[:REQUESTED_FRIENDS]->(a))=false,
                 \\"  WITH $a AS a, $b AS b
                 MERGE(a)-[:REQUESTED_FRIENDS]->(b)
-                ON CREATE SET a.is_exist = true
-                ON MATCH SET a.is_exist = false
-                WITH a, (
-                    CASE a.is_exist
-                    WHEN true THEN {status: 'OK', message: ${friendshipRequestSentSuccess}}
-                    ELSE {status: 'ERROR', message: ${friendAlreadyExistsError}}
-                    END
-                ) AS result
-                REMOVE a.is_exist
-                RETURN result \\"
+                RETURN {status: 'OK', message: ${friendshipRequestSentSuccess}} AS result \\"
         ],
         '',
         {a:a, b:b}
