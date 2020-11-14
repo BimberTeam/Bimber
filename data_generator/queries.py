@@ -56,11 +56,11 @@ query Group($id: ID!) {
       genderPreference
       alcoholPreference
       agePreferenceFrom
-      agePreferenceTo  
+      agePreferenceTo
       latestLocation {
         latitude
         longitude
-      }   
+      }
     }
     averageAge
     averageLocation{

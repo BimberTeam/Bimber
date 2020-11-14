@@ -13,24 +13,24 @@ def create_users(number):
         users.append(user)
     return users
 
-
 def add_users_to_friends(users, probability):
-    sended_requests = dict()
     for user in users:
-        sended_requests[user.id] = set()
         for _ in range(int(probability*len(users))):
             friend = random.choice(users)
-            sended_requests[user.id].add(friend.id)
-            friend.addFriend(user.id)
+            if(user != friend):
+                friend.addFriend(user.id)
+
     for user in users:
-        friends_requests = sended_requests[user.id]
+        friends_requests = user.queryMe()['me']['friendRequests']
         for _ in range(int(probability*len(friends_requests))):
             friend = random.sample(friends_requests, 1)
             user.acceptFriendRequest(friend[0])
 
+def main():
+    users = create_users(5)
+    add_users_to_friends(users, 0.5)
 
+if __name__ == "__main__":
+    main()
 
-
-users = create_users(5)
-add_users_to_friends(users, 0.5)
-users[0].createGroupFromFriends()
+# users[0].createGroupFromFriends()
