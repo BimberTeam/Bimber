@@ -29,8 +29,10 @@ def add_users_to_friends(users, probability):
 def main():
     users = create_users(5)
     add_users_to_friends(users, 0.5)
+    users[0].createGroupFromFriends()
+    for user in users:
+        user.acceptAllGroupRequests()
+
 
 if __name__ == "__main__":
     main()
-
-# users[0].createGroupFromFriends()

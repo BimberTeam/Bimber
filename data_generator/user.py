@@ -16,8 +16,7 @@ alcohols = ["BEER", "WINE", "VODKA"]
 genders = ["MALE", "FEMALE"]
 gender_preferences = ["MALE", "FEMALE", None]
 
-
-class User(object):
+class User():
     def __init__(self):
         self.name = fake.name()
         self.email = fake.email()
