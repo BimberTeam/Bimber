@@ -115,3 +115,8 @@ class User():
         variable = {"groupId": group_id, "userId": user_id}
         data = self.getClient().execute(voteAgainst, variable_values=json.dumps(variable))
         print(data)
+
+    def sendChatMessage(self, group_id):
+        variable = {"groupId": group_id, "message": fake.sentence()}
+        data = self.getClient().execute(sendChatMessage, variable_values=json.dumps(variable))
+        print(data)

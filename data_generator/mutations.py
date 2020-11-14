@@ -157,3 +157,14 @@ mutation RejectGroupPendingUser($groupId: ID!, $userId: ID!){
     }
 }
 """)
+
+sendChatMessage = gql("""
+mutation SendChatMessage($groupId: ID!, $message: String!) {
+  sendChatMessage(input: {
+    groupId: $groupId, message: $message
+  }) {
+    status
+    message
+  }
+}
+""")

@@ -36,6 +36,14 @@ def createGroupsFromRandomFriends(users, probability):
         # no need for random choice, cause only first two users will join group and rest will become candidates
         user.acceptAllGroupRequests()
 
+def generateMessages(users, number):
+    for user in users:
+        groups = user.queryMe()['me']['groups']
+        groups_id = list(map(lambda x: x['id'], groups))
+        for id in groups_id:
+            for _ in range(number):
+                user.sendChatMessage(id)
+
 def dump_users(users):
     with open("db.json", "w") as db_file:
         db_file.write("[\n")
@@ -48,9 +56,10 @@ def dump_users(users):
 
 
 def main():
-    users = create_users(5)
-    add_users_to_friends(users, 0.9)
+    users = create_users(10)
+    add_users_to_friends(users, 0.7)
     createGroupsFromRandomFriends(users, 1)
+    generateMessages(users, 20)
     dump_users(users)
 
 
