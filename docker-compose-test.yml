@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+  redis:
+    image: redis:6.0.9
+    # change password when in production
+    command: redis-server --requirepass redis_pass
+
+  neo4j:
+    build: ./neo4j
+    environment:
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_dbms_shell_enabled=true
+      - NEO4J_dbms.connectors.default_listen_address=0.0.0.0/test
+      - NEO4J_dbms_connector_https_advertised__address=0.0.0.0/test:7473
+      - NEO4J_dbms_connector_http_advertised__address=0.0.0.0/test:7474
+      - NEO4J_dbms_connector_bolt_advertised__address=0.0.0.0/test:7687
+
+  test:
+    build:
+      context: ./api
+      dockerfile: ./test.Dockerfile
+    ports:
+      - 4001:4001
+    env_file:
+      - test.env
+    environment:
+      - NODE_ENV=test
+    links:
+      - neo4j
+    depends_on:
+      - neo4j

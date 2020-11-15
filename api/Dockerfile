@@ -2,12 +2,12 @@ FROM node:12-alpine AS BUILDER
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
-RUN npm install
+COPY package.json yarn.lock ./
+RUN yarn install
 COPY . .
+RUN rm -rf tests
 
-RUN npm run build
-RUN npm prune --production
+RUN yarn run build
 
 FROM node:12-alpine
 
