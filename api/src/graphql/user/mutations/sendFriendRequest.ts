@@ -5,10 +5,10 @@ import { userExists, singleQuote, friendshipExist } from '../../common/helper';
 import { ensureAuthorized, debugQuery } from '../../common/helper';
 import { neo4jgraphql } from "neo4j-graphql-js";
 
-const userNotFoundError = singleQuote("Podany użytkownik nie istnieje!");
-const friendshipExistsError = singleQuote("Podany użytkownik już jest Twoim znajomym!");
-const friendRequestExistsError = singleQuote("Wysłano już zaproszenie do tego użytkownika!");
-const requestedFriendIsMeError = singleQuote("Nie możesz zaprosić samego siebie do znajomych!");
+export const userNotFoundError = singleQuote("Podany użytkownik nie istnieje!");
+export const friendshipExistsError = singleQuote("Podany użytkownik już jest Twoim znajomym!");
+export const friendRequestExistsError = singleQuote("Wysłano już zaproszenie do tego użytkownika!");
+export const requestedFriendIsMeError = singleQuote("Nie możesz zaprosić samego siebie do znajomych!");
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);

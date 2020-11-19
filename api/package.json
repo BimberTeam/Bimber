@@ -6,7 +6,7 @@
     "scripts": {
         "build": "tsc",
         "start": "nodemon --exec ts-node src/app.ts",
-        "test": "NODE_ENV=test jest --forceExit"
+        "test": "NODE_ENV=test jest --runInBand"
     },
     "repository": {
         "type": "git",
@@ -39,9 +39,9 @@
         "apollo-link-http": "^1.5.17",
         "apollo-server": "^2.16.0",
         "apollo-server-core": "^2.15.1",
-        "apollo-server-express": "2.9.13",
+        "apollo-server-express": "^2.9.13",
+        "apollo-server-integration-testing": "^2.3.0",
         "apollo-server-lambda": "^2.13.1",
-        "apollo-server-testing": "2.9.13",
         "bcrypt": "^5.0.0",
         "csv-parse": "^4.10.1",
         "dotenv": "^8.2.0",

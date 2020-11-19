@@ -1,119 +1,73 @@
+import { mockUser } from './mock';
 import { REGISTER } from './mutations';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
-import { createTestClient } from "apollo-server-testing";
-import { server } from "../../src/app";
 
-const {query, mutate} = createTestClient(server);
+export const registerTests = (query, mutate) => {
+    describe('Register mutation', () => {
 
-describe('Register tests', () => {
-
-    beforeAll(async  () => {
-        await prepareDbForTests();
-    }, 10000);
-
-    afterAll(async () => {
-        await clearDatabase();
-    });
-
-    beforeEach(async () => {
-        await clearDatabase();
-    });
-
-    test('Email is already taken test', async () => {
-        const mutation =  {
-            mutation: REGISTER,
-            variables: {
-                name: "kuba4",
-                email: "Jacek@111",
-                password: "lalala",
-                age: 10,
-                favoriteAlcoholName: "Harnas",
-                favoriteAlcoholType: "VODKA",
-                description: "asdasd",
-                genderPreference: "MALE",
-                gender: "MALE",
-                alcoholPreference: "VODKA",
-                agePreferenceFrom: 3,
-                agePreferenceTo: 7,
-            }
+        const registerInput=  {
+            variables: mockUser
         };
 
-        await mutate(mutation);
-        const {errors: [error]} = await mutate(mutation);
-        const {code} = error.extensions
+        beforeAll(async  () => {
+            await prepareDbForTests();
+        }, 20000);
 
-        expect(error.message).toEqual("\'Podany email jest zajęty!\'");
-        expect(code).toEqual('200');
-    });
+        afterAll(async () => {
+            await clearDatabase();
+        });
 
-    test('Register success test', async () => {
-        const mutation =  {
-            mutation: REGISTER,
-            variables: {
-                name: "kuba4",
-                email: "Jacek@1112",
-                password: "lalala",
-                age: 10,
-                favoriteAlcoholName: "Harnas",
-                favoriteAlcoholType: "VODKA",
-                description: "test",
-                genderPreference: "MALE",
-                gender: "MALE",
-                alcoholPreference: "VODKA",
-                agePreferenceFrom: 3,
-                agePreferenceTo: 7,
-            }
-        };
+        beforeEach(async () => {
+            await clearDatabase();
+        });
 
-        const {data: {register}} = await mutate(mutation);
+        test('should not allow for duplicated emails', async () => {
+            await mutate(REGISTER, registerInput);
+            const {errors: [error]} = await mutate(REGISTER, registerInput);
+            const {code} = error.extensions
 
-        expect(register.name).toEqual("kuba4");
-        expect(register.email).toEqual("Jacek@1112");
-        expect(register.password).not.toEqual("lalala");
-        expect(register.age).toEqual(10);
-        expect(register.favoriteAlcoholName).toEqual("Harnas");
-        expect(register.favoriteAlcoholType).toEqual("VODKA");
-        expect(register.description).toEqual("test");
-        expect(register.genderPreference).toEqual("MALE");
-        expect(register.gender).toEqual("MALE");
-        expect(register.alcoholPreference).toEqual("VODKA");
-        expect(register.agePreferenceFrom).toEqual(3);
-        expect(register.agePreferenceTo).toEqual(7);
-    });
+            expect(error.message).toEqual("\'Podany email jest zajęty!\'");
+            expect(code).toEqual('200');
+        });
 
-    test('Gender preference is null test', async () => {
-        const mutation =  {
-            mutation: REGISTER,
-            variables: {
-                name: "kuba4",
-                email: "Jacek@1112",
-                password: "lalala",
-                age: 10,
-                favoriteAlcoholName: "Harnas",
-                favoriteAlcoholType: "VODKA",
-                description: "test",
-                genderPreference: null,
-                gender: "MALE",
-                alcoholPreference: "VODKA",
-                agePreferenceFrom: 3,
-                agePreferenceTo: 7,
-            }
-        };
+        test('should succeed on valid input data', async () => {
+            const {data: {register}} = await mutate(REGISTER, registerInput);
 
-        const {data: {register}} = await mutate(mutation);
+            expect(register.name).toEqual("kuba4");
+            expect(register.email).toEqual("Jacek@111");
+            expect(register.password).not.toEqual("lalala");
+            expect(register.age).toEqual(10);
+            expect(register.favoriteAlcoholName).toEqual("Harnas");
+            expect(register.favoriteAlcoholType).toEqual("VODKA");
+            expect(register.description).toEqual("test");
+            expect(register.genderPreference).toEqual("MALE");
+            expect(register.gender).toEqual("MALE");
+            expect(register.alcoholPreference).toEqual("VODKA");
+            expect(register.agePreferenceFrom).toEqual(3);
+            expect(register.agePreferenceTo).toEqual(7);
+        });
 
-        expect(register.name).toEqual("kuba4");
-        expect(register.email).toEqual("Jacek@1112");
-        expect(register.password).not.toEqual("lalala");
-        expect(register.age).toEqual(10);
-        expect(register.favoriteAlcoholName).toEqual("Harnas");
-        expect(register.favoriteAlcoholType).toEqual("VODKA");
-        expect(register.description).toEqual("test");
-        expect(register.genderPreference).toEqual(null);
-        expect(register.gender).toEqual("MALE");
-        expect(register.alcoholPreference).toEqual("VODKA");
-        expect(register.agePreferenceFrom).toEqual(3);
-        expect(register.agePreferenceTo).toEqual(7);
-    });
+        test('should succeed with null gender preference', async () => {
+            const genderPreferenceNullInput =   {
+                variables: {
+                    name: "kuba4",
+                    email: "Jacek@111",
+                    password: "lalala",
+                    age: 10,
+                    favoriteAlcoholName: "Harnas",
+                    favoriteAlcoholType: "VODKA",
+                    description: "test",
+                    genderPreference: null,
+                    gender: "MALE",
+                    alcoholPreference: "VODKA",
+                    agePreferenceFrom: 3,
+                    agePreferenceTo: 7,
+                }
+            };
 
-});
+            const {data: {register}} = await mutate(REGISTER, genderPreferenceNullInput);
+
+            expect(register.genderPreference).toBeNull();
+        });
+    })
+};

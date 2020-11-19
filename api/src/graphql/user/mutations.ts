@@ -1,13 +1,11 @@
 import { singleQuote } from "./../common/helper";
 
 // accept friend request messages
-const friendAddedSuccess = singleQuote("Zaakceptowano zaproszenie do znajomych!");
-const friendAlreadyExistsError = singleQuote("Jesteście już znajomymi!");
-const friendMissingRequestError = singleQuote("Nie dostałeś takiego zaproszenia!");
+export const friendAddedSuccess = singleQuote("Zaakceptowano zaproszenie do znajomych!");
 const friendDeletedSuccess = singleQuote("Usunięto znajomego!");
 
-const friendshipRequestSentSuccess = singleQuote("Wysłano zaproszenie do znajomych!");
-const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");
+export const friendshipRequestSentSuccess = singleQuote("Wysłano zaproszenie do znajomych!");
+export const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");
 
 const deleteAccountSuccess = singleQuote("Konto zostało usunięte!");
 const updatedLocationSuccess = singleQuote("Zaktualizowano lokalizacje!");

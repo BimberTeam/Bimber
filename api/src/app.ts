@@ -38,6 +38,7 @@ export const server = new ApolloServer({
     };
   },
   schema,
+  stopOnTerminationSignals: true,
   introspection: true,
   playground: true,
 });
