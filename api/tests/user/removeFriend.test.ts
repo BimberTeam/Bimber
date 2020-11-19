@@ -24,8 +24,9 @@ export const removeFriendTest = (query, mutate, setOptions) => {
         invalidTokenTest(REMOVE_FRIEND, mutate, setOptions);
 
         test('should validate that user exists', async () => {
-            await registerUser(mutate, mockedUsers[0]);
-            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
+            const [me] = mockedUsers
+            await registerUser(mutate, me);
+            await login(mutate, me, setOptions);
 
             const removeFriendInput = {
                 variables: {
@@ -44,9 +45,10 @@ export const removeFriendTest = (query, mutate, setOptions) => {
         });
 
         test('should fail when friendship exists', async () => {
-            const friendId: string = await registerUser(mutate, mockedUsers[1]);
-            await registerUser(mutate, mockedUsers[0]);
-            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
+            const [me, friend] = mockedUsers
+            const friendId: string = await registerUser(mutate, friend);
+            await registerUser(mutate, me);
+            await login(mutate, me, setOptions);
 
             const removeFriendInput = {
                 variables: {
@@ -65,8 +67,9 @@ export const removeFriendTest = (query, mutate, setOptions) => {
         });
 
         test("should succeed on valid data", async () => {
-            const {inviterId, friendId} = await createUserAndAddToFriend(mockedUsers[0], mockedUsers[1], mutate, setOptions);
-            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
+            const [me, inviter] = mockedUsers
+            const {inviterId, friendId} = await createUserAndAddToFriend(inviter, me, mutate, setOptions);
+            await login(mutate, inviter, setOptions);
 
             const removeFriendInput = {
                 variables: {
@@ -78,10 +81,10 @@ export const removeFriendTest = (query, mutate, setOptions) => {
 
             const {data: {removeFriend}}  = await mutate(REMOVE_FRIEND, removeFriendInput);
 
-            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
+            await login(mutate, inviter, setOptions);
             const {friends: inviterFriends} = await meQuery(query);
 
-            await login(mutate, mockedUsers[1].email, mockedUsers[1].password, setOptions);
+            await login(mutate, me, setOptions);
             const {friends: meFriends} = await meQuery(query);
 
             expect(removeFriend.message).toEqual(deleteSingleQuote(friendDeletedSuccess));

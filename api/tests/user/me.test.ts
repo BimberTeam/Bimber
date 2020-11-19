@@ -5,6 +5,7 @@ import { prepareDbForTests, clearDatabase } from './../../src/app';
 
 export const meTests = (query, mutate, setOptions) => {
     describe("Me query", () => {
+        const [me] = mockedUsers;
 
         beforeAll(async  () => {
             await prepareDbForTests();
@@ -18,27 +19,28 @@ export const meTests = (query, mutate, setOptions) => {
         beforeEach(async () => {
             await clearDatabase();
             await setToken('', setOptions);
-            await registerUser(mutate, mockedUsers[0]);
+            await registerUser(mutate, me);
         });
 
         invalidTokenTest(ME, query, setOptions);
 
         test("should succeed on valid token", async () => {
-            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
-            const me = await meQuery(query);
-            expect(me.name).toEqual("kuba4");
-            expect(me.email).toEqual("Jacek@111");
-            expect(me.password).not.toEqual("lalala");
-            expect(me.age).toEqual(10);
-            expect(me.favoriteAlcoholName).toEqual("Harnas");
-            expect(me.favoriteAlcoholType).toEqual("VODKA");
-            expect(me.description).toEqual("test");
-            expect(me.genderPreference).toEqual("MALE");
-            expect(me.gender).toEqual("MALE");
-            expect(me.alcoholPreference).toEqual("VODKA");
-            expect(me.agePreferenceFrom).toEqual(3);
-            expect(me.agePreferenceTo).toEqual(7);
-            expect(me.friends).toEqual([]);
+            const [me] = mockedUsers;
+            await login(mutate, me, setOptions);
+            const meResponse = await meQuery(query);
+            expect(meResponse.name).toEqual("kuba4");
+            expect(meResponse.email).toEqual("Jacek@111");
+            expect(meResponse.password).not.toEqual("lalala");
+            expect(meResponse.age).toEqual(10);
+            expect(meResponse.favoriteAlcoholName).toEqual("Harnas");
+            expect(meResponse.favoriteAlcoholType).toEqual("VODKA");
+            expect(meResponse.description).toEqual("test");
+            expect(meResponse.genderPreference).toEqual("MALE");
+            expect(meResponse.gender).toEqual("MALE");
+            expect(meResponse.alcoholPreference).toEqual("VODKA");
+            expect(meResponse.agePreferenceFrom).toEqual(3);
+            expect(meResponse.agePreferenceTo).toEqual(7);
+            expect(meResponse.friends).toEqual([]);
         });
     });
 };

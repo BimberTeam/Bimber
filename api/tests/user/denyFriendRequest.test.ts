@@ -1,5 +1,5 @@
-import { ACCEPT_FRIEND_REQUEST, DENY_FRIEND_REQUEST } from './mutations';
-import { registerUser, invalidTokenTest, login, setToken, createUserAndSendFriendRequest, deleteSingleQuote, meQuery, replyToFriendRequestMutation } from './../common/helper';
+import { ACCEPT_FRIEND_REQUEST, DENY_FRIEND_REQUEST, ADD_FRIEND } from './mutations';
+import { registerUser, invalidTokenTest, login, setToken, deleteSingleQuote, replyToFriendRequestMutation, meQuery } from './../common/helper';
 import { mockedUsers } from './mock';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
 import {userNotFoundError, lackingFriendRequestError} from './../../src/graphql/user/common/friendRequest';
@@ -23,12 +23,11 @@ export const denyFriendRequestTest = (query, mutate, setOptions) => {
 
         invalidTokenTest(ACCEPT_FRIEND_REQUEST, mutate, setOptions);
 
-        test("should validate that inviter exists", async () => {
-            await registerUser(mutate, mockedUsers[0]);
-            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
-            await createUserAndSendFriendRequest(mockedUsers[1], mutate);
+        test("should validate that the inviter exists", async () => {
+            const [me, inviter] = mockedUsers;
+            await registerUser(mutate, me);
+            await login(mutate, me, setOptions);
 
-            await login(mutate, mockedUsers[1].email, mockedUsers[1].password, setOptions);
             const {errors: [error]} = await replyToFriendRequestMutation(mutate, "invalidID", DENY_FRIEND_REQUEST);
             const {code} = error.extensions
 
@@ -36,12 +35,13 @@ export const denyFriendRequestTest = (query, mutate, setOptions) => {
             expect(code).toEqual('400');
         });
 
-        test("should validate that invitation exists", async () => {
-            const inviterId: string = await registerUser(mutate, mockedUsers[0]);
-            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
+        test("should validate that an invitation exists", async () => {
+            const [me, inviter] = mockedUsers;
+            const inviterId: string = await registerUser(mutate, me);
+            await login(mutate, me, setOptions);
 
-            await registerUser(mutate, mockedUsers[1]);
-            await login(mutate, mockedUsers[1].email, mockedUsers[1].password, setOptions);
+            await registerUser(mutate, inviter);
+            await login(mutate, inviter, setOptions);
             const {errors: [error]}  = await replyToFriendRequestMutation(mutate, inviterId, DENY_FRIEND_REQUEST);
             const {code} = error.extensions
 
@@ -50,15 +50,33 @@ export const denyFriendRequestTest = (query, mutate, setOptions) => {
         });
 
         test("should succeed on valid data", async () => {
-            const inviterId: string = await registerUser(mutate, mockedUsers[0]);
-            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
-            await createUserAndSendFriendRequest(mockedUsers[1], mutate);
+            const [me, inviter] = mockedUsers;
+            const inviterId: string = await registerUser(mutate, inviter);
+            const meId: string = await registerUser(mutate, me);
 
-            await login(mutate, mockedUsers[1].email, mockedUsers[1].password, setOptions);
+            await login(mutate, inviter, setOptions);
+
+            const addFriendInput = {
+                variables: {
+                    input: {
+                        id: meId
+                    }
+                }
+            };
+
+            await mutate(ADD_FRIEND, addFriendInput);
+
+            await login(mutate, me, setOptions);
             const {data: {denyFriendRequest}}  = await replyToFriendRequestMutation(mutate, inviterId, DENY_FRIEND_REQUEST);
+            const {friends: meFriends} = await meQuery(query);
+
+            await login(mutate, inviter, setOptions);
+            const {friends: inviterFriends} = await meQuery(query);
 
             expect(denyFriendRequest.message).toEqual(deleteSingleQuote(friendshipRequestDeniedSuccess));
             expect(denyFriendRequest.status).toEqual('OK');
+            expect(inviterFriends).toEqual([]);
+            expect(meFriends).toEqual([]);
         });
     });
 };

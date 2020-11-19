@@ -16,22 +16,20 @@ export const invalidTokenTest = (request, serverClient, setOptions): void => {
 };
 
 export const registerUser = async(mutate, registerInput): Promise<string> => {
-    const res = await mutate(REGISTER, {
+    const {data: {register}}  = await mutate(REGISTER, {
         variables: registerInput
     });
-    console.log(res);
-
-    const {data: {register}} = res;
     return register.id;
 };
 
-export const login = async(mutate, email: string, password:string, setOptions): Promise<string> => {
+export const login = async(mutate, user, setOptions): Promise<string> => {
     const loginInput = {
         variables: {
-            email: email,
-            password: password
+            email: user.email,
+            password: user.password
         }
     };
+
     const {data: {login}}  = await mutate(LOGIN, loginInput);
     await setOptions({
         request: {
@@ -53,27 +51,11 @@ export const setToken = async (token: string, setOptions): Promise<void> => {
     });
 };
 
-export const createUserAndSendFriendRequest = async (mockUserFriend, mutate): Promise<string> => {
-    const friendId: string = await registerUser(mutate, mockUserFriend);
-
-    const addFriendInput = {
-        variables: {
-            input: {
-                id: friendId
-            }
-        }
-    };
-
-    await mutate(ADD_FRIEND, addFriendInput);
-    return friendId;
-};
-
-
 export const createUserAndAddToFriend = async (mockUser, mockUserFriend, mutate, setOptions): Promise<{inviterId: string, friendId: string}> => {
     const inviterId: string = await registerUser(mutate, mockUser);
     const friendId: string = await registerUser(mutate, mockUserFriend);
 
-    await login(mutate, mockUser.email, mockUser.password, setOptions);
+    await login(mutate, mockUser, setOptions);
 
     let addFriendInput = {
         variables: {
@@ -84,7 +66,7 @@ export const createUserAndAddToFriend = async (mockUser, mockUserFriend, mutate,
     };
     await mutate(ADD_FRIEND, addFriendInput);
 
-    await login(mutate, mockUserFriend.email, mockUserFriend.password, setOptions);
+    await login(mutate, mockUserFriend, setOptions);
 
     addFriendInput = {
         variables: {

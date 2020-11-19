@@ -5,8 +5,9 @@ import { prepareDbForTests, clearDatabase } from './../../src/app';
 export const registerTests = (query, mutate) => {
     describe('Register mutation', () => {
 
+        const [me] = mockedUsers;
         const registerInput=  {
-            variables: mockedUsers[0]
+            variables: me
         };
 
         beforeAll(async  () => {
@@ -33,18 +34,18 @@ export const registerTests = (query, mutate) => {
         test('should succeed on valid input data', async () => {
             const {data: {register}} = await mutate(REGISTER, registerInput);
 
-            expect(register.name).toEqual("kuba4");
-            expect(register.email).toEqual("Jacek@111");
-            expect(register.password).not.toEqual("lalala");
-            expect(register.age).toEqual(10);
-            expect(register.favoriteAlcoholName).toEqual("Harnas");
-            expect(register.favoriteAlcoholType).toEqual("VODKA");
-            expect(register.description).toEqual("test");
-            expect(register.genderPreference).toEqual("MALE");
-            expect(register.gender).toEqual("MALE");
-            expect(register.alcoholPreference).toEqual("VODKA");
-            expect(register.agePreferenceFrom).toEqual(3);
-            expect(register.agePreferenceTo).toEqual(7);
+            expect(register.name).toEqual(me.name);
+            expect(register.email).toEqual(me.email);
+            expect(register.password).not.toEqual(me.password);
+            expect(register.age).toEqual(me.age);
+            expect(register.favoriteAlcoholName).toEqual(me.favoriteAlcoholName);
+            expect(register.favoriteAlcoholType).toEqual(me.favoriteAlcoholType);
+            expect(register.description).toEqual(me.description);
+            expect(register.genderPreference).toEqual(me.genderPreference);
+            expect(register.gender).toEqual(me.gender);
+            expect(register.alcoholPreference).toEqual(me.alcoholPreference);
+            expect(register.agePreferenceFrom).toEqual(me.agePreferenceFrom);
+            expect(register.agePreferenceTo).toEqual(me.agePreferenceTo);
         });
 
         test('should succeed with null gender preference', async () => {

@@ -8,7 +8,7 @@ import { loginTests } from './user/login.test';
 import { registerTests } from './user/register.test';
 import { createTestClient } from 'apollo-server-integration-testing';
 
-describe("" , () => {
+describe("Backend tests :" , () => {
     const {query, mutate, setOptions} = createTestClient({
         apolloServer: server
     });

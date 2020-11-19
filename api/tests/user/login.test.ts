@@ -5,8 +5,9 @@ import { prepareDbForTests, clearDatabase } from './../../src/app';
 export const loginTests = (query, mutate) => {
     describe('Login mutation', () => {
 
+        const [me] = mockedUsers
         const registerInput = {
-            variables: mockedUsers[0]
+            variables: me
         };
 
         beforeAll(async  () => {
