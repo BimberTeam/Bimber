@@ -22,8 +22,6 @@ services:
     build:
       context: ./api
       dockerfile: ./test.Dockerfile
-    ports:
-      - 4001:4001
     env_file:
       - test.env
     environment:

@@ -5,8 +5,8 @@ import { userExists, singleQuote } from '../../common/helper';
 import { ensureAuthorized, debugQuery } from '../../common/helper';
 import { neo4jgraphql } from "neo4j-graphql-js";
 
-const userNotFoundError = singleQuote("Podany użytkownik nie istnieje!");
-const lackingFriendshipError = singleQuote("Podany użytkownik nie jest twoim znajomym!");
+export const userNotFoundError = singleQuote("Podany użytkownik nie istnieje!");
+export const lackingFriendshipError = singleQuote("Podany użytkownik nie jest twoim znajomym!");
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);

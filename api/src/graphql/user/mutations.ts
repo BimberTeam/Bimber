@@ -2,7 +2,7 @@ import { singleQuote } from "./../common/helper";
 
 // accept friend request messages
 export const friendAddedSuccess = singleQuote("Zaakceptowano zaproszenie do znajomych!");
-const friendDeletedSuccess = singleQuote("Usunięto znajomego!");
+export const friendDeletedSuccess = singleQuote("Usunięto znajomego!");
 
 export const friendshipRequestSentSuccess = singleQuote("Wysłano zaproszenie do znajomych!");
 export const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");

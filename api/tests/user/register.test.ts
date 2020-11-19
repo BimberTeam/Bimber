@@ -1,4 +1,4 @@
-import { mockUser } from './mock';
+import { mockedUsers } from './mock';
 import { REGISTER } from './mutations';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
 
@@ -6,7 +6,7 @@ export const registerTests = (query, mutate) => {
     describe('Register mutation', () => {
 
         const registerInput=  {
-            variables: mockUser
+            variables: mockedUsers[0]
         };
 
         beforeAll(async  () => {

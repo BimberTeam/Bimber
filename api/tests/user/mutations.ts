@@ -83,3 +83,12 @@ export const DENY_FRIEND_REQUEST = gql`
         }
     }
 `;
+
+export const REMOVE_FRIEND = gql`
+    mutation ($input: FriendInput!){
+        removeFriend(input: $input) {
+            message
+            status
+        }
+    }
+`;

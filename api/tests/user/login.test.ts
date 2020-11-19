@@ -1,4 +1,4 @@
-import { mockUser } from './mock';
+import { mockedUsers } from './mock';
 import { REGISTER, LOGIN } from './mutations';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
 
@@ -6,7 +6,7 @@ export const loginTests = (query, mutate) => {
     describe('Login mutation', () => {
 
         const registerInput = {
-            variables: mockUser
+            variables: mockedUsers[0]
         };
 
         beforeAll(async  () => {
@@ -21,7 +21,7 @@ export const loginTests = (query, mutate) => {
             await clearDatabase();
         });
 
-        test("should valid that user exists", async () => {
+        test("should validate that user exists", async () => {
             const loginInput = {
                 variables: {
                     email: "Jacek@111",

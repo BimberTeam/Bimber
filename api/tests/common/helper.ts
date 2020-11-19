@@ -1,7 +1,6 @@
-import { gql } from 'apollo-server';
 import { ME } from './../user/queries';
 import { REGISTER, LOGIN, ADD_FRIEND, ACCEPT_FRIEND_REQUEST, DENY_FRIEND_REQUEST } from './../user/mutations';
-import { mockUser } from './../user/mock';
+import { mockedUsers } from './../user/mock';
 import { HttpQueryError } from "apollo-server-core";
 import { DocumentNode } from 'graphql';
 
@@ -17,9 +16,12 @@ export const invalidTokenTest = (request, serverClient, setOptions): void => {
 };
 
 export const registerUser = async(mutate, registerInput): Promise<string> => {
-    const {data: {register}}  = await mutate(REGISTER, {
+    const res = await mutate(REGISTER, {
         variables: registerInput
     });
+    console.log(res);
+
+    const {data: {register}} = res;
     return register.id;
 };
 
@@ -51,8 +53,8 @@ export const setToken = async (token: string, setOptions): Promise<void> => {
     });
 };
 
-export const createUserAndSendFriendRequest = async (mockFriendUser, mutate): Promise<string> => {
-    const friendId: string = await registerUser(mutate, mockFriendUser);
+export const createUserAndSendFriendRequest = async (mockUserFriend, mutate): Promise<string> => {
+    const friendId: string = await registerUser(mutate, mockUserFriend);
 
     const addFriendInput = {
         variables: {
@@ -67,19 +69,33 @@ export const createUserAndSendFriendRequest = async (mockFriendUser, mutate): Pr
 };
 
 
-export const createUserAndAddToFriend = async (mockFriendUser, mutate): Promise<string> => {
-    const friendId: string = await registerUser(mutate, mockFriendUser);
+export const createUserAndAddToFriend = async (mockUser, mockUserFriend, mutate, setOptions): Promise<{inviterId: string, friendId: string}> => {
+    const inviterId: string = await registerUser(mutate, mockUser);
+    const friendId: string = await registerUser(mutate, mockUserFriend);
 
-    const addFriendInput = {
+    await login(mutate, mockUser.email, mockUser.password, setOptions);
+
+    let addFriendInput = {
         variables: {
             input: {
                 id: friendId
             }
         }
     };
-
     await mutate(ADD_FRIEND, addFriendInput);
-    return friendId;
+
+    await login(mutate, mockUserFriend.email, mockUserFriend.password, setOptions);
+
+    addFriendInput = {
+        variables: {
+            input: {
+                id: inviterId
+            }
+        }
+    };
+    await mutate(ADD_FRIEND, addFriendInput);
+
+    return {inviterId, friendId};
 };
 
 export const meQuery = async (query): Promise<any> => {

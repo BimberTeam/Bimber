@@ -1,6 +1,6 @@
 import { ADD_FRIEND } from './mutations';
 import { registerUser, invalidTokenTest, login, setToken, createUserAndSendFriendRequest, deleteSingleQuote, meQuery } from './../common/helper';
-import { mockUser, mockFriendUser } from './mock';
+import { mockedUsers } from './mock';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
 import {userNotFoundError, friendRequestExistsError, requestedFriendIsMeError} from './../../src/graphql/user/mutations/sendFriendRequest';
 import {friendAddedSuccess, friendshipRequestSentSuccess} from './../../src/graphql/user/mutations';
@@ -24,8 +24,8 @@ export const addFriendTest = (query, mutate, setOptions) => {
         invalidTokenTest(ADD_FRIEND, mutate, setOptions);
 
         test("should validate that friend exists", async () => {
-            await registerUser(mutate, mockUser);
-            await login(mutate, mockUser.email, mockUser.password, setOptions);
+            await registerUser(mutate, mockedUsers[0]);
+            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
 
             const addFriendInput = {
                 variables: {
@@ -43,10 +43,10 @@ export const addFriendTest = (query, mutate, setOptions) => {
         });
 
         test("should succeed on valid data", async () => {
-            await registerUser(mutate, mockUser);
-            await login(mutate, mockUser.email, mockUser.password, setOptions);
+            await registerUser(mutate, mockedUsers[0]);
+            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
 
-            const friendId: string = await registerUser(mutate, mockFriendUser);
+            const friendId: string = await registerUser(mutate, mockedUsers[1]);
 
             const addFriendInput = {
                 variables: {
@@ -62,10 +62,10 @@ export const addFriendTest = (query, mutate, setOptions) => {
         });
 
         test("should validate that user is already send friendRequest", async () => {
-            await registerUser(mutate, mockUser);
-            await login(mutate, mockUser.email, mockUser.password, setOptions);
+            await registerUser(mutate, mockedUsers[0]);
+            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
 
-            const friendId: string = await createUserAndSendFriendRequest(mockFriendUser, mutate);
+            const friendId: string = await createUserAndSendFriendRequest(mockedUsers[1], mutate);
 
             const addFriendInput = {
                 variables: {
@@ -83,11 +83,11 @@ export const addFriendTest = (query, mutate, setOptions) => {
         });
 
         test("should succeed if user send friend request to friend, friend send friend request to user, and friendship will be create", async () => {
-            const meId: string = await registerUser(mutate, mockUser);
-            await login(mutate, mockUser.email, mockUser.password, setOptions);
+            const meId: string = await registerUser(mutate, mockedUsers[0]);
+            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
 
-            const friendId: string = await createUserAndSendFriendRequest(mockFriendUser, mutate);
-            await login(mutate, mockFriendUser.email, mockFriendUser.password, setOptions);
+            const friendId: string = await createUserAndSendFriendRequest(mockedUsers[1], mutate);
+            await login(mutate, mockedUsers[1].email, mockedUsers[1].password, setOptions);
 
             const addFriendInput = {
                 variables: {
@@ -101,7 +101,7 @@ export const addFriendTest = (query, mutate, setOptions) => {
 
             const {friends: [friend]} = await meQuery(query);
 
-            await login(mutate, mockUser.email, mockUser.password, setOptions);
+            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
             const {friends: [meFriend]} = await meQuery(query);
 
             expect(sendFriendRequest.message).toEqual(deleteSingleQuote(friendAddedSuccess));
@@ -110,8 +110,8 @@ export const addFriendTest = (query, mutate, setOptions) => {
         });
 
         test("should fail when user want send friend request to himself", async () => {
-            const meId: string = await registerUser(mutate, mockUser);
-            await login(mutate, mockUser.email, mockUser.password, setOptions);
+            const meId: string = await registerUser(mutate, mockedUsers[0]);
+            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
 
             const addFriendInput = {
                 variables: {

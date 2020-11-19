@@ -6,7 +6,7 @@
     "scripts": {
         "build": "tsc",
         "start": "nodemon --exec ts-node src/app.ts",
-        "test": "NODE_ENV=test jest --runInBand"
+        "test": "NODE_ENV=test jest --runInBand --verbose true --silent"
     },
     "repository": {
         "type": "git",

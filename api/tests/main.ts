@@ -1,3 +1,4 @@
+import { removeFriendTest } from './user/removeFriend.test';
 import { denyFriendRequestTest } from './user/denyFriendRequest.test';
 import { acceptFriendRequestTest } from './user/acceptFriendRequest.test';
 import { addFriendTest } from './user/addFriend.test';
@@ -27,4 +28,5 @@ describe("" , () => {
     addFriendTest(query, mutate, setOptions);
     acceptFriendRequestTest(query, mutate, setOptions);
     denyFriendRequestTest(query, mutate, setOptions);
+    removeFriendTest(query, mutate, setOptions);
 })

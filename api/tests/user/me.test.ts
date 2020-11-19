@@ -1,6 +1,6 @@
 import { invalidTokenTest, registerUser, setToken, meQuery, login } from './../common/helper';
 import { ME } from './queries';
-import { mockUser } from './mock';
+import { mockedUsers } from './mock';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
 
 export const meTests = (query, mutate, setOptions) => {
@@ -18,13 +18,13 @@ export const meTests = (query, mutate, setOptions) => {
         beforeEach(async () => {
             await clearDatabase();
             await setToken('', setOptions);
-            await registerUser(mutate, mockUser);
+            await registerUser(mutate, mockedUsers[0]);
         });
 
         invalidTokenTest(ME, query, setOptions);
 
         test("should succeed on valid token", async () => {
-            await login(mutate, mockUser.email, mockUser.password, setOptions);
+            await login(mutate, mockedUsers[0].email, mockedUsers[0].password, setOptions);
             const me = await meQuery(query);
             expect(me.name).toEqual("kuba4");
             expect(me.email).toEqual("Jacek@111");

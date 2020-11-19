@@ -49,7 +49,7 @@ const host = process.env.GRAPHQL_SERVER_HOST || "0.0.0.0";
 
 server.applyMiddleware({ app, path });
 
-export const ws = createServer(app);
+const ws = createServer(app);
 server.installSubscriptionHandlers(ws);
 
 ws.listen({ host, port, path }, () => {
