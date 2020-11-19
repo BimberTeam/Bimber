@@ -1,12 +1,14 @@
 import { ApolloServer } from "apollo-server-express";
 import dotenv from "dotenv";
 import express from "express";
-import neo4j from "neo4j-driver";
+import neo4j, { Session } from "neo4j-driver";
 import { retrieveToken, verifyToken } from "./auth/auth";
 import { initializeDatabase } from "./database/initialize";
 import { schema } from "./graphql/schema";
 import {createServer} from "http";
 import { initializeRedisClient } from "./database/redis";
+
+dotenv.config();
 
 const driver = neo4j.driver(
   process.env.NEO4J_URI || "bolt://localhost:7687",
@@ -19,15 +21,12 @@ const driver = neo4j.driver(
   },
 );
 
-
-dotenv.config();
-
 const app = express();
 
 initializeDatabase(driver, {retries: 5, timeout: 5000});
 initializeRedisClient();
 
-const server = new ApolloServer({
+export const server = new ApolloServer({
   context: ({ req, connection }) => {
     const token = retrieveToken(req, connection);
     const user = verifyToken(token);
@@ -38,9 +37,10 @@ const server = new ApolloServer({
       token,
     };
   },
+  schema,
+  stopOnTerminationSignals: true,
   introspection: true,
   playground: true,
-  schema,
 });
 
 const port = process.env.GRAPHQL_SERVER_PORT || 4001;
@@ -55,3 +55,16 @@ server.installSubscriptionHandlers(ws);
 ws.listen({ host, port, path }, () => {
   console.log(`GraphQL server ready at http://${host}:${port}${path}`);
 });
+
+export const clearDatabase = async (): Promise<void> => {
+  const session: Session = driver.session();
+
+  await session.run(`
+    MATCH (n)
+    DETACH DELETE n
+  `);
+}
+
+export const prepareDbForTests = async (): Promise<void> => {
+  await initializeDatabase(driver, {retries: 5, timeout: 5000});
+};
