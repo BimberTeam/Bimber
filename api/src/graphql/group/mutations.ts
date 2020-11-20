@@ -201,4 +201,6 @@ export const GroupMutations = `
             RETURN {status: 'OK', message: ${rejectGroupInvitationSuccess}}
         """
     )
+
+    suggestGroups(input: SuggestGroupsInput!): [Group]
 `;

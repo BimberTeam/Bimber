@@ -34,4 +34,8 @@ export const GroupInputs = `
         groupId: ID!
     }
 
+    input SuggestGroupsInput {
+        groupNumber: Int!
+    }
+
 `

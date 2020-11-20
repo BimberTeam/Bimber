@@ -39,7 +39,7 @@ import groupCandidatesResult from "./group/queries/groupCandidatesResult";
 import sendFriendRequest from "./user/mutations/sendFriendRequest";
 import friendRequest from "./user/common/friendRequest";
 import removeFriend from "./user/mutations/removeFriend";
-
+import suggestGroups from "./group/mutations/suggestGroups";
 
 export const typeDefs = `
   scalar BimberDate
@@ -101,7 +101,8 @@ const resolvers = {
     acceptGroupPendingUser,
     rejectGroupPendingUser,
     sendChatMessage,
-    updateLocation
+    updateLocation,
+    suggestGroups
   },
   Query: {
     me(object, params, ctx, resolveInfo) {
