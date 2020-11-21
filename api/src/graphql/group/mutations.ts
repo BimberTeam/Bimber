@@ -57,8 +57,10 @@ export const GroupMutations = `
     swipeToDislike(input: SwipeInput!): Message
     @cypher(
         statement: """
-        MATCH(g: Group {id: $input.groupId})
-        MATCH(me:Account {id: $meId})
+        MATCH(g: Group {id: $input.groupId})-[:OWNER]-(a:Account)
+        MATCH(me:Account {id: $meId})-[:OWNER]-(meGroup:Group)
+        OPTIONAL MATCH((a)-[p:PENDING]-(meGroup))
+        DELETE p
         MERGE(me)-[:DISLIKE]->(g)
         RETURN {status: 'OK', message: ${swipeToDislikeSuccess}}
         """
