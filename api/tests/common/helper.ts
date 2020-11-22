@@ -1,3 +1,4 @@
+import { CREATE_GROUP } from './../group/mutations';
 import { ME } from './../user/queries';
 import { REGISTER, LOGIN, ADD_FRIEND, ACCEPT_FRIEND_REQUEST, DENY_FRIEND_REQUEST } from './../user/mutations';
 import { mockedUsers } from './../user/mock';
@@ -51,11 +52,10 @@ export const setToken = async (token: string, setOptions): Promise<void> => {
     });
 };
 
-export const createUserAndAddToFriend = async (mockUser, mockUserFriend, mutate, setOptions): Promise<{inviterId: string, friendId: string}> => {
-    const inviterId: string = await registerUser(mutate, mockUser);
+export const createUserAndAddToFriend = async (inviterId:string, inviter, mockUserFriend, mutate, setOptions): Promise<string> => {
     const friendId: string = await registerUser(mutate, mockUserFriend);
 
-    await login(mutate, mockUser, setOptions);
+    await login(mutate, inviter, setOptions);
 
     let addFriendInput = {
         variables: {
@@ -64,6 +64,7 @@ export const createUserAndAddToFriend = async (mockUser, mockUserFriend, mutate,
             }
         }
     };
+
     await mutate(ADD_FRIEND, addFriendInput);
 
     await login(mutate, mockUserFriend, setOptions);
@@ -77,7 +78,7 @@ export const createUserAndAddToFriend = async (mockUser, mockUserFriend, mutate,
     };
     await mutate(ADD_FRIEND, addFriendInput);
 
-    return {inviterId, friendId};
+    return friendId;
 };
 
 export const meQuery = async (query): Promise<any> => {
@@ -99,4 +100,29 @@ export const replyToFriendRequestMutation = async (mutate, inviterId: string, mu
     };
 
     return await mutate(mutation, acceptFriendRequestInput);
+};
+
+export const createGroupMutation = async (meId, me, groupMembers: Array<any>, mutate, query, setOptions): Promise<{friendsId: Array<string>, groupId:string}> => {
+    await login(mutate, me, setOptions);
+
+    let friendsId: Array<string> = [];
+
+    for(const member of groupMembers) {
+        friendsId.push(await createUserAndAddToFriend(meId, me, member, mutate, setOptions));
+    }
+
+    await login(mutate, me, setOptions);
+    const createGroupInput = {
+        variables: {
+            usersId: friendsId
+        }
+    }
+
+    await mutate(CREATE_GROUP, createGroupInput);
+    const {groups: meGroups} = await meQuery(query);
+
+    return {
+        friendsId: friendsId,
+        groupId: meGroups[0].id
+    };
 };

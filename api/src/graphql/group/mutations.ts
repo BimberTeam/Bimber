@@ -4,11 +4,11 @@ const addToGroupSuccess = singleQuote("Użytkownik został dodany do grupy!");
 const votingSuccess = singleQuote("Głos został oddany!");
 const deletedUserJoinRequestSuccess = singleQuote("Użytkownik został przegłosowany na jego niekorzyść, usunięto prośbę o dołączenie!");
 
-const groupCreatedSuccess = singleQuote("Utworzono nową grupę!");
+export const groupCreatedSuccess = singleQuote("Utworzono nową grupę!");
 const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy!");
 const groupInvitationSentSuccess = singleQuote("Wysłano zaproszenie do grupy!");
-const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane!");
-const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte!");
+export const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane!");
+export const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte!");
 const swipeToDislikeSuccess = singleQuote("Podana grupa została zignorowana!");
 
 export const GroupMutations = `

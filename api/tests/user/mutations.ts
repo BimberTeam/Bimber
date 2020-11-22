@@ -1,6 +1,7 @@
+import { DocumentNode } from 'graphql';
 import { gql } from "apollo-server";
 
-export const REGISTER = gql`
+export const REGISTER: DocumentNode = gql`
     mutation(
         $name: String!,
         $email: String!,
@@ -46,7 +47,7 @@ export const REGISTER = gql`
     }
 `;
 
-export const LOGIN = gql`
+export const LOGIN: DocumentNode = gql`
     mutation($email: String!, $password: String!) {
         login(input: {
             email: $email,
@@ -57,7 +58,7 @@ export const LOGIN = gql`
     }
 `;
 
-export const ADD_FRIEND = gql`
+export const ADD_FRIEND: DocumentNode = gql`
     mutation($input: FriendInput!){
         sendFriendRequest(input: $input) {
             message
@@ -75,7 +76,7 @@ export const ACCEPT_FRIEND_REQUEST = gql`
     }
 `;
 
-export const DENY_FRIEND_REQUEST = gql`
+export const DENY_FRIEND_REQUEST: DocumentNode = gql`
     mutation ($input: FriendInput!){
         denyFriendRequest(input: $input) {
             message
@@ -84,7 +85,7 @@ export const DENY_FRIEND_REQUEST = gql`
     }
 `;
 
-export const REMOVE_FRIEND = gql`
+export const REMOVE_FRIEND: DocumentNode = gql`
     mutation ($input: FriendInput!){
         removeFriend(input: $input) {
             message

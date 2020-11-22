@@ -41,6 +41,8 @@ export const meTests = (query, mutate, setOptions) => {
             expect(meResponse.agePreferenceFrom).toEqual(3);
             expect(meResponse.agePreferenceTo).toEqual(7);
             expect(meResponse.friends).toEqual([]);
+            expect(meResponse.groups).toEqual([]);
+            expect(meResponse.groupInvitations).toEqual([]);
         });
     });
 };

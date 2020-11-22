@@ -1,3 +1,6 @@
+import { rejectGroupInvitationTest } from './group/rejectGroupInvitation.test';
+import { acceptGroupInvitationTest } from './group/acceptGroupInvitation.test';
+import { createGroupTest } from './group/createGroup.test';
 import { removeFriendTest } from './user/removeFriend.test';
 import { denyFriendRequestTest } from './user/denyFriendRequest.test';
 import { acceptFriendRequestTest } from './user/acceptFriendRequest.test';
@@ -29,4 +32,7 @@ describe("Backend tests :" , () => {
     acceptFriendRequestTest(query, mutate, setOptions);
     denyFriendRequestTest(query, mutate, setOptions);
     removeFriendTest(query, mutate, setOptions);
+    createGroupTest(query, mutate, setOptions);
+    acceptGroupInvitationTest(query, mutate, setOptions);
+    rejectGroupInvitationTest(query, mutate, setOptions);
 })

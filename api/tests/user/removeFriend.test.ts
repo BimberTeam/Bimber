@@ -67,9 +67,10 @@ export const removeFriendTest = (query, mutate, setOptions) => {
         });
 
         test("should succeed on valid data", async () => {
-            const [me, inviter] = mockedUsers
-            const {inviterId, friendId} = await createUserAndAddToFriend(inviter, me, mutate, setOptions);
-            await login(mutate, inviter, setOptions);
+            const [me, friend] = mockedUsers
+            const meId = await registerUser(mutate, me);
+            const friendId = await createUserAndAddToFriend(meId, me, friend, mutate, setOptions);
+            await login(mutate, me, setOptions);
 
             const removeFriendInput = {
                 variables: {
@@ -81,7 +82,7 @@ export const removeFriendTest = (query, mutate, setOptions) => {
 
             const {data: {removeFriend}}  = await mutate(REMOVE_FRIEND, removeFriendInput);
 
-            await login(mutate, inviter, setOptions);
+            await login(mutate, friend, setOptions);
             const {friends: inviterFriends} = await meQuery(query);
 
             await login(mutate, me, setOptions);
@@ -93,6 +94,4 @@ export const removeFriendTest = (query, mutate, setOptions) => {
             expect(meFriends).toEqual([]);
         });
     });
-
-
 };

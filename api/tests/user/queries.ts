@@ -15,7 +15,13 @@ export const ME = gql`
             alcoholPreference
             agePreferenceFrom
             agePreferenceTo
-            friends{
+            friends {
+                id
+            }
+            groups {
+                id
+            }
+            groupInvitations {
                 id
             }
         }
