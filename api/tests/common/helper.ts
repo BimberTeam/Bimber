@@ -102,7 +102,7 @@ export const replyToFriendRequestMutation = async (mutate, inviterId: string, mu
     return await mutate(mutation, acceptFriendRequestInput);
 };
 
-export const createGroupMutation = async (meId, me, groupMembers: Array<any>, mutate, query, setOptions): Promise<{friendsId: Array<string>, groupId:string}> => {
+export const sendGroupInvitationsMutation = async (meId, me, groupMembers: Array<any>, mutate, query, setOptions): Promise<{friendsId: Array<string>, groupId:string}> => {
     await login(mutate, me, setOptions);
 
     let friendsId: Array<string> = [];

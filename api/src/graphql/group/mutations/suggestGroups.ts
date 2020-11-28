@@ -1,3 +1,4 @@
+import { mapLocationAndGetProperties } from '../common/helper';
 import { Session } from 'neo4j-driver';
 import { executeQuery, ensureAuthorized} from './../../common/helper';
 
@@ -51,6 +52,25 @@ const getGroupAlcoholPreference = async (groupId: string, session: Session): Pro
     return await executeQuery<string>(session, getDominatingGenderQuery);
 };
 
+const getGroupProperties = async (groupId: string, session: Session): Promise<any> => {
+    const getGroupPropertiesQuery: string = `
+        MATCH(g:Group{id:"${groupId}"})-[:OWNER|:BELONGS_TO]-(members:Account)
+        RETURN  {
+            id: g.id,
+            members: collect(members),
+            averageLocation: {
+                longitude: avg(members.latestLocation.longitude) + 0.000000001 ,
+                latitude: avg(members.latestLocation.latitude) + 0.000000001
+            },
+            averageAge: avg(members.age)
+        } as result
+    `;
+
+    let groupProperties: any = await executeQuery<any>(session, getGroupPropertiesQuery);
+    groupProperties.members = mapLocationAndGetProperties(groupProperties.members);
+    return groupProperties;
+}
+
 const compareProperty = (groupProperty: string, mePreference: string): number => {
     return groupProperty === mePreference ? 0 : 1;
 };
@@ -88,13 +108,13 @@ export default async (obj, params, ctx, resolveInfo) => {
     }
 
     suggestionGroups = suggestionGroups.concat(swipedGroups);
-    params.input.params -= swipedGroups.length;
+    params.input.limit -= swipedGroups.length;
 
     const getNearestGroupQuery: any = await session.run(`
         MATCH (me:Account{id: "${ctx.user.id}"})-[:OWNER]-(meGroup:Group)
-        MATCH (a:Account)-[:OWNER]-(groups:Group)
-        WHERE NOT EXISTS((me)-[:DISLIKE]-(groups)) AND NOT EXISTS((me)-[:OWNER]-(groups)) AND NOT EXISTS((a)-[:PENDING]-(meGroup))
-        MATCH (members:Account)-[:OWNER]->(groups)
+        MATCH (a:Account)-[:OWNER|:BELONGS_TO]-(groups:Group)
+        WHERE NOT EXISTS((me)-[:DISLIKE]-(groups)) AND NOT EXISTS((me)-[:OWNER|:BELONGS_TO]-(groups)) AND NOT EXISTS((a)-[:PENDING]-(meGroup))
+        MATCH (members:Account)-[:OWNER|:BELONGS_TO]->(groups)
         WITH groups,
              point({longitude: avg(members.latestLocation.longitude), latitude: avg(members.latestLocation.latitude)}) as averageLocation,
              me.latestLocation as meLocation
@@ -107,7 +127,7 @@ export default async (obj, params, ctx, resolveInfo) => {
         ORDER BY dist DESC
     `);
 
-    const nearestGroup:Array<any> = [];
+    let nearestGroup:Array<any> = [];
 
     getNearestGroupQuery.records.forEach(
         record => record.get("result").forEach(group => nearestGroup.push(group))
@@ -121,17 +141,18 @@ export default async (obj, params, ctx, resolveInfo) => {
         group["priority"] = (0.55 * group.distance / params.input.range) +
                             (0.15 * compareProperty(await getGroupGender(group.id, session), me.genderPreference)) +
                             (0.15 * compareProperty(await getGroupAlcoholPreference(group.id, session), me.alcoholPreference)) +
-                            (0.15 * ageCompatibility(await getGroupAverageAge(group.id, session), me))
+                            (0.15 * ageCompatibility(await getGroupAverageAge(group.id, session), me));
     };
 
     nearestGroup.sort((groupA, groupB) => groupB.priority - groupA.priority);
+    suggestionGroups = suggestionGroups.concat(nearestGroup.slice(0, params.input.limit));
 
-    nearestGroup.map(group => {
+    const groups: Array<any> = [];
+    for(const group of suggestionGroups) {
         delete group.distance;
         delete group.priority;
-        return group;
-    });
+        groups.push(await getGroupProperties(group.id, session));
+    };
 
-    suggestionGroups = suggestionGroups.concat(nearestGroup.slice(0, params.input.limit - 1));
-    return suggestionGroups;
+    return groups;
 };

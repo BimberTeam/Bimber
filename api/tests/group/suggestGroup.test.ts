@@ -1,3 +1,4 @@
+import { SUGGEST_GROUP } from './mutations';
 import { registerUser, invalidTokenTest, login, setToken, deleteSingleQuote, meQuery, replyToFriendRequestMutation } from './../common/helper';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
 import {userNotFoundError, lackingFriendRequestError} from './../../src/graphql/user/common/friendRequest';
@@ -19,7 +20,7 @@ export const suggestGroupTest = (query, mutate, setOptions) => {
             await setToken('', setOptions);
         });
 
-        invalidTokenTest("", mutate, setOptions);
+        invalidTokenTest(SUGGEST_GROUP, mutate, setOptions);
 
     });
 };

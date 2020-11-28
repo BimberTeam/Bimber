@@ -1,6 +1,6 @@
 import { REJECT_GROUP_INVITATION } from './mutations';
 import { mockedUsers } from './../user/mock';
-import { setToken, invalidTokenTest, login, registerUser, createGroupMutation, meQuery, deleteSingleQuote } from './../common/helper';
+import { setToken, invalidTokenTest, login, registerUser, sendGroupInvitationsMutation, meQuery, deleteSingleQuote } from './../common/helper';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
 import { groupNotFoundError, lackingInvitationError } from './../../src/graphql/group/mutations/groupInvitation';
 import {rejectGroupInvitationSuccess} from './../../src/graphql/group/mutations';
@@ -50,7 +50,7 @@ export const rejectGroupInvitationTest = (query, mutate, setOptions) => {
             await registerUser(mutate, userB);
             await login(mutate, me, setOptions);
 
-            const {friendsId, groupId} = await createGroupMutation(meId, me, [userA], mutate, query, setOptions);
+            const {friendsId, groupId} = await sendGroupInvitationsMutation(meId, me, [userA], mutate, query, setOptions);
 
             const rejectGroupInvitationInput = {
                 variables: {
@@ -76,7 +76,7 @@ export const rejectGroupInvitationTest = (query, mutate, setOptions) => {
             const meId: string = await registerUser(mutate, me);
             await login(mutate, me, setOptions);
 
-            const {friendsId, groupId} = await createGroupMutation(meId, me, [userA], mutate, query, setOptions);
+            const {friendsId, groupId} = await sendGroupInvitationsMutation(meId, me, [userA], mutate, query, setOptions);
 
             const rejectGroupInvitationInput = {
                 variables: {

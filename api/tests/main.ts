@@ -1,3 +1,5 @@
+import { updateLocationTest } from './user/updateLocation.test';
+import { suggestGroupTest } from './group/suggestGroup.test';
 import { rejectGroupInvitationTest } from './group/rejectGroupInvitation.test';
 import { acceptGroupInvitationTest } from './group/acceptGroupInvitation.test';
 import { createGroupTest } from './group/createGroup.test';
@@ -35,4 +37,6 @@ describe("Backend tests :" , () => {
     createGroupTest(query, mutate, setOptions);
     acceptGroupInvitationTest(query, mutate, setOptions);
     rejectGroupInvitationTest(query, mutate, setOptions);
+    updateLocationTest(query, mutate, setOptions);
+    suggestGroupTest(query, mutate, setOptions);
 })

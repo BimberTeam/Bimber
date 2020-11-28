@@ -24,6 +24,10 @@ export const ME = gql`
             groupInvitations {
                 id
             }
+            latestLocation {
+                longitude,
+                latitude
+            }
         }
     }
 `;

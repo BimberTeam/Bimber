@@ -1,3 +1,4 @@
+import { mapLocationAndGetProperties } from '../common/helper';
 import { executeQuery } from './../../common/helper';
 import { ensureAuthorized, singleQuote, debugQuery, groupExists, userBelongsToGroup} from "../../common/helper";
 import { ApolloError } from "apollo-server"
@@ -15,21 +16,6 @@ interface Neo4jNumber {
     low: number,
     high: number
 }
-
-const mapPointToLocation = (point: Point): Coords  => {
-    return {
-        "latitude": point && point['y'] || null,
-        "longitude": point && point['x'] || null,
-    };
-}
-
-const mapLocationAndGetProperties = (list: any): any =>  {
-    return list.map(
-        element => {
-            element["properties"]['latestLocation'] = mapPointToLocation(element["properties"]['latestLocation']);
-            return element["properties"];
-        });
-};
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);

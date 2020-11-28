@@ -93,3 +93,12 @@ export const REMOVE_FRIEND: DocumentNode = gql`
         }
     }
 `;
+
+export const UPDATE_LOCATION: DocumentNode = gql`
+    mutation ($latitude: Float, $longitude: Float) {
+        updateLocation(input: {latitude: $latitude, longitude: $longitude}) {
+            message
+            status
+        }
+    }
+`;
