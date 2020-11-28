@@ -71,6 +71,16 @@ const getGroupProperties = async (groupId: string, session: Session): Promise<an
     return groupProperties;
 }
 
+const getGroupsProperties = async (session: Session, groupsIds: Array<any>): Promise<Array<any>> => {
+    const groups: Array<any> = [];
+    for(const group of groupsIds) {
+        delete group.distance;
+        delete group.priority;
+        groups.push(await getGroupProperties(group.id, session));
+    };
+    return groups;
+}
+
 const compareProperty = (groupProperty: string, mePreference: string): number => {
     return groupProperty === mePreference ? 0 : 1;
 };
@@ -104,7 +114,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     swipedGroups = swipedGroups.map(group => group['properties']);
 
     if(swipedGroups.length >= params.input.limit) {
-        return swipedGroups;
+        return getGroupsProperties(session, swipedGroups);
     }
 
     suggestionGroups = suggestionGroups.concat(swipedGroups);
@@ -134,7 +144,7 @@ export default async (obj, params, ctx, resolveInfo) => {
     );
 
     if (nearestGroup.length === 0 || nearestGroup.length <= params.input.limit) {
-        return suggestionGroups.concat(nearestGroup);
+        return getGroupsProperties(session, suggestionGroups.concat(nearestGroup));
     };
 
     for(const group of nearestGroup) {
@@ -144,7 +154,7 @@ export default async (obj, params, ctx, resolveInfo) => {
                             (0.15 * ageCompatibility(await getGroupAverageAge(group.id, session), me));
     };
 
-    nearestGroup.sort((groupA, groupB) => groupB.priority - groupA.priority);
+    nearestGroup.sort((groupA, groupB) => groupA.priority - groupB.priority);
     suggestionGroups = suggestionGroups.concat(nearestGroup.slice(0, params.input.limit));
 
     const groups: Array<any> = [];

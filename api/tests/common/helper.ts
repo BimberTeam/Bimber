@@ -1,6 +1,8 @@
-import { CREATE_GROUP, ACCEPT_GROUP_INVITATION } from './../group/mutations';
+import { Session } from 'neo4j-driver';
+import { executeQuery } from './../../src/graphql/common/helper';
+import { CREATE_GROUP, ACCEPT_GROUP_INVITATION, SWIPE_TO_DISLIKE, SWIPE_TO_LIKE } from './../group/mutations';
 import { ME } from './../user/queries';
-import { REGISTER, LOGIN, ADD_FRIEND, ACCEPT_FRIEND_REQUEST, DENY_FRIEND_REQUEST } from './../user/mutations';
+import { REGISTER, LOGIN, ADD_FRIEND, ACCEPT_FRIEND_REQUEST, DENY_FRIEND_REQUEST, UPDATE_LOCATION } from './../user/mutations';
 import { mockedUsers } from './../user/mock';
 import { HttpQueryError } from "apollo-server-core";
 import { DocumentNode } from 'graphql';
@@ -139,4 +141,38 @@ export const acceptGroupInvitation = async (me, groupId, mutate, setOptions): Pr
     }
 
     await mutate(ACCEPT_GROUP_INVITATION, acceptGroupInvitationInput);
+};
+
+export const updateLocation = async (me, location: {longitude: number, latitude: number}, mutate, setOptions): Promise<void> => {
+    await login(mutate, me, setOptions);
+
+    const updateLocationInput = {
+        variables: {
+            latitude: location.latitude,
+            longitude: location.longitude
+        }
+    };
+
+    await mutate(UPDATE_LOCATION, updateLocationInput);
+};
+
+export const getMeGroupId = async (meId: string, session: Session): Promise<string> => {
+    const query = `
+        MATCH (me:Account{id: "${meId}"})-[:OWNER]-(group:Group)
+        RETURN group.id as result
+    `;
+
+    return await executeQuery<string>(session, query);
 }
+
+export const swipeToLike = async (me, groupId: string, mutate, setOptions): Promise<void> => {
+    await login(mutate, me, setOptions);
+
+    const swipeToLikeInput = {
+        variables: {
+            groupId: groupId
+        }
+    }
+
+    await mutate(SWIPE_TO_LIKE, swipeToLikeInput);
+};
