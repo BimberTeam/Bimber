@@ -71,21 +71,19 @@ const getGroupProperties = async (groupId: string, session: Session): Promise<an
     return groupProperties;
 }
 
-const getGroupsProperties = async (session: Session, groupsIds: Array<any>): Promise<Array<any>> => {
-    const groups: Array<any> = [];
+const getGroupsAttributes = async (session: Session, groupsIds: any[]): Promise<any[]> => {
+    const groups: any[] = [];
     for(const group of groupsIds) {
-        delete group.distance;
-        delete group.priority;
         groups.push(await getGroupProperties(group.id, session));
     };
     return groups;
 }
 
-const compareProperty = (groupProperty: string, mePreference: string): number => {
-    return groupProperty === mePreference ? 0 : 1;
+const isSame = (A: string, B: string): number => {
+    return A === B ? 0 : 1;
 };
 
-const ageCompatibility = (groupAge: number, me:any): number => {
+const isGroupInAgePreferenceRange = (groupAge: number, me: {agePreferenceFrom: any, agePreferenceTo: any}): number => {
     return groupAge >= me.agePreferenceFrom.low && groupAge <= me.agePreferenceTo.low ? 0 : 1;
 }
 
@@ -102,7 +100,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const {properties: me}: any = await executeQuery<any>(session, meQuery);
 
-    const getGroupsSwipedToYouQuery: string = `
+    const listGenesisGroupsOfSwipesOnMeQuery: string = `
         MATCH (me:Account{id: "${ctx.user.id}"})-[:OWNER]-(meGroup:Group)
         MATCH (a:Account)-[:PENDING]->(meGroup)
         MATCH (groups:Group)-[:OWNER]-(a)
@@ -110,11 +108,11 @@ export default async (obj, params, ctx, resolveInfo) => {
         RETURN collect(groups) as result
     `;
 
-    let swipedGroups: any = await <any>executeQuery(session, getGroupsSwipedToYouQuery);
+    let swipedGroups: any = await <any>executeQuery(session, listGenesisGroupsOfSwipesOnMeQuery);
     swipedGroups = swipedGroups.map(group => group['properties']);
 
     if(swipedGroups.length >= params.input.limit) {
-        return getGroupsProperties(session, swipedGroups);
+        return getGroupsAttributes(session, swipedGroups);
     }
 
     suggestionGroups = suggestionGroups.concat(swipedGroups);
@@ -137,30 +135,28 @@ export default async (obj, params, ctx, resolveInfo) => {
         ORDER BY dist DESC
     `);
 
-    let nearestGroup:Array<any> = [];
+    let nearestGroup:any[] = [];
 
     getNearestGroupQuery.records.forEach(
         record => record.get("result").forEach(group => nearestGroup.push(group))
     );
 
     if (nearestGroup.length === 0 || nearestGroup.length <= params.input.limit) {
-        return getGroupsProperties(session, suggestionGroups.concat(nearestGroup));
+        return getGroupsAttributes(session, suggestionGroups.concat(nearestGroup));
     };
 
     for(const group of nearestGroup) {
         group["priority"] = (0.55 * group.distance / params.input.range) +
-                            (0.15 * compareProperty(await getGroupGender(group.id, session), me.genderPreference)) +
-                            (0.15 * compareProperty(await getGroupAlcoholPreference(group.id, session), me.alcoholPreference)) +
-                            (0.15 * ageCompatibility(await getGroupAverageAge(group.id, session), me));
+                            (0.15 * isSame(await getGroupGender(group.id, session), me.genderPreference)) +
+                            (0.15 * isSame(await getGroupAlcoholPreference(group.id, session), me.alcoholPreference)) +
+                            (0.15 * isGroupInAgePreferenceRange(await getGroupAverageAge(group.id, session), me));
     };
 
     nearestGroup.sort((groupA, groupB) => groupA.priority - groupB.priority);
     suggestionGroups = suggestionGroups.concat(nearestGroup.slice(0, params.input.limit));
 
-    const groups: Array<any> = [];
+    const groups: any[] = [];
     for(const group of suggestionGroups) {
-        delete group.distance;
-        delete group.priority;
         groups.push(await getGroupProperties(group.id, session));
     };
 

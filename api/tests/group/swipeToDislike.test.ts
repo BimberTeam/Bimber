@@ -41,7 +41,7 @@ export const swipeToDislikeTest = (query, mutate, setOptions) => {
             expect(code).toEqual('400');
         });
 
-        test("should validate that user already belongs to the group", async () => {
+        test("should fail when user already belongs to the group", async () => {
             const [me, friend] = mockedUsers
             const meId: string = await registerUser(mutate, me);
             await login(mutate, me, setOptions);

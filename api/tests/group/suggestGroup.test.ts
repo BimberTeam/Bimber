@@ -22,7 +22,7 @@ export const suggestGroupTest = (query, mutate, setOptions, session: Session) =>
 
         invalidTokenTest(SUGGEST_GROUPS, mutate, setOptions);
 
-        test("should return group in the proper order", async () => {
+        test("should return groups in the proper order", async () => {
             const [me, userA, userB] = mockedUsers
             const meId: string = await registerUser(mutate, me);
             const userBId: string = await registerUser(mutate, userB);
@@ -62,7 +62,6 @@ export const suggestGroupTest = (query, mutate, setOptions, session: Session) =>
             expect(suggestGroups[1].averageAge).toEqual(15);
 
             await swipeToLike(me, userAGroupId, mutate, setOptions);
-
             ({data: {suggestGroups}} = await mutate(SUGGEST_GROUPS, suggestGroupInput));
 
             expect(suggestGroups[0].id).toEqual(userBGroupId);
