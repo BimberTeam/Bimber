@@ -32,18 +32,18 @@ describe("Backend tests :" , () => {
         });
     });
 
-    // loginTests(query, mutate);
-    // registerTests(query, mutate);
-    // meTests(query, mutate, setOptions);
-    // addFriendTest(query, mutate, setOptions);
-    // acceptFriendRequestTest(query, mutate, setOptions);
-    // denyFriendRequestTest(query, mutate, setOptions);
-    // removeFriendTest(query, mutate, setOptions);
-    // createGroupTest(query, mutate, setOptions);
-    // acceptGroupInvitationTest(query, mutate, setOptions);
-    // rejectGroupInvitationTest(query, mutate, setOptions);
-    // updateLocationTest(query, mutate, setOptions);
-    // swipeToLikeTest(query, mutate, setOptions);
-    // swipeToDislikeTest(query, mutate, setOptions);
+    loginTests(query, mutate);
+    registerTests(query, mutate);
+    meTests(query, mutate, setOptions);
+    addFriendTest(query, mutate, setOptions);
+    acceptFriendRequestTest(query, mutate, setOptions);
+    denyFriendRequestTest(query, mutate, setOptions);
+    removeFriendTest(query, mutate, setOptions);
+    createGroupTest(query, mutate, setOptions);
+    acceptGroupInvitationTest(query, mutate, setOptions);
+    rejectGroupInvitationTest(query, mutate, setOptions);
+    updateLocationTest(query, mutate, setOptions);
+    swipeToLikeTest(query, mutate, setOptions);
+    swipeToDislikeTest(query, mutate, setOptions);
     suggestGroupTest(query, mutate, setOptions, session);
 })
