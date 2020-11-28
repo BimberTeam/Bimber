@@ -32,7 +32,7 @@ const getGroupAverageAge = async (groupId: string, session: Session): Promise<nu
 }
 
 const getGroupAlcoholPreference = async (groupId: string, session: Session): Promise<string> => {
-    const getDominatingGenderQuery = `
+    const getGroupAlcoholPreferenceQuery = `
         CALL {
             MATCH(g:Group{id:"${groupId}"})-[:OWNER|:BELONGS_TO]-(members:Account{alcoholPreference: "VODKA"})
             RETURN count(members) as number, "VODKA" as result
@@ -49,7 +49,7 @@ const getGroupAlcoholPreference = async (groupId: string, session: Session): Pro
         RETURN result, number ORDER BY(number) desc
     `;
 
-    return await executeQuery<string>(session, getDominatingGenderQuery);
+    return await executeQuery<string>(session, getGroupAlcoholPreferenceQuery);
 };
 
 const getGroupProperties = async (groupId: string, session: Session): Promise<any> => {
