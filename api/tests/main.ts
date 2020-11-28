@@ -1,3 +1,5 @@
+import { swipeToDislikeTest } from './group/swipeToDislike.test';
+import { swipeToLikeTest } from './group/swipeToLike.test';
 import { updateLocationTest } from './user/updateLocation.test';
 import { suggestGroupTest } from './group/suggestGroup.test';
 import { rejectGroupInvitationTest } from './group/rejectGroupInvitation.test';
@@ -39,4 +41,6 @@ describe("Backend tests :" , () => {
     rejectGroupInvitationTest(query, mutate, setOptions);
     updateLocationTest(query, mutate, setOptions);
     suggestGroupTest(query, mutate, setOptions);
+    swipeToLikeTest(query, mutate, setOptions);
+    swipeToDislikeTest(query, mutate, setOptions);
 })

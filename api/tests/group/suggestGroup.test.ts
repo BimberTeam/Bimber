@@ -1,11 +1,11 @@
-import { SUGGEST_GROUP } from './mutations';
+import { SUGGEST_GROUP } from './queries';
 import { registerUser, invalidTokenTest, login, setToken, deleteSingleQuote, meQuery, replyToFriendRequestMutation } from './../common/helper';
 import { prepareDbForTests, clearDatabase } from './../../src/app';
 import {userNotFoundError, lackingFriendRequestError} from './../../src/graphql/user/common/friendRequest';
 import {friendAddedSuccess} from './../../src/graphql/user/mutations';
 
 export const suggestGroupTest = (query, mutate, setOptions) => {
-    describe('SuggestGroup mutation', () => {
+    describe('SuggestGroup query', () => {
         beforeAll(async  () => {
             await prepareDbForTests();
         }, 20000);

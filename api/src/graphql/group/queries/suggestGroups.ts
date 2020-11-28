@@ -1,6 +1,6 @@
 import { mapLocationAndGetProperties } from '../common/helper';
 import { Session } from 'neo4j-driver';
-import { executeQuery, ensureAuthorized} from './../../common/helper';
+import { executeQuery, ensureAuthorized} from '../../common/helper';
 
 const getGroupGender = async (groupId: string, session: Session): Promise<string> => {
     const getGroupGenderQuery = `

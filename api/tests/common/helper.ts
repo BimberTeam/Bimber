@@ -1,4 +1,4 @@
-import { CREATE_GROUP } from './../group/mutations';
+import { CREATE_GROUP, ACCEPT_GROUP_INVITATION } from './../group/mutations';
 import { ME } from './../user/queries';
 import { REGISTER, LOGIN, ADD_FRIEND, ACCEPT_FRIEND_REQUEST, DENY_FRIEND_REQUEST } from './../user/mutations';
 import { mockedUsers } from './../user/mock';
@@ -126,3 +126,17 @@ export const sendGroupInvitationsMutation = async (meId, me, groupMembers: Array
         groupId: meGroups[0].id
     };
 };
+
+export const acceptGroupInvitation = async (me, groupId, mutate, setOptions): Promise<void> =>  {
+    await login(mutate, me, setOptions);
+
+    const acceptGroupInvitationInput = {
+        variables: {
+            input: {
+                groupId
+            }
+        }
+    }
+
+    await mutate(ACCEPT_GROUP_INVITATION, acceptGroupInvitationInput);
+}

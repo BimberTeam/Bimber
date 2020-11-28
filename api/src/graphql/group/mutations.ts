@@ -5,11 +5,11 @@ const votingSuccess = singleQuote("Głos został oddany!");
 const deletedUserJoinRequestSuccess = singleQuote("Użytkownik został przegłosowany na jego niekorzyść, usunięto prośbę o dołączenie!");
 
 export const groupCreatedSuccess = singleQuote("Utworzono nową grupę!");
-const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy!");
+export const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy!");
 const groupInvitationSentSuccess = singleQuote("Wysłano zaproszenie do grupy!");
 export const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane!");
 export const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte!");
-const swipeToDislikeSuccess = singleQuote("Podana grupa została zignorowana!");
+export const swipeToDislikeSuccess = singleQuote("Podana grupa została zignorowana!");
 
 export const GroupMutations = `
     """
@@ -57,7 +57,8 @@ export const GroupMutations = `
     swipeToDislike(input: SwipeInput!): Message
     @cypher(
         statement: """
-        MATCH(g: Group {id: $input.groupId})-[:OWNER]-(a:Account)
+        MATCH(g: Group {id: $input.groupId})
+        OPTIONAL MATCH(g)-[:OWNER]-(a:Account)
         MATCH(me:Account {id: $meId})-[:OWNER]-(meGroup:Group)
         OPTIONAL MATCH((a)-[p:PENDING]-(meGroup))
         DELETE p
@@ -203,6 +204,4 @@ export const GroupMutations = `
             RETURN {status: 'OK', message: ${rejectGroupInvitationSuccess}}
         """
     )
-
-    suggestGroups(input: SuggestGroupsInput!): [Group]
 `;
