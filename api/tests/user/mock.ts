@@ -31,7 +31,7 @@ export const mockedUsers = [
         name: "krzysiek2",
         email: "krzysiek@1113.com",
         password: "lalala",
-        age: 13,
+        age: 15,
         favoriteAlcoholName: "Harnas",
         favoriteAlcoholType: "VODKA",
         description: "test",

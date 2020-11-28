@@ -8,7 +8,7 @@ export const friendshipRequestSentSuccess = singleQuote("Wysłano zaproszenie do
 export const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");
 
 const deleteAccountSuccess = singleQuote("Konto zostało usunięte!");
-const updatedLocationSuccess = singleQuote("Zaktualizowano lokalizacje!");
+export const updatedLocationSuccess = singleQuote("Zaktualizowano lokalizacje!");
 
 export const AccountMutations = `
     acceptFriendRequest(input: FriendInput!): Message

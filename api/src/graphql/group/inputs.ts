@@ -34,4 +34,9 @@ export const GroupInputs = `
         groupId: ID!
     }
 
+    input SuggestGroupsInput {
+        limit: Int!
+        range: Int!
+    }
+
 `

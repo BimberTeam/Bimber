@@ -39,4 +39,6 @@ export const GroupQueries = `
             RETURN a
         """
     )
+
+    suggestGroups(input: SuggestGroupsInput!): [Group]
 `;
