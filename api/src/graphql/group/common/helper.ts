@@ -16,6 +16,7 @@ export const mapLocationAndGetProperties = (list: any): any =>  {
     return list.map(
         element => {
             element["properties"]['latestLocation'] = mapPointToLocation(element["properties"]['latestLocation']);
+            element["properties"]['age'] = element["properties"]['age'].low;
             return element["properties"];
         });
 };
