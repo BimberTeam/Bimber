@@ -16,6 +16,7 @@ export const SUGGEST_GROUPS: DocumentNode =  gql`
                 id
                 name
                 email
+                age
                 latestLocation{
                     latitude
                     longitude
