@@ -7,7 +7,7 @@ export const friendDeletedSuccess = singleQuote("Usunięto znajomego!");
 export const friendshipRequestSentSuccess = singleQuote("Wysłano zaproszenie do znajomych!");
 export const friendshipRequestDeniedSuccess = singleQuote("Odrzucono prośbę o dołączenie do znajomych!");
 
-const deleteAccountSuccess = singleQuote("Konto zostało usunięte!");
+export const deleteAccountSuccess = singleQuote("Konto zostało usunięte!");
 export const updatedLocationSuccess = singleQuote("Zaktualizowano lokalizacje!");
 
 export const AccountMutations = `
@@ -90,7 +90,7 @@ export const AccountMutations = `
             name: $input.name,
             email: $input.email,
             password: $input.password,
-            age: $input.age,
+            age: toInteger($input.age),
             favoriteAlcoholName: $input.favoriteAlcoholName,
             favoriteAlcoholType: $input.favoriteAlcoholType,
             description: $input.description,
@@ -113,10 +113,11 @@ export const AccountMutations = `
     deleteAccount: Message
     @cypher(
         statement: """
-            MATCH (a:Account {id: $meId})
-            MATCH (a)-[:OWNER]-(g:Group)
-            MATCH (a)-[relations]-(any)
-            DELETE relations, a, g
+            MATCH (me:Account {id: $meId})
+            MATCH (me)-[:OWNER]-(g:Group)
+            MATCH (me)-[relations]-(a)
+            MATCH (g)-[group_relations]-(b)
+            DELETE relations, me, group_relations, g
             RETURN {status: 'OK', message: ${deleteAccountSuccess}}
         """
     )

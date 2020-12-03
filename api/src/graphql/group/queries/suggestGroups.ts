@@ -62,7 +62,7 @@ const getGroupProperties = async (groupId: string, session: Session): Promise<an
                 longitude: avg(members.latestLocation.longitude) + 0.000000001 ,
                 latitude: avg(members.latestLocation.latitude) + 0.000000001
             },
-            averageAge: avg(members.age)
+            averageAge: avg(members.age) + 0.000000001
         } as result
     `;
 
@@ -121,25 +121,62 @@ export default async (obj, params, ctx, resolveInfo) => {
     const getNearestGroupQuery: any = await session.run(`
         MATCH (me:Account{id: "${ctx.user.id}"})-[:OWNER]-(meGroup:Group)
         MATCH (a:Account)-[:OWNER|:BELONGS_TO]-(groups:Group)
-        WHERE NOT EXISTS((me)-[:DISLIKE]-(groups)) AND NOT EXISTS((me)-[:OWNER|:BELONGS_TO]-(groups)) AND NOT EXISTS((a)-[:PENDING]-(meGroup))
+        WHERE NOT EXISTS((me)-[:DISLIKE]-(groups)) AND NOT EXISTS((me)-[:OWNER|:BELONGS_TO|:PENDING]-(groups)) AND NOT EXISTS((a)-[:PENDING]-(meGroup))
         MATCH (members:Account)-[:OWNER|:BELONGS_TO]->(groups)
         WITH groups,
              point({longitude: avg(members.latestLocation.longitude), latitude: avg(members.latestLocation.latitude)}) as averageLocation,
-             me.latestLocation as meLocation
-        WITH distance(averageLocation, meLocation) as dist, groups
+             me.latestLocation as meLocation,
+             count(members) as countMembers
+        WITH distance(averageLocation, meLocation) as dist, groups, countMembers
         WHERE dist < toInteger(${params.input.range})
         RETURN collect({
             id: groups.id,
-            distance: dist
+            distance: dist,
+            countMembers: countMembers
         }) as result, dist
-        ORDER BY dist DESC
+        ORDER BY dist
     `);
 
     let nearestGroup:any[] = [];
 
-    getNearestGroupQuery.records.forEach(
-        record => record.get("result").forEach(group => nearestGroup.push(group))
-    );
+    for(const record of getNearestGroupQuery.records) {
+        for(const group of record.get("result")) {
+            if(group.countMembers.low == 1) {
+                const listOfGroupsUserAndMeBelongs: any = await session.run(`
+                    MATCH (me:Account{id: "${ctx.user.id}"})
+                    MATCH (g: Group{id: "${group.id}"})<-[:OWNER]-(a:Account)
+                    OPTIONAL MATCH (a)-[:BELONGS_TO]->(groups:Group)<-[:BELONGS_TO]-(me)
+                    RETURN {
+                        id: groups.id
+                    } as result
+                `);
+
+                if(listOfGroupsUserAndMeBelongs.records.length == 0) {
+                    nearestGroup.push(group);
+                    continue;
+                }
+
+                let meBelongsToGroup: boolean = false;
+                for(const record of  listOfGroupsUserAndMeBelongs.records) {
+                    const {id: groupId} = record.get("result");
+                        const meBelongsToGroupQuery: string = `
+                            MATCH (me:Account{id: "${ctx.user.id}"})
+                            OPTIONAL MATCH (g:Group{id: "${groupId}"})-[:BELONGS_TO]-(members:Account)
+                            RETURN count(members) = 2 AND me in collect(members) as result
+                        `;
+
+                        if(await executeQuery<boolean>(session, meBelongsToGroupQuery)) {
+                            meBelongsToGroup = true;
+                        }
+                };
+
+                if(!meBelongsToGroup) nearestGroup.push(group);
+
+            } else {
+                nearestGroup.push(group);
+            }
+        }
+    }
 
     if (nearestGroup.length === 0 || nearestGroup.length <= params.input.limit) {
         return getGroupsAttributes(session, suggestionGroups.concat(nearestGroup));

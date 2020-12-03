@@ -14,6 +14,7 @@ import { server, driver } from './../src/app';
 import { meTests } from './user/me.test';
 import { loginTests } from './user/login.test';
 import { registerTests } from './user/register.test';
+import { deleteAccountTest } from './user/deleteAccount.test';
 import { createTestClient } from 'apollo-server-integration-testing';
 
 describe("Backend tests :" , () => {
@@ -34,6 +35,7 @@ describe("Backend tests :" , () => {
 
     loginTests(query, mutate);
     registerTests(query, mutate);
+    deleteAccountTest(query, mutate, setOptions);
     meTests(query, mutate, setOptions);
     addFriendTest(query, mutate, setOptions);
     acceptFriendRequestTest(query, mutate, setOptions);

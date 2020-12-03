@@ -102,3 +102,12 @@ export const UPDATE_LOCATION: DocumentNode = gql`
         }
     }
 `;
+
+export const DELETE_ACCOUNT: DocumentNode = gql`
+    mutation {
+        deleteAccount {
+            message
+            status
+        }
+    }
+`;
