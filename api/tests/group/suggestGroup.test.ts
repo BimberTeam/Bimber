@@ -55,11 +55,11 @@ export const suggestGroupTest = (query, mutate, setOptions, session: Session) =>
             expect(suggestGroups[0].id).toEqual(userAGroupId);
             expect(suggestGroups[0].averageLocation.latitude.toPrecision(2)).toEqual("5.0");
             expect(suggestGroups[0].averageLocation.longitude.toPrecision(2)).toEqual("5.0");
-            expect(suggestGroups[0].averageAge).toEqual(13);
+            expect(suggestGroups[0].averageAge.toPrecision(2)).toEqual("13");
             expect(suggestGroups[1].id).toEqual(userBGroupId);
             expect(suggestGroups[1].averageLocation.latitude.toPrecision(2)).toEqual("3.0");
             expect(suggestGroups[1].averageLocation.longitude.toPrecision(2)).toEqual("3.0");
-            expect(suggestGroups[1].averageAge).toEqual(15);
+            expect(suggestGroups[1].averageAge.toPrecision(2)).toEqual("15");
 
             await swipeToLike(me, userAGroupId, mutate, setOptions);
             ({data: {suggestGroups}} = await mutate(SUGGEST_GROUPS, suggestGroupInput));
@@ -67,11 +67,11 @@ export const suggestGroupTest = (query, mutate, setOptions, session: Session) =>
             expect(suggestGroups[0].id).toEqual(userBGroupId);
             expect(suggestGroups[0].averageLocation.latitude.toPrecision(2)).toEqual("3.0");
             expect(suggestGroups[0].averageLocation.longitude.toPrecision(2)).toEqual("3.0");
-            expect(suggestGroups[0].averageAge).toEqual(15);
+            expect(suggestGroups[0].averageAge.toPrecision(2)).toEqual("15");
             expect(suggestGroups[1].id).toEqual(groupId);
             expect(suggestGroups[1].averageLocation.latitude.toPrecision(2)).toEqual("4.0");
             expect(suggestGroups[1].averageLocation.longitude.toPrecision(2)).toEqual("4.0");
-            expect(suggestGroups[1].averageAge).toEqual(14);
+            expect(suggestGroups[1].averageAge.toPrecision(2)).toEqual("14");
         });
 
     });
