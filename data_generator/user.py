@@ -4,7 +4,7 @@ from faker import Faker
 import random
 import json
 from mutations import *
-from queries import me
+from queries import *
 import urllib.request
 import os
 import requests
@@ -68,8 +68,7 @@ class User():
 
     def queryMe(self):
         data = self.getClient().execute(me)
-        # print(data)
-        return data
+        return data['me']
 
     def addFriend(self, id):
         variable = {"input": {"id": id}}
@@ -77,7 +76,7 @@ class User():
         print(data)
 
     def acceptAllFriendRequests(self):
-        users = self.queryMe()['me']['friendRequests']
+        users = self.queryMe()['friendRequests']
         for user in users:
             self.acceptFriendRequest(user['id'])
 
@@ -87,7 +86,7 @@ class User():
         print(data)
 
     def createGroupFromFriends(self):
-        friends = self.queryMe()['me']['friends']
+        friends = self.queryMe()['friends']
         friends_id = list(map(lambda x: x['id'], friends))
         self.createGroup(friends_id)
 
@@ -97,9 +96,14 @@ class User():
         print(data)
 
     def acceptAllGroupRequests(self):
-        groups = self.queryMe()['me']['groupInvitations']
+        groups = self.queryMe()['groupInvitations']
         for group in groups:
             self.acceptGroupRequest(group['id'])
+
+    def acceptPendingUser(self, user_id, group_id):
+        variable = {"userId": user_id, "groupId": group_id}
+        data = self.getClient().execute(voteFor, variable_values=json.dumps(variable))
+        print(data)
 
     def acceptGroupRequest(self, id):
         variable = {"input": {"groupId": id}}
@@ -120,3 +124,8 @@ class User():
         variable = {"groupId": group_id, "message": fake.sentence()}
         data = self.getClient().execute(sendChatMessage, variable_values=json.dumps(variable))
         print(data)
+
+    def showGroupCandidate(self, group_id):
+        variable = {"id": group_id}
+        data = self.getClient().execute(groupCandidates, variable_values=json.dumps(variable))
+        return data['groupCandidates']

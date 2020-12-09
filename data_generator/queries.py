@@ -26,6 +26,9 @@ query Me {
     }
     groups {
       id
+      members{
+        id
+      }
     }
     groupInvitations {
       id
@@ -64,6 +67,25 @@ query Group($id: ID!) {
     }
     averageAge
     averageLocation{
+      latitude
+      longitude
+    }
+  }
+}
+""")
+
+groupCandidates = gql("""
+query GroupCandidates($id: ID!) {
+  groupCandidates(input: {groupId: $id}) {
+    __typename
+    id
+    name
+    age
+    favoriteAlcoholName
+    favoriteAlcoholType
+    description
+    gender
+    latestLocation {
       latitude
       longitude
     }

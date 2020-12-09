@@ -20,15 +20,14 @@ def add_users_to_friends(users, probability):
             if user != friend and random.random() < probability:
                 friend.addFriend(user.id)
     for user in users:
-        friends_requests = user.queryMe()['me']['friendRequests']
+        friends_requests = user.queryMe()['friendRequests']
         friends_requests = list(map(lambda x: x['id'], friends_requests))
-        for friend_id in friends_requests:
-            if random.random() < probability:
-                user.acceptFriendRequest(friend)
+        for friend in friends_requests:
+            user.acceptFriendRequest(friend)
 
 def createGroupsFromRandomFriends(users, probability):
     for user in users:
-        friends = user.queryMe()['me']['friends']
+        friends = user.queryMe()['friends']
         friends_id = list(map(lambda x: x['id'], friends))
         ids = random.sample(friends_id, int(len(friends_id)*probability))
         user.createGroup(ids)
@@ -36,9 +35,27 @@ def createGroupsFromRandomFriends(users, probability):
         # no need for random choice, cause only first two users will join group and rest will become candidates
         user.acceptAllGroupRequests()
 
+def acceptGroupsPendingUser(users, probability):
+    for user in users:
+        groups = user.queryMe()['groups']
+        for group in groups:
+            group_canditdates = user.showGroupCandidate(group['id'])
+            for candidate in group_canditdates:
+                if random.random() <= probability:
+                    user.vote_for(group['id'], candidate['id'])
+
+def denyGroupsPendingUser(users, probability):
+    for user in users:
+        groups = user.queryMe()['groups']
+        for group in groups:
+            group_canditdates = user.showGroupCandidate(group['id'])
+            for candidate in group_canditdates:
+                if random.random() <= probability:
+                    user.vote_against(group['id'], candidate['id'])
+
 def generateMessages(users, number):
     for user in users:
-        groups = user.queryMe()['me']['groups']
+        groups = user.queryMe()['groups']
         groups_id = list(map(lambda x: x['id'], groups))
         for id in groups_id:
             for _ in range(number):
@@ -52,14 +69,14 @@ def dump_users(users):
             if i != len(users) -1:
                 db_file.write(",\n")
         db_file.write("\n]")
-       
-
 
 def main():
-    users = create_users(10)
+    users = create_users(50)
     add_users_to_friends(users, 0.7)
-    createGroupsFromRandomFriends(users, 1)
-    generateMessages(users, 20)
+    createGroupsFromRandomFriends(users, 0.6)
+    acceptGroupsPendingUser(users, 0.5)
+    denyGroupsPendingUser(users, 0.3)
+    generateMessages(users, 3)
     dump_users(users)
 
 
