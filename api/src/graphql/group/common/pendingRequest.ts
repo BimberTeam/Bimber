@@ -83,8 +83,8 @@ export const votesDistribution = async (params, ctx, relation: "VOTE_IN_FAVOUR" 
 
     await session.close();
 
-    const votesCount = votesDistribution.records[0].get("result").low;
-    const groupCount = votesDistribution.records[1].get("result").low;
+    const votesCount = votesDistribution.records[0].get("result");
+    const groupCount = votesDistribution.records[1].get("result");
 
     return new VotesDistribution(groupCount, votesCount);
 }

@@ -17,9 +17,9 @@ export default async (obj, params, ctx, resolveInfo) => {
         RETURN count(*) AS groupMembers
         `;
 
-    const groupMembers = await executeQuery<Integer>(session, groupMembersQuery, "groupMembers");
+    const groupMembers = await executeQuery<number>(session, groupMembersQuery, "groupMembers");
 
-    if (groupMembers.low === 0) {
+    if (groupMembers === 0) {
 
         const userAlreadyPendingToGroupQuery =
             `
@@ -46,7 +46,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     params.meId = ctx.user.id;
     params.ttl = process.env.NEO4J_TTL;
-    params.groupMembers = groupMembers.low;
+    params.groupMembers = groupMembers;
 
     return neo4jgraphql(obj, params, ctx, resolveInfo, debugQuery());
 };

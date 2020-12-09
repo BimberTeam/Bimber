@@ -18,6 +18,7 @@ export const driver = neo4j.driver(
   ),
   {
     encrypted: process.env.NEO4J_ENCRYPTED ? "ENCRYPTION_ON" : "ENCRYPTION_OFF",
+    disableLosslessIntegers: true,
   },
 );
 
