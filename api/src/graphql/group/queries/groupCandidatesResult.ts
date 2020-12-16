@@ -71,9 +71,9 @@ export default async (obj, params, ctx, resolveInfo) => {
 
         groupCandidatesResultPayloadList.push({
             "user": user,
-            "votesAgainst": votesInFavour.low,
-            "votesInFavour": votesAgainst.low,
-            "groupCount": groupMembers.low
+            "votesAgainst": votesInFavour,
+            "votesInFavour": votesAgainst,
+            "groupCount": groupMembers
         })
     }
 

@@ -67,6 +67,7 @@ const getGroupProperties = async (groupId: string, session: Session): Promise<an
     `;
 
     let groupProperties: any = await executeQuery<any>(session, getGroupPropertiesQuery);
+    console.log(groupProperties.members);
     groupProperties.members = mapLocationAndGetProperties(groupProperties.members);
     return groupProperties;
 }
@@ -84,7 +85,7 @@ const isSame = (A: string, B: string): number => {
 };
 
 const isGroupInAgePreferenceRange = (groupAge: number, me: {agePreferenceFrom: any, agePreferenceTo: any}): number => {
-    return groupAge >= me.agePreferenceFrom.low && groupAge <= me.agePreferenceTo.low ? 0 : 1;
+    return groupAge >= me.agePreferenceFrom && groupAge <= me.agePreferenceTo ? 0 : 1;
 }
 
 export default async (obj, params, ctx, resolveInfo) => {
@@ -141,7 +142,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     for(const record of getNearestGroupQuery.records) {
         for(const group of record.get("result")) {
-            if(group.countMembers.low == 1) {
+            if(group.countMembers == 1) {
                 const listOfGroupsUserAndMeBelongs: any = await session.run(`
                     MATCH (me:Account{id: "${ctx.user.id}"})
                     MATCH (g: Group{id: "${group.id}"})<-[:OWNER]-(a:Account)
