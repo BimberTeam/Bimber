@@ -168,3 +168,25 @@ mutation SendChatMessage($groupId: ID!, $message: String!) {
   }
 }
 """)
+
+swipeToLike = gql("""
+mutation SwipeToLike($groupId: ID!){
+    swipeToLike(input: {
+    groupId: $groupId
+    }) {
+      message
+      status
+    }
+}
+""")
+
+swipeToDislike = gql("""
+mutation SwipeToDislike($groupId: ID!){
+    swipeToDislike(input: {
+    groupId: $groupId
+    }) {
+      message
+      status
+    }
+}
+""")

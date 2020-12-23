@@ -70,44 +70,49 @@ class User():
         data = self.getClient().execute(me)
         return data['me']
 
+    def groupSuggestion(self, limit, suggestions_range):
+        variable = {"input": {"limit": limit, "range": suggestions_range}}
+        data = self.getClient().execute(groupSuggestions, variable_values=json.dumps(variable))
+        return data['groupSuggestions']
+
+    def swipeToLike(self, id):
+        variable = {"input": {"groupId": id}}
+        data = self.getClient().execute(swipeToLike, variable_values=json.dumps(variable))
+        print(data)
+
+    def swipeToDislike(self, id):
+        variable = {"input": {"groupId": id}}
+        data = self.getClient().execute(swipeToDislike, variable_values=json.dumps(variable))
+        print(data)
+
     def addFriend(self, id):
         variable = {"input": {"id": id}}
         data = self.getClient().execute(addFriend, variable_values=json.dumps(variable))
         print(data)
-
-    def acceptAllFriendRequests(self):
-        users = self.queryMe()['friendRequests']
-        for user in users:
-            self.acceptFriendRequest(user['id'])
 
     def acceptFriendRequest(self, id):
         variable = {"input": {"id": str(id)}}
         data = self.getClient().execute(acceptFriendRequest, variable_values=json.dumps(variable))
         print(data)
 
-    def createGroupFromFriends(self):
-        friends = self.queryMe()['friends']
-        friends_id = list(map(lambda x: x['id'], friends))
-        self.createGroup(friends_id)
+    def denyFriendRequest(self, id):
+        variable = {"input": {"id": str(id)}}
+        data = self.getClient().execute(denyFriendRequest, variable_values=json.dumps(variable))
+        print(data)
 
     def createGroup(self, user_ids):
         variable = {"usersId": user_ids}
         data = self.getClient().execute(createGroup, variable_values=json.dumps(variable))
         print(data)
 
-    def acceptAllGroupRequests(self):
-        groups = self.queryMe()['groupInvitations']
-        for group in groups:
-            self.acceptGroupRequest(group['id'])
-
-    def acceptPendingUser(self, user_id, group_id):
-        variable = {"userId": user_id, "groupId": group_id}
-        data = self.getClient().execute(voteFor, variable_values=json.dumps(variable))
-        print(data)
-
     def acceptGroupRequest(self, id):
         variable = {"input": {"groupId": id}}
         data = self.getClient().execute(acceptGroupRequest, variable_values=json.dumps(variable))
+        print(data)
+
+    def rejectGroupRequest(self, id):
+        variable = {"input": {"groupId": id}}
+        data = self.getClient().execute(rejectGroupRequest, variable_values=json.dumps(variable))
         print(data)
 
     def vote_for(self, group_id, user_id):

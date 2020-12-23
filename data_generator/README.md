@@ -7,7 +7,7 @@
 
 ### run
 ```bash
-    python3 main.py
+    python3 generate_data.py
 ```
 
 ### update requirements

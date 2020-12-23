@@ -33,7 +33,9 @@ def createGroupsFromRandomFriends(users, probability):
         user.createGroup(ids)
     for user in users:
         # no need for random choice, cause only first two users will join group and rest will become candidates
-        user.acceptAllGroupRequests()
+        groups = user.queryMe()['groupInvitations']
+        for group in groups:
+            user.acceptGroupRequest(group['id'])
 
 def acceptGroupsPendingUser(users, probability):
     for user in users:
@@ -71,7 +73,7 @@ def dump_users(users):
         db_file.write("\n]")
 
 def main():
-    users = create_users(50)
+    users = create_users(10)
     add_users_to_friends(users, 0.7)
     createGroupsFromRandomFriends(users, 0.6)
     acceptGroupsPendingUser(users, 0.5)
