@@ -5,7 +5,7 @@ const votingSuccess = singleQuote("Głos został oddany!");
 const deletedUserJoinRequestSuccess = singleQuote("Użytkownik został przegłosowany na jego niekorzyść, usunięto prośbę o dołączenie!");
 
 export const groupCreatedSuccess = singleQuote("Utworzono nową grupę!");
-export const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy!");
+export const requestedGroupJoinSuccess = singleQuote("Wysłano prośbę o dołączenię do grupy!");
 const groupInvitationSentSuccess = singleQuote("Wysłano zaproszenie do grupy!");
 export const acceptGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało zaakceptowane!");
 export const rejectGroupInvitationSuccess = singleQuote("Zaproszenie do grupy zostało usunięte!");
@@ -108,18 +108,22 @@ export const GroupMutations = `
     rejectGroupPendingUser(input: RejectPendingRequestInput!): Message
     @cypher(
         statement: """
-        MATCH (a:Account{id: $input.userId})
-        MATCH (g:Group{id: $input.groupId})
         CALL apoc.do.when(
             $votesDistribution > 0.5,
             \\"
             CALL {
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[vf:VOTE_IN_FAVOUR]-(g) )
                 RETURN vf as result
                 UNION ALL
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[va:VOTE_AGAINST]-(g) )
                 RETURN va as result
                 UNION ALL
+                MATCH (a:Account{id: $input.userId})
+                MATCH (g:Group{id: $input.groupId})
                 MATCH ( (a)-[p:PENDING]->(g) )
                 RETURN p as result
             }
@@ -127,10 +131,12 @@ export const GroupMutations = `
             RETURN {status: 'OK', message: ${deletedUserJoinRequestSuccess}} as result
             \\",
             \\"
+            MATCH (a:Account{id: $input.userId})
+            MATCH (g:Group{id: $input.groupId})
             MERGE (g)-[:VOTE_AGAINST{id: $meId}]->(a)
             RETURN {status: 'OK', message: ${votingSuccess}} as result
             \\",
-            {a:a, g:g, meId:$meId}
+            {meId:$meId, input:$input}
         ) YIELD value
         RETURN value.result
         """
