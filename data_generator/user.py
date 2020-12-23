@@ -17,6 +17,15 @@ genders = ["MALE", "FEMALE"]
 gender_preferences = ["MALE", "FEMALE", None]
 
 class User():
+    @classmethod
+    def from_dict(cls, dict_user):
+        user = cls.__new__(cls) 
+        user.name = dict_user['name']
+        user.email = dict_user['email']
+        user.password = "123456"
+        user.token = None
+        return user
+    
     def __init__(self):
         self.name = fake.name()
         self.email = fake.email()
@@ -70,18 +79,18 @@ class User():
         data = self.getClient().execute(me)
         return data['me']
 
-    def groupSuggestion(self, limit, suggestions_range):
-        variable = {"input": {"limit": limit, "range": suggestions_range}}
+    def groupSuggestions(self, limit, suggestions_range):
+        variable = {"limit": limit, "range": suggestions_range}
         data = self.getClient().execute(groupSuggestions, variable_values=json.dumps(variable))
-        return data['groupSuggestions']
+        return data['suggestGroups']
 
     def swipeToLike(self, id):
-        variable = {"input": {"groupId": id}}
+        variable = {"groupId": id}
         data = self.getClient().execute(swipeToLike, variable_values=json.dumps(variable))
         print(data)
 
     def swipeToDislike(self, id):
-        variable = {"input": {"groupId": id}}
+        variable = {"groupId": id}
         data = self.getClient().execute(swipeToDislike, variable_values=json.dumps(variable))
         print(data)
 

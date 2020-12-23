@@ -5,9 +5,14 @@
     pip3 install -r requirements.txt
 ```
 
-### run
+### generate data
 ```bash
     python3 generate_data.py
+```
+
+### simulate traffic
+```bash
+    python3 simulate_traffic.py
 ```
 
 ### update requirements
