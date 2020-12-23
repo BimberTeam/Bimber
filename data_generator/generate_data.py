@@ -1,6 +1,7 @@
 from user import User
 import random
 import json
+import sys
 
 ##
 # this script allows to generate data for empty database
@@ -85,16 +86,22 @@ def dump_users(users):
                 db_file.write(",\n")
         db_file.write("\n]")
 
-def main():
-    users = create_users(10)
-    swipe(users, 0.7, 10)
+def generate(number):
+    users = create_users(number)
+    swipe(users, 0.7, int(number/2))
     add_users_to_friends(users, 0.3)
     createGroupsFromRandomFriends(users, 0.6)
     acceptGroupsPendingUser(users, 0.5)
-    denyGroupsPendingUser(users, 0.3)
+    denyGroupsPendingUser(users, 0.6)
     generateMessages(users, 3)
     dump_users(users)
 
 
 if __name__ == "__main__":
-    main()
+    args = sys.argv[1:]
+    number = 10
+    for i, arg in enumerate(args):
+        if arg == "--users" and len(args) > i:
+            number = int(args[i+1])
+            break
+    generate(number)

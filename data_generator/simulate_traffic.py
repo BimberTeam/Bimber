@@ -1,6 +1,7 @@
 from user import User
 import random
 import json
+import sys
 
 ##
 # this scripts could be called i.e. every day to simulate traffic in our app
@@ -81,10 +82,10 @@ def dump_users(users):
                 db_file.write(",\n")
         db_file.write("\n]")
 
-def main():    
+def simulate(new_users, swipes):    
     users = load_users()
-    create_new_users(users, 10)
-    swipe(users, 0.7, 50)
+    create_new_users(users, new_users)
+    swipe(users, 0.7, swipes)
     answear_friend_requests(users, 0.7)
     acceptGroupsPendingUser(users, 0.5)
     denyGroupsPendingUser(users, 0.6)
@@ -93,4 +94,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = sys.argv[1:]
+    new_users=10
+    swipes=50
+    for i, arg in enumerate(args):
+        if arg == "--users" and len(args) > i:
+            new_users = int(args[i+1])
+        if arg == "--swipes" and len(args) > i:
+            swipes = int(args[i+1])
+    simulate(new_users, swipes)
