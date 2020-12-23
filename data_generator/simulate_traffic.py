@@ -82,7 +82,7 @@ def dump_users(users):
                 db_file.write(",\n")
         db_file.write("\n]")
 
-def simulate(new_users, swipes):    
+def simulate(new_users, swipes):
     users = load_users()
     create_new_users(users, new_users)
     swipe(users, 0.7, swipes)

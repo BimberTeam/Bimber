@@ -1,21 +1,21 @@
-### set up env
+### Setup env
 ```bash
     virtualenv -p python3 venv
     source venv/bin/activate
     pip3 install -r requirements.txt
 ```
 
-### generate data
+### Generate data
 ```bash
-    python3 generate_data.py
+    venv/bin/python3 generate_data.py --users number_of_users
 ```
 
-### simulate traffic
+### Simulate traffic
 ```bash
-    python3 simulate_traffic.py
+    venv/bin/python3 python3 simulate_traffic.py --users number_of_users --swipes number_of_swipes
 ```
 
-### update requirements
+### Update requirements
 ```bash
     pip3 freeze > requirements.txt
 ```
