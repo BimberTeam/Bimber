@@ -36,6 +36,11 @@ import listFriendsWithoutGroupMembership from "./group/queries/listFriendsWithou
 import updateLocation from "./user/resolvers/updateLocation";
 import groupMembersWithoutFriendship from "./group/queries/groupMembersWithoutFriendship";
 import groupCandidatesResult from "./group/queries/groupCandidatesResult";
+import sendFriendRequest from "./user/mutations/sendFriendRequest";
+import friendRequest from "./user/common/friendRequest";
+import removeFriend from "./user/mutations/removeFriend";
+import suggestGroups from "./group/queries/suggestGroups";
+import groupTTL from "./group/queries/groupTTL";
 
 export const typeDefs = `
   scalar BimberDate
@@ -72,16 +77,10 @@ const resolvers = {
   Mutation: {
     login,
     acceptFriendRequest(object, params, ctx, resolveInfo) {
-      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
-    },
-    removeFriend(object, params, ctx, resolveInfo) {
-      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
-    },
-    sendFriendRequest(object, params, ctx, resolveInfo) {
-      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+      return friendRequest(object, params, ctx, resolveInfo);
     },
     denyFriendRequest(object, params, ctx, resolveInfo) {
-      return getAccountInfoFromContex(object, params, ctx, resolveInfo);
+      return friendRequest(object, params, ctx, resolveInfo);
     },
     deleteAccount(object, params, ctx, resolveInfo) {
       return getAccountInfoFromContex(object, params, ctx, resolveInfo);
@@ -92,6 +91,8 @@ const resolvers = {
     rejectGroupInvitation(object, params, ctx, resolveInfo) {
       return groupInvitation(object, params, ctx, resolveInfo);
     },
+    sendFriendRequest,
+    removeFriend,
     register,
     createGroup,
     swipeToLike,
@@ -122,6 +123,8 @@ const resolvers = {
     listFriendsWithoutGroupMembership,
     groupMembersWithoutFriendship,
     groupCandidatesResult,
+    suggestGroups,
+    groupTTL
   },
   Subscription: {
     newChatMessage: {

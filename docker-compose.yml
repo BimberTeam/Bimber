@@ -23,12 +23,12 @@ services:
     env_file:
       - api.env
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=dev
     links:
       - neo4j
     depends_on:
       - neo4j
-  
+
   image_server:
     build: ./image_server
     environment:

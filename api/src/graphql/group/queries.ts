@@ -39,4 +39,14 @@ export const GroupQueries = `
             RETURN a
         """
     )
+
+    suggestGroups(input: SuggestGroupsInput!): [Group]
+
+    groupTTL(id: ID!): DateTime
+    @cypher(
+        statement: """
+            MATCH (g:Group{id: $id})
+            RETURN datetime({epochmillis:g.ttl})
+        """
+    )
 `;

@@ -5,7 +5,7 @@ import { verifyPassword } from "../../../auth/auth";
 import { createToken } from "../../../auth/auth";
 
 const emailNotFoundError = singleQuote("Podany email nie istnieje!");
-const incorrectPassword = singleQuote("Wprowadzono nie poprawne hasło!");
+const incorrectPassword = singleQuote("Wprowadzono niepoprawne hasło!");
 const unexpectedError = singleQuote("Wystąpił niespodziewany błąd!");
 
 export default async (obj, params, ctx, resolveInfo) => {
@@ -23,7 +23,7 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     const hashedPassword = findAccount.records[0].get("account").properties.password;
 
-    if (!verifyPassword(params.input.password, hashedPassword)) {
+    if (! await verifyPassword(params.input.password, hashedPassword)) {
         throw new ApolloError(incorrectPassword, "200", [incorrectPassword]);
     }
 

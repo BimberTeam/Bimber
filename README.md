@@ -2,6 +2,8 @@
 
 *Backend architecture for mobile application.*
 
+## Start api:
+docker-compose -p api up
 
-START :
-docker-compose up
+## Start tests:
+docker-compose -f docker-compose-test.yml -p test up

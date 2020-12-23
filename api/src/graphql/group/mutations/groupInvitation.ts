@@ -5,8 +5,8 @@ import { ensureAuthorized, singleQuote } from "../../common/helper";
 import { ApolloError } from "apollo-server"
 import { Session } from "neo4j-driver";
 
-const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
-const lackingInvitationError = singleQuote("Nie masz zaproszenia do tej grupy!");
+export const groupNotFoundError = singleQuote("Podana grupa nie istnieje!");
+export const lackingInvitationError = singleQuote("Nie masz zaproszenia do tej grupy!");
 
 export default async (obj, params, ctx, resolveInfo) => {
     await ensureAuthorized(ctx);
