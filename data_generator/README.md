@@ -12,7 +12,7 @@
 
 ### Simulate traffic
 ```bash
-    venv/bin/python3 python3 simulate_traffic.py --users number_of_users --swipes number_of_swipes
+    venv/bin/python3 simulate_traffic.py --users number_of_users --swipes number_of_swipes
 ```
 
 ### Update requirements
