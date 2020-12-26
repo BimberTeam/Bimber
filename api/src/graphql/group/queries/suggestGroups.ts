@@ -136,6 +136,7 @@ export default async (obj, params, ctx, resolveInfo) => {
             countMembers: countMembers
         }) as result, dist
         ORDER BY dist
+        LIMIT ${params.input.limit+5}
     `);
 
     let nearestGroup:any[] = [];
