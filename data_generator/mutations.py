@@ -5,6 +5,8 @@ mutation Register(
     $name: String!,
     $email: String!,
     $password: String!,
+    $latitude: Float!,
+    $longitude: Float!,
     $age: Int!,
     $favoriteAlcoholName: String!,
     $favoriteAlcoholType: AlcoholType!,
@@ -13,12 +15,14 @@ mutation Register(
     $genderPreference: Gender,
     $alcoholPreference: AlcoholType!,
     $agePreferenceFrom: Int!,
-    $agePreferenceTo: Int!
+    $agePreferenceTo: Int!,
   ) {
   register(input: {
     name: $name,
     email: $email,
     password: $password,
+    latitude: $latitude,
+    longitude: $longitude,
     age: $age,
     favoriteAlcoholName: $favoriteAlcoholName,
     favoriteAlcoholType: $favoriteAlcoholType,

@@ -36,6 +36,7 @@ export const GroupMutations = `
                 MATCH (swipedAccount)-[pen:PENDING]->(meGroup)
                 DELETE pen
                 CREATE(group: Group)
+                SET group.avgLocation = me.latestLocation
                 SET group.id = apoc.create.uuid()
                 SET group:TTL
                 SET group.ttl = timestamp() + toInteger(ttl)
@@ -146,7 +147,9 @@ export const GroupMutations = `
     @cypher(
         statement: """
             CALL {
+                MATCH(me: Account{id: $meId})
                 CREATE(g: Group)
+                SET group.avgLocation = me.latestLocation
                 SET g.id = apoc.create.uuid()
                 SET g:TTL
                 SET g.ttl = timestamp() + toInteger($ttl)

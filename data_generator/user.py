@@ -13,7 +13,6 @@ import requests
 GRAPHQL_URL="http://0.0.0.0:4001/graphql"
 IMAGE_SERVER="http://0.0.0.0:8080/images/"
 fake = Faker()
-locations = []
 alcohols = ["BEER", "WINE", "VODKA"]
 genders = ["MALE", "FEMALE"]
 gender_preferences = ["MALE", "FEMALE", None]
@@ -26,7 +25,7 @@ def get_random_cords(country):
 class User():
     @classmethod
     def from_dict(cls, dict_user):
-        user = cls.__new__(cls) 
+        user = cls.__new__(cls)
         user.name = dict_user['name']
         user.email = dict_user['email']
         user.password = "123456"
@@ -34,9 +33,12 @@ class User():
         return user
 
     def __init__(self):
+        [lat, lng] = get_random_cords("Poland")
         self.name = fake.name()
         self.email = fake.email()
         self.password = "123456"
+        self.latitude = lat
+        self.longitude = lng
         self.age = random.randint(18, 99)
         self.favoriteAlcoholName = fake.word()
         self.favoriteAlcoholType = random.choice(alcohols)
@@ -69,11 +71,7 @@ class User():
         print(self.token)
 
     def updateLocation(self):
-        global locations
         [lat, lng] = get_random_cords("Poland")
-        while [lat, lng]  in locations:
-            [lat, lng]  = fake.local_latlng(country_code='PL', coords_only=True)
-        locations.append([lat, lng] )
         variable = {"longitude": float(lng), "latitude": float(lat)}
         data = self.getClient().execute(updateLocation, variable_values=json.dumps(variable))
         print(data)

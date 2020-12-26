@@ -13,7 +13,6 @@ def create_users(number):
         user = User()
         user.register()
         user.login()
-        user.updateLocation()
         user.uploadImage()
         user.queryMe()
         users.append(user)
