@@ -1,6 +1,7 @@
 from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
 from faker import Faker
+import pycristoforo as pyc
 import random
 import json
 from mutations import *
@@ -12,9 +13,15 @@ import requests
 GRAPHQL_URL="http://0.0.0.0:4001/graphql"
 IMAGE_SERVER="http://0.0.0.0:8080/images/"
 fake = Faker()
+locations = []
 alcohols = ["BEER", "WINE", "VODKA"]
 genders = ["MALE", "FEMALE"]
 gender_preferences = ["MALE", "FEMALE", None]
+
+def get_random_cords(country):
+    country_shape = pyc.get_shape(country)
+    points = pyc.geoloc_generation(country_shape, 1, country)
+    return points[0]['geometry']['coordinates']
 
 class User():
     @classmethod
@@ -25,7 +32,7 @@ class User():
         user.password = "123456"
         user.token = None
         return user
-    
+
     def __init__(self):
         self.name = fake.name()
         self.email = fake.email()
@@ -62,7 +69,11 @@ class User():
         print(self.token)
 
     def updateLocation(self):
-        (lat, lng) = fake.local_latlng(country_code='PL', coords_only=True)
+        global locations
+        [lat, lng] = get_random_cords("Poland")
+        while [lat, lng]  in locations:
+            [lat, lng]  = fake.local_latlng(country_code='PL', coords_only=True)
+        locations.append([lat, lng] )
         variable = {"longitude": float(lng), "latitude": float(lat)}
         data = self.getClient().execute(updateLocation, variable_values=json.dumps(variable))
         print(data)
