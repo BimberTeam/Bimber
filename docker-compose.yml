@@ -5,21 +5,14 @@ services:
     image: redis:6.0.9
     # change password when in production
     command: redis-server --requirepass redis_pass
-    ports:
-      - "6379:6379"
 
   neo4j:
     build: ./neo4j
-    ports:
-      - 7474:7474
-      - 7687:7687
     env_file:
      - neo4j.env
 
   api:
     build: ./api
-    ports:
-      - 4001:4001
     env_file:
       - api.env
     environment:
@@ -35,8 +28,6 @@ services:
       - EZ=GMT
     env_file:
       - image_server.env
-    ports:
-      - 8080:8080
     links:
       - neo4j
     depends_on:
