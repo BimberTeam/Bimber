@@ -149,7 +149,7 @@ export const GroupMutations = `
             CALL {
                 MATCH(me: Account{id: $meId})
                 CREATE(g: Group)
-                SET group.avgLocation = me.latestLocation
+                SET g.avgLocation = me.latestLocation
                 SET g.id = apoc.create.uuid()
                 SET g:TTL
                 SET g.ttl = timestamp() + toInteger($ttl)

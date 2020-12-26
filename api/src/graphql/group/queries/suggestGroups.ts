@@ -67,7 +67,6 @@ const getGroupProperties = async (groupId: string, session: Session): Promise<an
     `;
 
     let groupProperties: any = await executeQuery<any>(session, getGroupPropertiesQuery);
-    console.log(groupProperties.members);
     groupProperties.members = mapLocationAndGetProperties(groupProperties.members);
     return groupProperties;
 }
