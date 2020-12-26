@@ -13,6 +13,8 @@ services:
 
   api:
     build: ./api
+    ports:
+      - 4001:4001
     env_file:
       - api.env
     environment:
@@ -28,6 +30,8 @@ services:
       - EZ=GMT
     env_file:
       - image_server.env
+    ports:
+      - 8080:8080
     links:
       - neo4j
     depends_on:

@@ -20,4 +20,6 @@ COPY --from=builder /image_server /image_server
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 ENV TZ=GMT
 
+EXPOSE 8080
+
 ENTRYPOINT ["/image_server"]
