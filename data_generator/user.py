@@ -1,6 +1,7 @@
 from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
 from faker import Faker
+import pycristoforo as pyc
 import random
 import json
 from mutations import *
@@ -16,20 +17,28 @@ alcohols = ["BEER", "WINE", "VODKA"]
 genders = ["MALE", "FEMALE"]
 gender_preferences = ["MALE", "FEMALE", None]
 
+def get_random_cords(country):
+    country_shape = pyc.get_shape(country)
+    points = pyc.geoloc_generation(country_shape, 1, country)
+    return points[0]['geometry']['coordinates']
+
 class User():
     @classmethod
     def from_dict(cls, dict_user):
-        user = cls.__new__(cls) 
+        user = cls.__new__(cls)
         user.name = dict_user['name']
         user.email = dict_user['email']
         user.password = "123456"
         user.token = None
         return user
-    
+
     def __init__(self):
+        [lng, lat] = get_random_cords("Poland")
         self.name = fake.name()
         self.email = fake.email()
         self.password = "123456"
+        self.latitude = lat
+        self.longitude = lng
         self.age = random.randint(18, 99)
         self.favoriteAlcoholName = fake.word()
         self.favoriteAlcoholType = random.choice(alcohols)
@@ -62,7 +71,7 @@ class User():
         print(self.token)
 
     def updateLocation(self):
-        (lat, lng) = fake.local_latlng(country_code='PL', coords_only=True)
+        [lat, lng] = get_random_cords("Poland")
         variable = {"longitude": float(lng), "latitude": float(lat)}
         data = self.getClient().execute(updateLocation, variable_values=json.dumps(variable))
         print(data)

@@ -13,7 +13,7 @@ import { AccountTypes } from "./user/types";
 import login from "./user/resolvers/login";
 import { AccountMutations } from "./user/mutations";
 import register from "./user/resolvers/register";
-import updateAccount from "./user/resolvers/updateAccount"
+import updateAccount from "./user/mutations/updateAccount"
 import { AccountQueries } from "./user/queries";
 import addFriendToGroup from "./group/mutations/addFriendToGroup";
 import getAccountInfoFromContex from "./common/getAccountInfoFromContext";
@@ -33,7 +33,7 @@ import { ensureAuthorized } from "./common/helper";
 import { ChatTypes } from "./chat/types";
 import { ChatInputs } from "./chat/inputs";
 import listFriendsWithoutGroupMembership from "./group/queries/listFriendsWithoutGroupMembership";
-import updateLocation from "./user/resolvers/updateLocation";
+import updateLocation from "./user/mutations/updateLocation";
 import groupMembersWithoutFriendship from "./group/queries/groupMembersWithoutFriendship";
 import groupCandidatesResult from "./group/queries/groupCandidatesResult";
 import sendFriendRequest from "./user/mutations/sendFriendRequest";

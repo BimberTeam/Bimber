@@ -89,6 +89,7 @@ export const AccountMutations = `
         CREATE (u:Account {
             name: $input.name,
             email: $input.email,
+            latestLocation: point({latitude:$input.latitude, longitude:$input.longitude}),
             password: $input.password,
             age: toInteger($input.age),
             favoriteAlcoholName: $input.favoriteAlcoholName,
@@ -103,6 +104,7 @@ export const AccountMutations = `
         CREATE (g: Group)
         SET u.id = apoc.create.uuid()
         SET g.id = apoc.create.uuid()
+        SET g.avgLocation = u.latestLocation
         MERGE(u)-[:OWNER]->(g)
         RETURN u
     """
@@ -123,11 +125,4 @@ export const AccountMutations = `
     )
 
     updateLocation(input: UpdateLocationInput): Message
-    @cypher(
-        statement: """
-            MATCH (a:Account {id: $meId})
-            SET a.latestLocation = $location
-            RETURN {status: 'OK', message: ${updatedLocationSuccess}}
-        """
-    )
 `;

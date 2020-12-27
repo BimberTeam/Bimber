@@ -67,7 +67,6 @@ const getGroupProperties = async (groupId: string, session: Session): Promise<an
     `;
 
     let groupProperties: any = await executeQuery<any>(session, getGroupPropertiesQuery);
-    console.log(groupProperties.members);
     groupProperties.members = mapLocationAndGetProperties(groupProperties.members);
     return groupProperties;
 }
@@ -124,11 +123,7 @@ export default async (obj, params, ctx, resolveInfo) => {
         MATCH (a:Account)-[:OWNER|:BELONGS_TO]-(groups:Group)
         WHERE NOT EXISTS((me)-[:DISLIKE]-(groups)) AND NOT EXISTS((me)-[:OWNER|:BELONGS_TO|:PENDING]-(groups)) AND NOT EXISTS((a)-[:PENDING]-(meGroup))
         MATCH (members:Account)-[:OWNER|:BELONGS_TO]->(groups)
-        WITH groups,
-             point({longitude: avg(members.latestLocation.longitude), latitude: avg(members.latestLocation.latitude)}) as averageLocation,
-             me.latestLocation as meLocation,
-             count(members) as countMembers
-        WITH distance(averageLocation, meLocation) as dist, groups, countMembers
+        WITH distance(groups.avgLocation, me.latestLocation) as dist, groups, count(members) as countMembers
         WHERE dist < toInteger(${params.input.range})
         RETURN collect({
             id: groups.id,

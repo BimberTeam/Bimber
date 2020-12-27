@@ -3,6 +3,8 @@ export const AccountInputs = `
         name: String!
         email: String!
         password: String!
+        latitude: Float!
+        longitude: Float!
         age: Int!
         favoriteAlcoholName: String!
         favoriteAlcoholType: AlcoholType!

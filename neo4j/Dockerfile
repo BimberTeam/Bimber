@@ -9,5 +9,4 @@ ENV APOC_URI https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/dow
 RUN sh -c 'cd /var/lib/neo4j/plugins && curl -L -O "${APOC_URI}"'
 
 EXPOSE 7474 7473 7687
-
 CMD ["neo4j"]
