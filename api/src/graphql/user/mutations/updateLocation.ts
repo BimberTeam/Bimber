@@ -24,7 +24,6 @@ export default async (obj, params, ctx, resolveInfo) => {
     const groups:[] = await executeQuery(session, getGroupsQuery);
 
     for(const group of groups) {
-        console.log(group["properties"]["id"]);
         const setGroupAverageLocation: string = `
             MATCH (a: Account)-[:BELONGS_TO]->(g:Group {id: "${group["properties"]["id"]}"})
             WITH point({
@@ -34,7 +33,6 @@ export default async (obj, params, ctx, resolveInfo) => {
             SET g.avgLocation = avgLocation
             RETURN avgLocation as result
         `;
-        console.log(await executeQuery<string>(session, setGroupAverageLocation));
     }
 
     await session.close();
