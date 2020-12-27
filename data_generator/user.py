@@ -33,7 +33,7 @@ class User():
         return user
 
     def __init__(self):
-        [lat, lng] = get_random_cords("Poland")
+        [lng, lat] = get_random_cords("Poland")
         self.name = fake.name()
         self.email = fake.email()
         self.password = "123456"
