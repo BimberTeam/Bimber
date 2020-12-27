@@ -1,7 +1,7 @@
-[![Commit badge](https://img.shields.io/github/last-commit/BimberTeam/BimberApp)](https://github.com/BimberTeam/BimberApp/commits/master)
+[![Commit badge](https://img.shields.io/github/last-commit/BimberTeam/Bimber)](https://github.com/BimberTeam/Bimber/commits/master)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
-[![HitCount](http://hits.dwyl.com/BimberTeam/BimberApp.svg)](http://hits.dwyl.com/BimberTeam/BimberApp)
+[![HitCount](http://hits.dwyl.com/BimberTeam/Bimber.svg)](http://hits.dwyl.com/BimberTeam/Bimber)
 
 # Bimber :beers:
 *Backend architecture for mobile application.*
@@ -21,7 +21,7 @@
 ***Have you ever felt the need to met new peoples that love the same type of alcohol as you? Peoples, that like to party the exact same way as you? Now Bimber makes meeting those people possible.***
 
 
-Bimber is a tinder-like app in which you can instead of searching for love search for parties and drinking. You can discover new people by swiping them just like in Tinder but what's different is when you match with another person, you form a party group. It means that other thirsty souls can discover you as a group so more people can party together. You can accept or reject potential party-goers in a dedicated view, it works like voting - if 50% of the group members accept the candidate, he's in. You can add people you discovered to your friends' list with whom you can later create a new group or simply invite them to an existing group. We also implemented a well-known feature you may recall from Snapchat  - a localization map. It helps users to see where they currently are so they can meet together. Just like in Snapchat stories, each group exists for a limited time. Make sure you get in touch with people you like as after 4 days all group history will be gone forever. 
+Bimber is a tinder-like app in which you can instead of searching for love search for parties and drinking. You can discover new people by swiping them just like in Tinder but what's different is when you match with another person, you form a party group. It means that other thirsty souls can discover you as a group so more people can party together. You can accept or reject potential party-goers in a dedicated view, it works like voting - if 50% of the group members accept the candidate, he's in. You can add people you discovered to your friends' list with whom you can later create a new group or simply invite them to an existing group. We also implemented a well-known feature you may recall from Snapchat  - a localization map. It helps users to see where they currently are so they can meet together. Just like in Snapchat stories, each group exists for a limited time. Make sure you get in touch with people you like as after 4 days all group history will be gone forever.
 
 ### What we learned
 During working on that project we learned a lot about team cooperation. We often work simultaneously on the same code base so we have to develop good task management. Luckily GitHub had a great tool for that (Projects). As we worked in a team, we learned how important it is to write clean and readable code, so other team members could easily understand it. At the end it turned out that creating app with team is way more exciting cause you can discuss every ideas together and work out the best solution.
