@@ -54,8 +54,6 @@ image service, a golang server for better performance.
 ### Frontend
 Full description of frontend technologies is available [here](https://github.com/BimberTeam/BimberApp)
 
-## Frontend demo :iphone:
-
 ## Get Started :fire:
 
 Right now backend server is deployed on DigitalOcean so all you have to do to start using app is to download it from [here](https://github.com/BimberTeam/BimberApp/releases/download/1.0/app.apk).
@@ -84,3 +82,39 @@ cd BimberApp/bimber
 flutter build apk --split-per-abi
 flutter install
 ```
+
+## Frontend demo :iphone:
+Here you can see demo of most features our app offers
+### Discovering new peoples and groups
+
+<img src="gifs/discover.gif" height=500/>
+
+<img src="gifs/match.gif" height=500/>
+
+### Accepting friend/group requests
+
+<img src="gifs/friend-accept.gif" height=500/>
+
+### Chatting with your matches
+
+<img src="gifs/chat.gif" height=500/>
+
+### Checking group info and map
+
+<img src="gifs/group-info.gif" height=500/>
+
+### Voting on new group members
+
+<img src="gifs/voting.gif" height=500 />
+
+### Adding friends to group
+
+<img src="gifs/add-friends.gif" height=500/>
+
+### Creating new group from friends
+
+<img src="gifs/create-group.gif" height=500/>
+
+### Editing your account
+
+<img src="gifs/edit-account.gif" height=500 />
