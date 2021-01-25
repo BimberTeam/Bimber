@@ -2,6 +2,18 @@ import { mapLocationAndGetProperties } from '../common/helper';
 import { Session } from 'neo4j-driver';
 import { executeQuery, ensureAuthorized} from '../../common/helper';
 
+function startTimer() {
+    return process.hrtime(); 
+}
+
+function endTimer(startTime) {
+    return process.hrtime(startTime);
+}
+
+function log(prefix, elapsedTime: [number, number]) {
+    console.info(`${prefix}: %ds %dms`, elapsedTime[0], elapsedTime[1] / 1000000);
+}
+
 const getGroupGender = async (groupId: string, session: Session): Promise<string> => {
     const getGroupGenderQuery = `
         CALL { MATCH (g:Group{id:"${groupId}"})-[:BELONGS_TO|:OWNER]-(members:Account{gender: "FEMALE"}) RETURN count(members) as female }
@@ -72,10 +84,13 @@ const getGroupProperties = async (groupId: string, session: Session): Promise<an
 }
 
 const getGroupsAttributes = async (session: Session, groupsIds: any[]): Promise<any[]> => {
+    const start = startTimer();
     const groups: any[] = [];
     for(const group of groupsIds) {
         groups.push(await getGroupProperties(group.id, session));
     };
+    const end = endTimer(start);
+    log("GetGroupsAttributes", end);
     return groups;
 }
 
@@ -107,8 +122,15 @@ export default async (obj, params, ctx, resolveInfo) => {
         WHERE NOT EXISTS((me)-[:DISLIKE]-(groups))
         RETURN collect(groups) as result
     `;
+    
+    let start: [number, number];
+    let end: [number, number];
 
+    start = startTimer();
     let swipedGroups: any = await <any>executeQuery(session, listGenesisGroupsOfSwipesOnMeQuery);
+    end = endTimer(start);
+    log("Swiped groups", end);
+
     swipedGroups = swipedGroups.map(group => group['properties']);
 
     if(swipedGroups.length >= params.input.limit) {
@@ -117,6 +139,8 @@ export default async (obj, params, ctx, resolveInfo) => {
 
     suggestionGroups = suggestionGroups.concat(swipedGroups);
     params.input.limit -= swipedGroups.length;
+    
+    start = startTimer();
 
     const getNearestGroupQuery: any = await session.run(`
         MATCH (me:Account{id: "${ctx.user.id}"})-[:OWNER]-(meGroup:Group)
@@ -133,12 +157,16 @@ export default async (obj, params, ctx, resolveInfo) => {
         ORDER BY dist
         LIMIT ${params.input.limit+5}
     `);
+    
+    end = endTimer(start);
+    log("GetNearestGroupQuery", end);
 
     let nearestGroup:any[] = [];
 
     for(const record of getNearestGroupQuery.records) {
         for(const group of record.get("result")) {
             if(group.countMembers == 1) {
+                start = startTimer();
                 const listOfGroupsUserAndMeBelongs: any = await session.run(`
                     MATCH (me:Account{id: "${ctx.user.id}"})
                     MATCH (g: Group{id: "${group.id}"})<-[:OWNER]-(a:Account)
@@ -147,6 +175,8 @@ export default async (obj, params, ctx, resolveInfo) => {
                         id: groups.id
                     } as result
                 `);
+                end = endTimer(start);
+                log("ListOfGroupsUserAndMeBelongs", end);
 
                 if(listOfGroupsUserAndMeBelongs.records.length == 0) {
                     nearestGroup.push(group);
@@ -154,6 +184,7 @@ export default async (obj, params, ctx, resolveInfo) => {
                 }
 
                 let meBelongsToGroup: boolean = false;
+                start = startTimer();
                 for(const record of  listOfGroupsUserAndMeBelongs.records) {
                     const {id: groupId} = record.get("result");
                         const meBelongsToGroupQuery: string = `
@@ -166,6 +197,9 @@ export default async (obj, params, ctx, resolveInfo) => {
                             meBelongsToGroup = true;
                         }
                 };
+                end = endTimer(start);
+                log(`MeBelongsToGroupQuery * ${listOfGroupsUserAndMeBelongs.records.length}`, end);
+
 
                 if(!meBelongsToGroup) nearestGroup.push(group);
 
@@ -179,20 +213,28 @@ export default async (obj, params, ctx, resolveInfo) => {
         return getGroupsAttributes(session, suggestionGroups.concat(nearestGroup));
     };
 
+    start = startTimer();
     for(const group of nearestGroup) {
         group["priority"] = (0.55 * group.distance / params.input.range) +
                             (0.15 * isSame(await getGroupGender(group.id, session), me.genderPreference)) +
                             (0.15 * isSame(await getGroupAlcoholPreference(group.id, session), me.alcoholPreference)) +
                             (0.15 * isGroupInAgePreferenceRange(await getGroupAverageAge(group.id, session), me));
     };
+    end = endTimer(start);
+    
+    log("Priorities of nearestGroups", end);
 
     nearestGroup.sort((groupA, groupB) => groupA.priority - groupB.priority);
     suggestionGroups = suggestionGroups.concat(nearestGroup.slice(0, params.input.limit));
 
     const groups: any[] = [];
+    start = startTimer();
     for(const group of suggestionGroups) {
         groups.push(await getGroupProperties(group.id, session));
     };
+    end = endTimer(start);
+    log("SuggestionGroups properties", end);
+
 
     return groups;
 };
